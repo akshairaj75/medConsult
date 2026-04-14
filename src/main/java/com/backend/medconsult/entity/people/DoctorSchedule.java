@@ -9,6 +9,7 @@ import org.hibernate.annotations.UuidGenerator;
 import org.hibernate.type.SqlTypes;
 
 import com.backend.medconsult.enums.ScheduleType;
+import com.backend.medconsult.enums.Weekday;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -29,11 +30,10 @@ import jakarta.persistence.Table;
 public class DoctorSchedule {
     @Id
     @GeneratedValue
-    @UuidGenerator@JdbcTypeCode(SqlTypes.CHAR)
+    @UuidGenerator
+    @JdbcTypeCode(SqlTypes.CHAR)
 
-
-    @Column(name = "schedule_id", nullable = false, updatable = false, length=36
-)
+    @Column(name = "schedule_id", nullable = false, updatable = false, length = 36)
     private UUID scheduleId;
 
     // FK → doctors(doctor_id)
@@ -41,8 +41,9 @@ public class DoctorSchedule {
     @JoinColumn(name = "doctor_id", nullable = false)
     private Doctor doctor;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "day_of_week", nullable = false)
-    private int dayOfWeek; // 0=Sunday … 6=Saturday
+    private Weekday dayOfWeek; // 0=Sunday … 6=Saturday
 
     @Column(name = "start_time", nullable = false)
     private LocalTime startTime;
@@ -76,11 +77,11 @@ public class DoctorSchedule {
         this.doctor = doctor;
     }
 
-    public int getDayOfWeek() {
+    public Weekday getDayOfWeek() {
         return dayOfWeek;
     }
 
-    public void setDayOfWeek(int dayOfWeek) {
+    public void setDayOfWeek(Weekday dayOfWeek) {
         this.dayOfWeek = dayOfWeek;
     }
 

@@ -61,11 +61,11 @@ public class Doctor {
     private String doctorCode;
 
     @Column(nullable = false, length = 100)
-    private String specialty;
+    private String speciality;
 
     // JSON array
-    @Column(name = "sub_specialties", columnDefinition = "JSON")
-    private List<String> subSpecialties;
+    @Column(name = "sub_specialities", columnDefinition = "JSON")
+    private List<String> subSpecialities;
 
     @Column(name = "license_number", nullable = false, length = 60, unique = true)
     private String licenseNumber;
@@ -164,20 +164,20 @@ public class Doctor {
         this.doctorCode = doctorCode;
     }
 
-    public String getSpecialty() {
-        return specialty;
+    public String getSpeciality() {
+        return speciality;
     }
 
-    public void setSpecialty(String specialty) {
-        this.specialty = specialty;
+    public void setSpeciality(String speciality) {
+        this.speciality = speciality;
     }
 
-    public List<String> getSubSpecialties() {
-        return subSpecialties;
+    public List<String> getSubSpecialities() {
+        return subSpecialities;
     }
 
-    public void setSubSpecialties(List<String> subSpecialties) {
-        this.subSpecialties = subSpecialties;
+    public void setSubSpecialities(List<String> subSpecialities) {
+        this.subSpecialities = subSpecialities;
     }
 
     public String getLicenseNumber() {

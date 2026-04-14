@@ -48,6 +48,7 @@ public class CaseDiscussion {
     private String content;
 
     // JSON field
+    
     @Column(columnDefinition = "JSON")
     private List<String> tags;
 
