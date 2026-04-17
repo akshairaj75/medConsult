@@ -18,7 +18,6 @@ import com.backend.medconsult.repository.DoctorScheduleRepository;
 import com.backend.medconsult.repository.UserRepository;
 import com.backend.medconsult.service.DoctorService;
 
-import jakarta.transaction.Transactional;
 
 @Service
 public class DoctorServiceImpl implements DoctorService {
@@ -58,7 +57,7 @@ public class DoctorServiceImpl implements DoctorService {
         // doctor.setLanguagesSpoken(dto.getLanguagesSpoken());
         doctor.setConsultationFee(dto.getConsultationFee());
         doctor.setBio(dto.getBio());
-        Doctor savedDoctor = doctorRepository.save(doctor);
+        doctorRepository.save(doctor);
         // return DoctorRegisterDto.fromEntity(savedDoctor);
         return dto;
     }
@@ -81,5 +80,23 @@ public class DoctorServiceImpl implements DoctorService {
         return schedules.stream()
                 .map(DoctorScheduleDto::fromEntity)
                 .toList();
+    }
+
+    @Override
+    public DoctorScheduleDto addDoctorSchedule(UUID doctorId, DoctorScheduleDto scheduleDto) {
+        Doctor doctor = doctorRepository.findById(doctorId)
+                .orElseThrow(() -> new RuntimeException("Doctor not found"));
+
+        DoctorSchedule schedule = new DoctorSchedule();
+        schedule.setDoctor(doctor);
+        schedule.setDayOfWeek(scheduleDto.getDayOfWeek());
+        schedule.setStartTime(scheduleDto.getStartTime());
+        schedule.setEndTime(scheduleDto.getEndTime());
+        schedule.setScheduleType(scheduleDto.getScheduleType());
+        schedule.setEffectiveFrom(scheduleDto.getEffectiveFrom());
+        schedule.setEffectiveUntil(scheduleDto.getEffectiveUntil());
+
+        DoctorSchedule savedSchedule = doctorScheduleRepository.save(schedule);
+        return DoctorScheduleDto.fromEntity(savedSchedule);
     }
 }

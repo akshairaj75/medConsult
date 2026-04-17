@@ -16,4 +16,6 @@ public interface DoctorService {
     DoctorDto getDoctorById(UUID id);
 
     public List<DoctorScheduleDto> getDoctorSchedules(UUID doctorId);
+
+    public DoctorScheduleDto addDoctorSchedule(UUID doctorId, DoctorScheduleDto scheduleDto);
 }

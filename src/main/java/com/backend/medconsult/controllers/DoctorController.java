@@ -46,6 +46,8 @@ public class DoctorController {
         return ResponseEntity.ok(doctor);
     }
 
+    // SCHEDULE ENDPOINTS
+    //-------------------
     @GetMapping("/{doctorId}/schedules")
     public ResponseEntity<List<DoctorScheduleDto>> getDoctorSchedules(@PathVariable UUID doctorId) {
         List<DoctorScheduleDto> schedule = doctorService.getDoctorSchedules(doctorId);
@@ -55,15 +57,13 @@ public class DoctorController {
         return ResponseEntity.ok(schedule);
     }
 
-
-
-    // @GetMapping("/all")
-    // public ResponseEntity<List<DoctorRegisterDto>> getAllDoctors() {
-    //     List<DoctorRegisterDto> doctors = doctorService.getDoctors()
-    //             .stream()
-    //             .map(DoctorRegisterDto::fromEntity)
-    //             .toList();
-    //     return ResponseEntity.ok(doctors);
-    // }
+    @PostMapping("/{doctorId}/schedules")
+    public ResponseEntity<DoctorScheduleDto> addDoctorSchedule(@PathVariable UUID doctorId, @RequestBody DoctorScheduleDto scheduleDto) {
+        DoctorScheduleDto createdSchedule = doctorService.addDoctorSchedule(doctorId, scheduleDto);
+        if (createdSchedule == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdSchedule);
+    }
 
 }

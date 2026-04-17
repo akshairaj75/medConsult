@@ -8,6 +8,7 @@ public class  UserRegisterDto {
     public String phone;
     public String profilePhotoUrl;
     public String language;
+    
     public String getEmail() {
         return email;
     }

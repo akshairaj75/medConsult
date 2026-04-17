@@ -3,8 +3,6 @@ package com.backend.medconsult.dto.doctorDto;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-import com.backend.medconsult.entity.people.Doctor;
-
 public class DoctorRegisterDto {
     public UUID userId;
     public String doctorCode;

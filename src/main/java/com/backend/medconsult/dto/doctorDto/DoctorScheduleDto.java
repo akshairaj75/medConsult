@@ -1,19 +1,21 @@
 package com.backend.medconsult.dto.doctorDto;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 
 import com.backend.medconsult.entity.people.DoctorSchedule;
 import com.backend.medconsult.enums.ScheduleType;
+import com.backend.medconsult.enums.Weekday;
 
 public class DoctorScheduleDto {
     private String doctorId;
     private String doctorName;
-    private String dayOfWeek;
-    private String startTime;
-    private String endTime;
+    private Weekday dayOfWeek;
+    private LocalTime startTime;
+    private LocalTime endTime;
     private ScheduleType scheduleType;
     private LocalDate effectiveFrom;
-    private LocalDate effectiveTo;
+    private LocalDate effectiveUntil;
 
     public String getDoctorId() {
         return doctorId;
@@ -31,27 +33,27 @@ public class DoctorScheduleDto {
         this.doctorName = doctorName;
     }
 
-    public String getDayOfWeek() {
+    public Weekday getDayOfWeek() {
         return dayOfWeek;
     }
 
-    public void setDayOfWeek(String dayOfWeek) {
+    public void setDayOfWeek(Weekday dayOfWeek) {
         this.dayOfWeek = dayOfWeek;
     }
 
-    public String getStartTime() {
+    public LocalTime getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(String startTime) {
+    public void setStartTime(LocalTime startTime) {
         this.startTime = startTime;
     }
 
-    public String getEndTime() {
+    public LocalTime getEndTime() {
         return endTime;
     }
 
-    public void setEndTime(String endTime) {
+    public void setEndTime(LocalTime endTime) {
         this.endTime = endTime;
     }
 
@@ -71,24 +73,24 @@ public class DoctorScheduleDto {
         this.effectiveFrom = effectiveFrom;
     }
 
-    public LocalDate getEffectiveTo() {
-        return effectiveTo;
+    public LocalDate getEffectiveUntil() {
+        return effectiveUntil;
     }
 
-    public void setEffectiveTo(LocalDate effectiveTo) {
-        this.effectiveTo = effectiveTo;
+    public void setEffectiveUntil(LocalDate effectiveUntil) {
+        this.effectiveUntil = effectiveUntil;
     }
 
     public static DoctorScheduleDto fromEntity(DoctorSchedule schedule) {
         DoctorScheduleDto dto = new DoctorScheduleDto();
         dto.setDoctorId(schedule.getDoctor().getDoctorId().toString());
         dto.setDoctorName(schedule.getDoctor().getUser().getFullName());
-        dto.setDayOfWeek(schedule.getDayOfWeek().name());
-        dto.setStartTime(schedule.getStartTime().toString());
-        dto.setEndTime(schedule.getEndTime().toString());
+        dto.setDayOfWeek(schedule.getDayOfWeek());
+        dto.setStartTime(schedule.getStartTime());
+        dto.setEndTime(schedule.getEndTime());
         dto.setScheduleType(schedule.getScheduleType());
         dto.setEffectiveFrom(schedule.getEffectiveFrom());
-        dto.setEffectiveTo(schedule.getEffectiveUntil());
+        dto.setEffectiveUntil(schedule.getEffectiveUntil());
         return dto;
     }
 
