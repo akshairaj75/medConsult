@@ -11,12 +11,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.backend.medconsult.dto.AuthResponseDto;
 import com.backend.medconsult.dto.UserDto;
 import com.backend.medconsult.dto.UserLoginDto;
 import com.backend.medconsult.dto.UserRegisterDto;
 import com.backend.medconsult.service.impl.UserService;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -26,7 +27,7 @@ public class AuthController {
     private UserService userService;
 
     @PostMapping("/register")
-    public ResponseEntity<UserRegisterDto> register(@RequestBody UserRegisterDto dto) {
+    public ResponseEntity<UserRegisterDto> register(@Valid @RequestBody UserRegisterDto dto) {
         UserRegisterDto registered = userService.register(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(registered);
     }
@@ -47,6 +48,14 @@ public class AuthController {
     @GetMapping("/me")
     public String getCurrentUser(Authentication authentication) {
         return authentication.getName(); // returns email
+    }
+
+    @GetMapping("/patients")
+    public ResponseEntity<List<UserDto>> getPatients() {
+        List<UserDto> patients = userService.getPatients()
+                .stream().map(UserDto::fromEntity)
+                .toList();
+        return ResponseEntity.ok(patients); 
     }
 
 }

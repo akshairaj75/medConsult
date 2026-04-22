@@ -1,10 +1,15 @@
 package com.backend.medconsult.dto;
 
+import jakarta.validation.constraints.NotBlank;
+
 public class  UserRegisterDto {
 
     public String email;
     public String password;
-    public String fullName;
+
+    @NotBlank(message = "First name is required")
+    public String firstName;
+    public String lastName;
     public String phone;
     public String profilePhotoUrl;
     public String language;
@@ -21,11 +26,17 @@ public class  UserRegisterDto {
     public void setPassword(String password) {
         this.password = password;
     }
-    public String getFullName() {
-        return fullName;
+    public String getFirstName() {
+        return firstName;
     }
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+    public String getLastName() {
+        return lastName;
+    }
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
     public String getPhone() {
         return phone;

@@ -18,6 +18,7 @@ import com.backend.medconsult.dto.AuthResponseDto;
 import com.backend.medconsult.dto.UserLoginDto;
 import com.backend.medconsult.dto.UserRegisterDto;
 import com.backend.medconsult.entity.auth.User;
+import com.backend.medconsult.enums.Role;
 import com.backend.medconsult.repository.UserRepository;
 
 @Service
@@ -37,11 +38,17 @@ public class UserService {
                     HttpStatus.BAD_REQUEST,
                     "Email already exists");
         }
-
         User user = new User();
-        user.setEmail(dto.email);
-        user.setPasswordHash(passwordEncoder.encode(dto.password)); // encode here
-        user.setFullName(dto.fullName);
+        String fullName;
+        user.setEmail(dto.getEmail());
+        user.setPasswordHash(passwordEncoder.encode(dto.getPassword())); // encode here
+
+        if (dto.getLastName() != null && !dto.getLastName().trim().isEmpty()) {
+            fullName = dto.getFirstName() + " " + dto.getLastName();
+        } else {
+            fullName = dto.getFirstName();
+        }
+        user.setFullName(fullName);
         userRepository.save(user);
         return dto;
 
@@ -65,7 +72,7 @@ public class UserService {
 
             SecurityContext context = SecurityContextHolder.getContext();
             context.setAuthentication(auth);
-            
+
             return new AuthResponseDto(request.getEmail());
 
         } catch (BadCredentialsException e) {
@@ -77,6 +84,10 @@ public class UserService {
 
     public List<User> getUsers() {
         return userRepository.findAll();
+    }
+
+    public List<User> getPatients() {
+        return userRepository.findByRole(Role.PATIENT);
     }
 
 }

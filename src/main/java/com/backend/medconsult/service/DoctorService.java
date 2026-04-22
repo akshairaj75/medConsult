@@ -3,6 +3,7 @@ package com.backend.medconsult.service;
 import java.util.List;
 import java.util.UUID;
 
+import com.backend.medconsult.dto.appointmentDto.BookAppointmentDto;
 import com.backend.medconsult.dto.doctorDto.DoctorDto;
 import com.backend.medconsult.dto.doctorDto.DoctorRegisterDto;
 import com.backend.medconsult.dto.doctorDto.DoctorScheduleDto;
@@ -18,4 +19,7 @@ public interface DoctorService {
     public List<DoctorScheduleDto> getDoctorSchedules(UUID doctorId);
 
     public DoctorScheduleDto addDoctorSchedule(UUID doctorId, DoctorScheduleDto scheduleDto);
+
+    public BookAppointmentDto bookConsultation(UUID doctorId, UUID patientId, BookAppointmentDto appointmentDto);
+
 }

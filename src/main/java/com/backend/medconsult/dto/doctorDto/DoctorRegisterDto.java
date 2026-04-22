@@ -1,18 +1,19 @@
 package com.backend.medconsult.dto.doctorDto;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
 
 public class DoctorRegisterDto {
     public UUID userId;
     public String doctorCode;
     public String speciality;
-    public String[] subSpecialities;
+    private List<String> subSpecialities;
     public String licenseNumber;
     public String licenseAuthority;
     public int yearsExperience;
     public String hospitalAffiliation;
-    public String[] languagesSpoken;
+    private List<String> languagesSpoken;
     public BigDecimal consultationFee;
     public String bio;
 
@@ -40,11 +41,11 @@ public class DoctorRegisterDto {
         this.speciality = speciality;
     }
 
-    public String[] getSubSpecialities() {
+    public List<String> getSubSpecialities() {
         return subSpecialities;
     }
 
-    public void setSubSpecialities(String[] subSpecialities) {
+    public void setSubSpecialities(List<String> subSpecialities) {
         this.subSpecialities = subSpecialities;
     }
 
@@ -80,11 +81,11 @@ public class DoctorRegisterDto {
         this.hospitalAffiliation = hospitalAffiliation;
     }
 
-    public String[] getLanguagesSpoken() {
+    public List<String> getLanguagesSpoken() {
         return languagesSpoken;
     }
 
-    public void setLanguagesSpoken(String[] languagesSpoken) {
+    public void setLanguagesSpoken(List<String> languagesSpoken) {
         this.languagesSpoken = languagesSpoken;
     }
 
@@ -106,16 +107,16 @@ public class DoctorRegisterDto {
 
     // public static DoctorRegisterDto fromEntity(Doctor savedDoctor) {
 
-    //     DoctorRegisterDto dto = new DoctorRegisterDto(); 
-    //     dto.userId = savedDoctor.getDoctorId();
-    //     dto.doctorCode = savedDoctor.getDoctorCode();
-    //     dto.speciality = savedDoctor.getSpeciality();
-    //     dto.licenseNumber = savedDoctor.getLicenseNumber();
-    //     dto.licenseAuthority = savedDoctor.getLicenseAuthority();   
-    //     dto.yearsExperience = savedDoctor.getYearsExperience();
-    //     dto.hospitalAffiliation = savedDoctor.getHospitalAffiliation();
-    //     dto.consultationFee = savedDoctor.getConsultationFee();
-    //     dto.bio = savedDoctor.getBio();
+    // DoctorRegisterDto dto = new DoctorRegisterDto();
+    // dto.userId = savedDoctor.getDoctorId();
+    // dto.doctorCode = savedDoctor.getDoctorCode();
+    // dto.speciality = savedDoctor.getSpeciality();
+    // dto.licenseNumber = savedDoctor.getLicenseNumber();
+    // dto.licenseAuthority = savedDoctor.getLicenseAuthority();
+    // dto.yearsExperience = savedDoctor.getYearsExperience();
+    // dto.hospitalAffiliation = savedDoctor.getHospitalAffiliation();
+    // dto.consultationFee = savedDoctor.getConsultationFee();
+    // dto.bio = savedDoctor.getBio();
     // throw new UnsupportedOperationException("Unimplemented method 'fromEntity'");
     // }
 }

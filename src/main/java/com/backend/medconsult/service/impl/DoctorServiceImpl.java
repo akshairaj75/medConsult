@@ -6,18 +6,22 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.backend.medconsult.dto.appointmentDto.BookAppointmentDto;
 import com.backend.medconsult.dto.doctorDto.DoctorDto;
 import com.backend.medconsult.dto.doctorDto.DoctorRegisterDto;
 import com.backend.medconsult.dto.doctorDto.DoctorScheduleDto;
+import com.backend.medconsult.entity.appointment.Appointment;
 import com.backend.medconsult.entity.auth.User;
 import com.backend.medconsult.entity.people.Doctor;
 import com.backend.medconsult.entity.people.DoctorSchedule;
+import com.backend.medconsult.entity.people.Patient;
 import com.backend.medconsult.enums.Role;
+import com.backend.medconsult.repository.AppointmentRepository;
 import com.backend.medconsult.repository.DoctorRepository;
 import com.backend.medconsult.repository.DoctorScheduleRepository;
+import com.backend.medconsult.repository.PatientRepository;
 import com.backend.medconsult.repository.UserRepository;
 import com.backend.medconsult.service.DoctorService;
-
 
 @Service
 public class DoctorServiceImpl implements DoctorService {
@@ -31,6 +35,12 @@ public class DoctorServiceImpl implements DoctorService {
     @Autowired
     UserRepository userRepository;
 
+    @Autowired
+    PatientRepository patientRepository;
+
+    @Autowired
+    AppointmentRepository appointmentRepository;
+
     @Override
     public List<DoctorDto> getDoctors() {
         return doctorRepository.findAll()
@@ -40,7 +50,6 @@ public class DoctorServiceImpl implements DoctorService {
     }
 
     public DoctorRegisterDto registerDoctor(DoctorRegisterDto dto) {
-
         Doctor doctor = new Doctor();
         UUID userId = dto.getUserId();
         User user = userRepository.findById(userId)
@@ -48,13 +57,13 @@ public class DoctorServiceImpl implements DoctorService {
         doctor.setUser(user);
         doctor.setDoctorCode(dto.getDoctorCode());
         doctor.setSpeciality(dto.getSpeciality());
-        // doctor.setSubSpecialities(dto.getSubSpecialities());
+        doctor.setSubSpecialities(dto.getSubSpecialities());
         doctor.setLicenseNumber(dto.getLicenseNumber());
         doctor.setLicenseAuthority(dto.getLicenseAuthority());
         doctor.setYearsExperience(dto.getYearsExperience());
         doctor.setHospitalAffiliation(dto.getHospitalAffiliation());
         doctor.getUser().setRole(Role.DOCTOR);
-        // doctor.setLanguagesSpoken(dto.getLanguagesSpoken());
+        doctor.setLanguagesSpoken(dto.getLanguagesSpoken());
         doctor.setConsultationFee(dto.getConsultationFee());
         doctor.setBio(dto.getBio());
         doctorRepository.save(doctor);
@@ -85,7 +94,7 @@ public class DoctorServiceImpl implements DoctorService {
     @Override
     public DoctorScheduleDto addDoctorSchedule(UUID doctorId, DoctorScheduleDto scheduleDto) {
         Doctor doctor = doctorRepository.findById(doctorId)
-                .orElseThrow(() -> new RuntimeException("Doctor not found"));
+            .orElseThrow(() -> new RuntimeException("Doctor not found"));
 
         DoctorSchedule schedule = new DoctorSchedule();
         schedule.setDoctor(doctor);
@@ -99,4 +108,29 @@ public class DoctorServiceImpl implements DoctorService {
         DoctorSchedule savedSchedule = doctorScheduleRepository.save(schedule);
         return DoctorScheduleDto.fromEntity(savedSchedule);
     }
+
+    @Override
+    public BookAppointmentDto bookConsultation(UUID doctorId, UUID patientId, BookAppointmentDto appointmentDto) {
+        Doctor doctor = doctorRepository.findById(doctorId)
+            .orElseThrow(() -> new RuntimeException("Doctor not found"));
+
+        Patient patient = patientRepository.findById(patientId)
+            .orElseThrow(() -> new RuntimeException("Patient not found"));
+            
+        Appointment appointment = new Appointment();
+        appointment.setPatient(patient);
+        appointment.setDoctor(doctor);
+        appointment.setAppointmentType(appointmentDto.getAppointmentType());
+        appointment.setScheduledAt(appointmentDto.getScheduledAt());
+        appointment.setDurationMinutes(appointmentDto.getDurationMinutes());
+        // appointment.setStatus(appointmentDto.getStatus());
+        appointment.setLocation(appointmentDto.getLocation());
+        appointment.setNotes(appointmentDto.getNotes());
+        appointment.setReminderSent(appointmentDto.isReminderSent());
+        appointment.setCancelledBy(appointmentDto.getCancelledBy());
+        appointment.setCancelReason(appointmentDto.getCancelReason());
+        appointmentRepository.save(appointment);
+        return appointmentDto;
+    }
+
 }

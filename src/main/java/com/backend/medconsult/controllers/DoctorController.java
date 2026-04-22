@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.backend.medconsult.dto.appointmentDto.BookAppointmentDto;
 import com.backend.medconsult.dto.doctorDto.DoctorDto;
 import com.backend.medconsult.dto.doctorDto.DoctorRegisterDto;
 import com.backend.medconsult.dto.doctorDto.DoctorScheduleDto;
@@ -25,14 +26,14 @@ public class DoctorController {
     @Autowired
     private DoctorService doctorService;
 
-    @PostMapping("/register")
+    @PostMapping("/register") //add userId as path variable after implementing auth
     public ResponseEntity<DoctorRegisterDto> registerDoctor(@RequestBody DoctorRegisterDto dto) {
         DoctorRegisterDto registered = doctorService.registerDoctor(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(registered);
     }
 
     @GetMapping("/all")
-    public  ResponseEntity<List<DoctorDto>> getDoctors() {
+    public ResponseEntity<List<DoctorDto>> getDoctors() {
         List<DoctorDto> doctors = doctorService.getDoctors();
         return ResponseEntity.ok(doctors);
     }
@@ -47,7 +48,7 @@ public class DoctorController {
     }
 
     // SCHEDULE ENDPOINTS
-    //-------------------
+    // -------------------
     @GetMapping("/{doctorId}/schedules")
     public ResponseEntity<List<DoctorScheduleDto>> getDoctorSchedules(@PathVariable UUID doctorId) {
         List<DoctorScheduleDto> schedule = doctorService.getDoctorSchedules(doctorId);
@@ -58,12 +59,28 @@ public class DoctorController {
     }
 
     @PostMapping("/{doctorId}/schedules")
-    public ResponseEntity<DoctorScheduleDto> addDoctorSchedule(@PathVariable UUID doctorId, @RequestBody DoctorScheduleDto scheduleDto) {
+    public ResponseEntity<DoctorScheduleDto> addDoctorSchedule(@PathVariable UUID doctorId,
+            @RequestBody DoctorScheduleDto scheduleDto) {
         DoctorScheduleDto createdSchedule = doctorService.addDoctorSchedule(doctorId, scheduleDto);
         if (createdSchedule == null) {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.status(HttpStatus.CREATED).body(createdSchedule);
     }
+
+    @PostMapping("/{doctorId}/book_consultation/{patientId}")
+    public ResponseEntity<BookAppointmentDto> bookConsultation(
+            @PathVariable UUID doctorId,
+            @PathVariable UUID patientId,
+            @RequestBody BookAppointmentDto appointmentDto) {
+        BookAppointmentDto bookedAppointment = doctorService.bookConsultation(doctorId, patientId, appointmentDto);
+        if (bookedAppointment == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.status(HttpStatus.CREATED).body(bookedAppointment);
+
+    }
+
+    
 
 }

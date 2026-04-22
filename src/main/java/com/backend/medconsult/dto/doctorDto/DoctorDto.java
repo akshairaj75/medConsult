@@ -9,12 +9,16 @@ public class DoctorDto {
     private String name;
     private String id;
     private String specialization;
+    private String[] subSpecialities;
     private String profilePhotoUrl;
     private int yearsExperience;
     private BigDecimal avgRating;
     private String hospitalAffiliation;
     private String[] languagesSpoken;
     private AvailabilityStatus availabilityStatus;
+    private BigDecimal consultationFee;
+    private String doctorCode;
+    private String bio;
     private String email;
     private String phone;
 
@@ -40,6 +44,14 @@ public class DoctorDto {
 
     public void setSpecialization(String specialization) {
         this.specialization = specialization;
+    }
+
+    public String[] getSubSpecialities() {
+        return subSpecialities;
+    }
+
+    public void setSubSpecialities(String[] subSpecialities) {
+        this.subSpecialities = subSpecialities;
     }
 
     public String getProfilePhotoUrl() {
@@ -86,8 +98,32 @@ public class DoctorDto {
         return availabilityStatus;
     }
 
+    public BigDecimal getConsultationFee() {
+        return consultationFee;
+    }
+
+    public void setConsultationFee(BigDecimal consultationFee) {
+        this.consultationFee = consultationFee;
+    }
+
+    public String getDoctorCode() {
+        return doctorCode;
+    }
+
+    public void setDoctorCode(String doctorCode) {
+        this.doctorCode = doctorCode;
+    }
+
     public void setAvailabilityStatus(AvailabilityStatus availabilityStatus) {
         this.availabilityStatus = availabilityStatus;
+    }
+
+    public String getBio() {
+        return bio;
+    }
+
+    public void setBio(String bio) {
+        this.bio = bio;
     }
 
     public String getEmail() {
@@ -116,11 +152,16 @@ public class DoctorDto {
             dto.setId(doctor.getDoctorId().toString());
             dto.setName(doctor.getUser().getFullName());
             dto.setProfilePhotoUrl(doctor.getUser().getProfilePhotoUrl());
-            dto.email = doctor.getUser().getEmail();
-            dto.phone = doctor.getUser().getPhone();
+            dto.setEmail(doctor.getUser().getEmail());
+            dto.setPhone(doctor.getUser().getPhone());
         }
-
+        dto.setBio(doctor.getBio());
+        dto.consultationFee = doctor.getConsultationFee();
+        dto.doctorCode = doctor.getDoctorCode();
         dto.setSpecialization(doctor.getSpeciality());
+        dto.subSpecialities = doctor.getSubSpecialities() == null
+                ? new String[0]
+                : doctor.getSubSpecialities().toArray(new String[0]);
         dto.yearsExperience = doctor.getYearsExperience();
         dto.avgRating = doctor.getAvgRating();
         dto.hospitalAffiliation = doctor.getHospitalAffiliation();
