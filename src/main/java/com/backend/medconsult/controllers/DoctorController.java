@@ -26,7 +26,7 @@ public class DoctorController {
     @Autowired
     private DoctorService doctorService;
 
-    @PostMapping("/register") //add userId as path variable after implementing auth
+    @PostMapping("/register") // add userId as path variable after implementing auth
     public ResponseEntity<DoctorRegisterDto> registerDoctor(@RequestBody DoctorRegisterDto dto) {
         DoctorRegisterDto registered = doctorService.registerDoctor(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(registered);
@@ -78,9 +78,6 @@ public class DoctorController {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.status(HttpStatus.CREATED).body(bookedAppointment);
-
     }
-
-    
 
 }

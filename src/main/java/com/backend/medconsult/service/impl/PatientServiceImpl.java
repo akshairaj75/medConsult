@@ -6,7 +6,6 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.backend.medconsult.dto.doctorDto.DoctorDto;
 import com.backend.medconsult.dto.patientDto.PatientDto;
 import com.backend.medconsult.dto.patientDto.PatientRegisterDto;
 import com.backend.medconsult.entity.auth.User;

@@ -55,7 +55,7 @@ public class AuthController {
         List<UserDto> patients = userService.getPatients()
                 .stream().map(UserDto::fromEntity)
                 .toList();
-        return ResponseEntity.ok(patients); 
+        return ResponseEntity.ok(patients);
     }
 
 }

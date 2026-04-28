@@ -8,10 +8,9 @@ public class BookAppointmentDto {
     private String doctorId;
     private String patientId;
     private String consultaionId;
-    private String appointmentType;
+    private String appointmentType; 
     private LocalDateTime scheduledAt;
     private int durationMinutes;
-    // private AppointmentStatus status;
     private String location;
     private String notes;
     private boolean reminderSent;
@@ -65,14 +64,6 @@ public class BookAppointmentDto {
     public void setDurationMinutes(int durationMinutes) {
         this.durationMinutes = durationMinutes;
     }
-
-    // public AppointmentStatus getStatus() {
-    //     return status;
-    // }
-
-    // public void setStatus(AppointmentStatus status) {
-    //     this.status = status;
-    // }
 
     public String getLocation() {
         return location;

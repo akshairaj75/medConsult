@@ -123,7 +123,6 @@ public class DoctorServiceImpl implements DoctorService {
         appointment.setAppointmentType(appointmentDto.getAppointmentType());
         appointment.setScheduledAt(appointmentDto.getScheduledAt());
         appointment.setDurationMinutes(appointmentDto.getDurationMinutes());
-        // appointment.setStatus(appointmentDto.getStatus());
         appointment.setLocation(appointmentDto.getLocation());
         appointment.setNotes(appointmentDto.getNotes());
         appointment.setReminderSent(appointmentDto.isReminderSent());

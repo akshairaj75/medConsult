@@ -5,5 +5,4 @@ public enum LabItemStatus {
     HIGH,
     LOW,
     CRITICAL
-
 }

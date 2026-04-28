@@ -56,7 +56,7 @@ public class LabItem {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private LabItemStatus status = LabItemStatus.NORMAL;
+    private LabItemStatus itemStatus = LabItemStatus.NORMAL;
 
     @Column(name = "sort_order", nullable = false)
     private int sortOrder = 0;
@@ -117,12 +117,12 @@ public class LabItem {
         this.referenceMax = referenceMax;
     }
 
-    public LabItemStatus getStatus() {
-        return status;
+    public LabItemStatus getItemStatus() {
+        return itemStatus;
     }
 
-    public void setStatus(LabItemStatus status) {
-        this.status = status;
+    public void setItemStatus(LabItemStatus itemStatus) {
+        this.itemStatus = itemStatus;
     }
 
     public int getSortOrder() {

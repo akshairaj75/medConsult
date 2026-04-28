@@ -2,6 +2,7 @@ package com.backend.medconsult.entity.clinicalData;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -88,7 +89,7 @@ public class LabResult {
 
     @OneToMany(mappedBy = "labResult", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("sortOrder ASC")
-    private List<LabItem> items;
+    private List<LabItem> items = new ArrayList<>();;
 
     @OneToMany(mappedBy = "labResult")
     private List<File> files;
