@@ -7,16 +7,15 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.backend.medconsult.dto.clinicalDataDto.FileDto;
 import com.backend.medconsult.dto.clinicalDataDto.FileUploadRequestDto;
-import com.backend.medconsult.dto.clinicalDataDto.LabItemRegisterDto;
 import com.backend.medconsult.dto.clinicalDataDto.LabResultDto;
 import com.backend.medconsult.dto.clinicalDataDto.LabResultListDto;
 import com.backend.medconsult.dto.clinicalDataDto.LabResultRegisterDto;
+import com.backend.medconsult.dto.clinicalDataDto.LabResultUpdateDto;
 import com.backend.medconsult.dto.clinicalDataDto.VitalsDto;
 
 public interface ClinicalService {
     List<LabResultListDto> getAllLabResults();
 
-    LabItemRegisterDto addLabItem(LabItemRegisterDto labItem, UUID labResultId );
 
     LabResultRegisterDto createLabResult(LabResultRegisterDto dto, List<MultipartFile> file);
 
@@ -29,5 +28,14 @@ public interface ClinicalService {
     List<VitalsDto> getVitals(UUID patientId);
 
     List<FileDto> uploadFiles(FileUploadRequestDto dto, List<MultipartFile> files, UUID uploadedById);
+
+
+    LabResultUpdateDto reviewLabResult(UUID labResultId, LabResultUpdateDto dto);
+
+
+    VitalsDto getLatestVitals(UUID patientId);
+
+
+    VitalsDto updateVitals(UUID patientId, VitalsDto dto);
 
 }

@@ -105,4 +105,20 @@ public class BookAppointmentDto {
         this.cancelReason = cancelReason;
     }
 
+    public static BookAppointmentDto fromEntity(com.backend.medconsult.entity.appointment.Appointment appointment) {
+        BookAppointmentDto dto = new BookAppointmentDto();
+        dto.setDoctorId(appointment.getDoctor().getDoctorId().toString());
+        dto.setPatientId(appointment.getPatient().getPatientId().toString());
+        // dto.setConsultaionId(appointment.getConsultaionId() != null ? appointment.getConsultaionId().toString() : null);
+        dto.setAppointmentType(appointment.getAppointmentType());
+        dto.setScheduledAt(appointment.getScheduledAt());
+        dto.setDurationMinutes(appointment.getDurationMinutes());
+        dto.setLocation(appointment.getLocation());
+        dto.setNotes(appointment.getNotes());
+        dto.setReminderSent(appointment.isReminderSent());
+        dto.setCancelledBy(appointment.getCancelledBy());
+        dto.setCancelReason(appointment.getCancelReason());
+        return dto;
+    }
+
 }

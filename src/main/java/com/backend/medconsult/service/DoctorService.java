@@ -20,6 +20,8 @@ public interface DoctorService {
 
     public DoctorScheduleDto addDoctorSchedule(UUID doctorId, DoctorScheduleDto scheduleDto);
 
-    public BookAppointmentDto bookConsultation(UUID doctorId, UUID patientId, BookAppointmentDto appointmentDto);
+    public BookAppointmentDto bookAppointment(UUID doctorId, UUID patientId, BookAppointmentDto appointmentDto);
+
+    public List<BookAppointmentDto> getDoctorAppointments(UUID doctorId);
 
 }

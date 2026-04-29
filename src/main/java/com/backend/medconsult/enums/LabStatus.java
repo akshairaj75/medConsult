@@ -4,5 +4,4 @@ public enum LabStatus {
     PENDING,
     REVIEWED,
     FLAGGED
-
 }

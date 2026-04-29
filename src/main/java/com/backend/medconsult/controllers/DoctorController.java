@@ -68,16 +68,24 @@ public class DoctorController {
         return ResponseEntity.status(HttpStatus.CREATED).body(createdSchedule);
     }
 
-    @PostMapping("/{doctorId}/book_consultation/{patientId}")
-    public ResponseEntity<BookAppointmentDto> bookConsultation(
+    @PostMapping("/{doctorId}/book_appointment/{patientId}")
+    public ResponseEntity<BookAppointmentDto> bookAppointment(
             @PathVariable UUID doctorId,
             @PathVariable UUID patientId,
             @RequestBody BookAppointmentDto appointmentDto) {
-        BookAppointmentDto bookedAppointment = doctorService.bookConsultation(doctorId, patientId, appointmentDto);
+        BookAppointmentDto bookedAppointment = doctorService.bookAppointment(doctorId, patientId, appointmentDto);
         if (bookedAppointment == null) {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.status(HttpStatus.CREATED).body(bookedAppointment);
     }
 
+    @GetMapping("/{doctorId}/appointments")
+    public ResponseEntity<List<BookAppointmentDto>> getDoctorAppointments(@PathVariable UUID doctorId) {
+        List<BookAppointmentDto> appointments = doctorService.getDoctorAppointments(doctorId);
+        if (appointments == null) {
+            return ResponseEntity.notFound().build();   
+        }
+        return ResponseEntity.ok(appointments);
+    }
 }

@@ -12,6 +12,7 @@ import com.backend.medconsult.enums.LabStatus;
 public class LabResultDto {
     private UUID labResultId;
     private UUID patientId;
+    private UUID reviewedById;
     private DoctorDetailDto orderedBy;
     private DoctorDetailDto reviewedBy;
     private String panelName;
@@ -38,6 +39,14 @@ public class LabResultDto {
 
     public void setPatientId(UUID patientId) {
         this.patientId = patientId;
+    }
+
+    public UUID getReviewedById() {
+        return reviewedById;
+    }
+
+    public void setReviewedById(UUID reviewedById) {
+        this.reviewedById = reviewedById;
     }
 
     public DoctorDetailDto getOrderedBy() {

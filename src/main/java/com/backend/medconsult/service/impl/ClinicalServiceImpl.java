@@ -1,5 +1,6 @@
 package com.backend.medconsult.service.impl;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -15,6 +16,7 @@ import com.backend.medconsult.dto.clinicalDataDto.LabItemRegisterDto;
 import com.backend.medconsult.dto.clinicalDataDto.LabResultDto;
 import com.backend.medconsult.dto.clinicalDataDto.LabResultListDto;
 import com.backend.medconsult.dto.clinicalDataDto.LabResultRegisterDto;
+import com.backend.medconsult.dto.clinicalDataDto.LabResultUpdateDto;
 import com.backend.medconsult.dto.clinicalDataDto.VitalsDto;
 import com.backend.medconsult.entity.auth.User;
 import com.backend.medconsult.entity.clinicalData.File;
@@ -87,45 +89,37 @@ public class ClinicalServiceImpl implements ClinicalService {
                 return result;
         }
 
-        @Override
-        public LabItemRegisterDto addLabItem(LabItemRegisterDto dto, UUID labResultId) {
-                LabItem labItem = new LabItem();
-                labItem.setTestName(dto.getTestName());
-                labItem.setValue(dto.getValue());
-                labItem.setUnit(dto.getUnit());
-                labItem.setItemStatus(dto.getItemStatus());
-                labItem.setReferenceMin(dto.getReferenceMin());
-                labItem.setReferenceMax(dto.getReferenceMax());
-                labItem.setSortOrder(dto.getSortOrder());
-                labItemRepository.save(labItem);
-                return LabItemRegisterDto.fromEntity(labItem);
-        }
+        // @Override
+        // public LabItemRegisterDto addLabItem(LabItemRegisterDto dto, UUID
+        // labResultId) {
+        // LabItem labItem = new LabItem();
+        // labItem.setTestName(dto.getTestName());
+        // labItem.setValue(dto.getValue());
+        // labItem.setUnit(dto.getUnit());
+        // labItem.setItemStatus(dto.getItemStatus());
+        // labItem.setReferenceMin(dto.getReferenceMin());
+        // labItem.setReferenceMax(dto.getReferenceMax());
+        // labItem.setSortOrder(dto.getSortOrder());
+        // labItemRepository.save(labItem);
+        // return LabItemRegisterDto.fromEntity(labItem);
+        // }
 
         @Override
         public LabResultRegisterDto createLabResult(LabResultRegisterDto dto, List<MultipartFile> files) {
                 UUID patientId = dto.getPatient();
                 UUID OrederedById = dto.getOrderedBy();
-                UUID reviewedById = dto.getReviewedBy();
                 boolean isAbnormal = false;
                 Patient patient = patientRepository.findById(patientId)
                                 .orElseThrow(() -> new RuntimeException("Patient not found"));
                 Doctor orderedBy = doctorRepository.findById(OrederedById)
                                 .orElseThrow(() -> new RuntimeException("Doctor not found"));
-                Doctor reviewedBy = reviewedById != null
-                                ? doctorRepository.findById(reviewedById)
-                                                .orElseThrow(() -> new RuntimeException("Doctor not found"))
-                                : null;
+
                 LabResult labResult = new LabResult();
                 labResult.setPatient(patient);
                 labResult.setOrderedBy(orderedBy);
-                labResult.setReviewedBy(reviewedBy);
                 labResult.setPanelName(dto.getPanelName());
                 labResult.setTestDate(dto.getTestDate());
                 labResult.setLabSource(dto.getLabSource());
-                labResult.setStatus(
-                                dto.getLabStatus() != null
-                                                ? dto.getLabStatus()
-                                                : LabStatus.PENDING);
                 List<LabItem> items = new ArrayList<>();
                 if (dto.getLabItems() != null) {
                         for (LabItemRegisterDto labItemDto : dto.getLabItems()) {
@@ -135,7 +129,6 @@ public class ClinicalServiceImpl implements ClinicalService {
                                 item.setUnit(labItemDto.getUnit());
                                 item.setReferenceMin(labItemDto.getReferenceMin());
                                 item.setReferenceMax(labItemDto.getReferenceMax());
-                                // item.setItemStatus(labItemDto.getItemStatus());
                                 item.setItemStatus(calculateStatus(
                                                 labItemDto.getValue(),
                                                 labItemDto.getReferenceMin(),
@@ -154,8 +147,12 @@ public class ClinicalServiceImpl implements ClinicalService {
                         }
                 }
                 labResult.setAbnormal(isAbnormal);
-                labResult.setReviewedAt(dto.getReviewedAt());
-                labResult.setDoctorNotes(dto.getDoctorNotes());
+                // if (isAbnormal) {
+                //         labResult.setStatus(LabStatus.FLAGGED);
+                // } else {
+                //         labResult.setStatus(LabStatus.PENDING);
+
+                // }
                 labResultRepository.save(labResult);
                 return LabResultRegisterDto.fromEntity(labResult);
         }
@@ -192,6 +189,54 @@ public class ClinicalServiceImpl implements ClinicalService {
                                 .map(VitalsDto::fromEntity)
                                 .collect(Collectors.toList());
                 return vitals;
+        }
+
+        @Override
+        public VitalsDto getLatestVitals(UUID patientId) {
+
+                Vital vitals = vitalRepository
+                                .findTopByPatient_PatientIdOrderByRecordedAtDesc(patientId)
+                                .orElseThrow(() -> new RuntimeException("No vitals found"));
+
+                return VitalsDto.fromEntity(vitals);
+        }
+
+        @Override
+        public VitalsDto updateVitals(UUID patientId, VitalsDto dto) {
+                Vital vital = vitalRepository.findTopByPatient_PatientIdOrderByRecordedAtDesc(patientId)
+                                .orElseThrow(() -> new RuntimeException("No vitals found"));
+
+                if (dto.getHeartRateBpm() != null) {
+                        vital.setHeartRateBpm(dto.getHeartRateBpm());
+                }
+                if (dto.getBpSystolic() != null) {
+                        vital.setBpSystolic(dto.getBpSystolic());
+                }
+                if (dto.getBpDiastolic() != null) {
+                        vital.setBpDiastolic(dto.getBpDiastolic());
+                }
+                if (dto.getTemperatureC() != null) {
+                        vital.setTemperatureC(dto.getTemperatureC());
+                }
+                if (dto.getSpo2Percent() != null) {
+                        vital.setSpo2Percent(dto.getSpo2Percent());
+                }
+                if (dto.getWeightKg() != null) {
+                        vital.setWeightKg(dto.getWeightKg());
+                }
+                if (dto.getHeightCm() != null) {
+                        vital.setHeightCm(dto.getHeightCm());
+                }
+                if (dto.getBmi() != null) {
+                        vital.setBmi(dto.getBmi());
+                }
+                if (dto.getBloodGlucoseMmol() != null) {
+                        vital.setBloodGlucoseMmol(dto.getBloodGlucoseMmol());
+                }
+
+                vitalRepository.save(vital);
+                return VitalsDto.fromEntity(vital);
+
         }
 
         @Override
@@ -232,7 +277,41 @@ public class ClinicalServiceImpl implements ClinicalService {
                 return responseList;
         }
 
-        // HELPER METHOD TO CALCULATE STATUS
+        @Override
+        public LabResultUpdateDto reviewLabResult(UUID labResultId, LabResultUpdateDto dto) {
+                LabResult labResult = labResultRepository.findById(labResultId)
+                                .orElseThrow(() -> new RuntimeException("Lab result not found"));
+                if (dto.getDoctorNotes() != null) {
+                        labResult.setDoctorNotes(dto.getDoctorNotes());
+                }
+                // if (dto.getReviewedAt() != null) {
+                labResult.setReviewedAt(LocalDateTime.now());
+                // }
+                if (dto.getLabStatus() != null) {
+                        LabStatus status = dto.getLabStatus() == LabStatus.REVIEWED
+                                        ? LabStatus.REVIEWED
+                                        : dto.getLabStatus() == LabStatus.FLAGGED
+                                                        ? LabStatus.FLAGGED
+                                                        : LabStatus.PENDING;
+
+                        labResult.setStatus(status);
+
+                        labResult.setAbnormal(status == LabStatus.FLAGGED);
+                }
+
+                if (dto.getReviewedBy() != null) {
+                        Doctor reviewer = doctorRepository.findById(dto.getReviewedBy())
+                                        .orElseThrow(() -> new RuntimeException("Reviewer doctor not found"));
+                        labResult.setReviewedBy(reviewer);
+                }
+                labResultRepository.save(labResult);
+                // Implementation for reviewing lab result
+                return LabResultUpdateDto.fromEntity(labResult);
+        }
+
+
+              //Helper method to calculate lab item status
+     //============================================================================
         private LabItemStatus calculateStatus(String value, String min, String max) {
                 try {
                         if (value == null || value.isBlank() ||
@@ -253,5 +332,7 @@ public class ClinicalServiceImpl implements ClinicalService {
                         return LabItemStatus.NORMAL;
                 }
         }
+     //============================================================================
+
 
 }

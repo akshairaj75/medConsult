@@ -94,7 +94,7 @@ public class DoctorServiceImpl implements DoctorService {
     @Override
     public DoctorScheduleDto addDoctorSchedule(UUID doctorId, DoctorScheduleDto scheduleDto) {
         Doctor doctor = doctorRepository.findById(doctorId)
-            .orElseThrow(() -> new RuntimeException("Doctor not found"));
+                .orElseThrow(() -> new RuntimeException("Doctor not found"));
 
         DoctorSchedule schedule = new DoctorSchedule();
         schedule.setDoctor(doctor);
@@ -110,13 +110,13 @@ public class DoctorServiceImpl implements DoctorService {
     }
 
     @Override
-    public BookAppointmentDto bookConsultation(UUID doctorId, UUID patientId, BookAppointmentDto appointmentDto) {
+    public BookAppointmentDto bookAppointment(UUID doctorId, UUID patientId, BookAppointmentDto appointmentDto) {
         Doctor doctor = doctorRepository.findById(doctorId)
-            .orElseThrow(() -> new RuntimeException("Doctor not found"));
+                .orElseThrow(() -> new RuntimeException("Doctor not found"));
 
         Patient patient = patientRepository.findById(patientId)
-            .orElseThrow(() -> new RuntimeException("Patient not found"));
-            
+                .orElseThrow(() -> new RuntimeException("Patient not found"));
+
         Appointment appointment = new Appointment();
         appointment.setPatient(patient);
         appointment.setDoctor(doctor);
@@ -130,6 +130,14 @@ public class DoctorServiceImpl implements DoctorService {
         appointment.setCancelReason(appointmentDto.getCancelReason());
         appointmentRepository.save(appointment);
         return appointmentDto;
+    }
+
+    @Override
+    public List<BookAppointmentDto> getDoctorAppointments(UUID doctorId) {
+        List<Appointment> appointments = appointmentRepository.findByDoctor_DoctorId(doctorId);
+        return appointments.stream()
+                .map(BookAppointmentDto::fromEntity)
+                .toList();
     }
 
 }

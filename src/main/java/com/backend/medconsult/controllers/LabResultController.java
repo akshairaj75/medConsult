@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -22,9 +23,9 @@ import com.backend.medconsult.dto.clinicalDataDto.FileUploadRequestDto;
 import com.backend.medconsult.dto.clinicalDataDto.LabResultDto;
 import com.backend.medconsult.dto.clinicalDataDto.LabResultListDto;
 import com.backend.medconsult.dto.clinicalDataDto.LabResultRegisterDto;
+import com.backend.medconsult.dto.clinicalDataDto.LabResultUpdateDto;
 import com.backend.medconsult.dto.clinicalDataDto.VitalsDto;
 import com.backend.medconsult.service.ClinicalService;
-import com.backend.medconsult.service.impl.FileStorageService;
 
 @RestController
 @RequestMapping("/api/lab-result")
@@ -32,9 +33,6 @@ public class LabResultController {
 
     @Autowired
     private ClinicalService clinicalService;
-
-    @Autowired
-    private FileStorageService fileService;
 
     @GetMapping("/all")
     public ResponseEntity<List<LabResultListDto>> getAllLabResults() {
@@ -80,9 +78,15 @@ public class LabResultController {
     }
 
     @GetMapping("/{patientId}/vitals")
-    public ResponseEntity<List<VitalsDto>> getVitals(@PathVariable UUID patientId) {
-        List<VitalsDto> vitals = clinicalService.getVitals(patientId);
+    public ResponseEntity<VitalsDto> getLatestVitals(@PathVariable UUID patientId) {
+        VitalsDto vitals = clinicalService.getLatestVitals(patientId);
         return ResponseEntity.ok(vitals);
+    }
+
+    @PutMapping("/{patientId}/vitals")
+    public ResponseEntity<VitalsDto> updateVitals(@PathVariable UUID patientId, @RequestBody VitalsDto dto) {
+        VitalsDto updatedVitals = clinicalService.updateVitals(patientId, dto);
+        return ResponseEntity.ok(updatedVitals);
     }
 
     @PostMapping(value = "/{uploadedById}/upload", consumes = "multipart/form-data")
@@ -92,5 +96,11 @@ public class LabResultController {
             @PathVariable("uploadedById") UUID uploadedById) throws IOException {
         List<FileDto> savedFiles = clinicalService.uploadFiles(dto, files, uploadedById);
         return ResponseEntity.ok(savedFiles);
+    }
+
+    @PutMapping("/{labResultId}/review")
+    public ResponseEntity<LabResultUpdateDto> reviewLabResult(@PathVariable UUID labResultId, @RequestBody LabResultUpdateDto dto) {
+        LabResultUpdateDto reviewedResult = clinicalService.reviewLabResult(labResultId, dto);
+        return ResponseEntity.ok(reviewedResult);
     }
 }
