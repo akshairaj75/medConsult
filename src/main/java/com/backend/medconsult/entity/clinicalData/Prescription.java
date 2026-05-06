@@ -28,6 +28,7 @@ import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 
 @Entity
@@ -43,8 +44,7 @@ public class Prescription {
     @UuidGenerator
     @JdbcTypeCode(SqlTypes.CHAR)
 
-    @Column(name = "prescription_id", nullable = false, updatable = false, length=36
-)
+    @Column(name = "prescription_id", nullable = false, updatable = false, length = 36)
     private UUID prescriptionId;
 
     // FK → patients(patient_id)
@@ -92,6 +92,13 @@ public class Prescription {
 
     @Column(name = "started_at", nullable = false)
     private LocalDate startedAt;
+
+    @PrePersist
+    public void prePersist() {
+        if (startedAt == null) {
+            startedAt = LocalDate.now();
+        }
+    }
 
     @Column(name = "expires_at")
     private LocalDate expiresAt;

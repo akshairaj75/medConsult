@@ -191,6 +191,13 @@ public class ClinicalServiceImpl implements ClinicalService {
                 return vitals;
         }
 
+                @Override
+        public VitalsDto getVitalsById(UUID vitalId) {
+                Vital vitals = vitalRepository.findById(vitalId)
+                                .orElseThrow(() -> new RuntimeException("Vital record not found"));
+                return VitalsDto.fromEntity(vitals);
+        }
+
         @Override
         public VitalsDto getLatestVitals(UUID patientId) {
 
@@ -202,8 +209,8 @@ public class ClinicalServiceImpl implements ClinicalService {
         }
 
         @Override
-        public VitalsDto updateVitals(UUID patientId, VitalsDto dto) {
-                Vital vital = vitalRepository.findTopByPatient_PatientIdOrderByRecordedAtDesc(patientId)
+        public VitalsDto updateVitals(UUID vitalId, VitalsDto dto) {
+                Vital vital = vitalRepository.findById(vitalId)
                                 .orElseThrow(() -> new RuntimeException("No vitals found"));
 
                 if (dto.getHeartRateBpm() != null) {
@@ -333,6 +340,8 @@ public class ClinicalServiceImpl implements ClinicalService {
                 }
         }
      //============================================================================
+
+
 
 
 }

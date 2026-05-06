@@ -83,14 +83,20 @@ public class LabResultController {
         return ResponseEntity.ok(vitals);
     }
 
-    @PutMapping("/{patientId}/vitals")
-    public ResponseEntity<VitalsDto> updateVitals(@PathVariable UUID patientId, @RequestBody VitalsDto dto) {
-        VitalsDto updatedVitals = clinicalService.updateVitals(patientId, dto);
+    @GetMapping("/{vitalId}/getVital")
+    public ResponseEntity<VitalsDto> getVitalsById(@PathVariable UUID vitalId) {
+        VitalsDto vitals = clinicalService.getVitalsById(vitalId);
+        return ResponseEntity.ok(vitals);
+    }
+
+    @PutMapping("/{vitalId}/vitals")
+    public ResponseEntity<VitalsDto> updateVitals(@PathVariable UUID vitalId, @RequestBody VitalsDto dto) {
+        VitalsDto updatedVitals = clinicalService.updateVitals(vitalId, dto);
         return ResponseEntity.ok(updatedVitals);
     }
 
     @PostMapping(value = "/{uploadedById}/upload", consumes = "multipart/form-data")
-    public ResponseEntity<List<FileDto>> uploadFiles(            
+    public ResponseEntity<List<FileDto>> uploadFiles(
             @RequestPart("data") FileUploadRequestDto dto,
             @RequestPart("files") List<MultipartFile> files,
             @PathVariable("uploadedById") UUID uploadedById) throws IOException {
@@ -99,7 +105,8 @@ public class LabResultController {
     }
 
     @PutMapping("/{labResultId}/review")
-    public ResponseEntity<LabResultUpdateDto> reviewLabResult(@PathVariable UUID labResultId, @RequestBody LabResultUpdateDto dto) {
+    public ResponseEntity<LabResultUpdateDto> reviewLabResult(@PathVariable UUID labResultId,
+            @RequestBody LabResultUpdateDto dto) {
         LabResultUpdateDto reviewedResult = clinicalService.reviewLabResult(labResultId, dto);
         return ResponseEntity.ok(reviewedResult);
     }

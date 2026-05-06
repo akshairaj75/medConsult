@@ -12,6 +12,7 @@ import org.hibernate.type.SqlTypes;
 import com.backend.medconsult.entity.people.Doctor;
 import com.backend.medconsult.entity.people.Patient;
 import com.backend.medconsult.entity.privacy.PrivacySettings;
+import com.backend.medconsult.enums.AuthProvider;
 import com.backend.medconsult.enums.Role;
 import com.backend.medconsult.enums.Units;
 
@@ -40,8 +41,18 @@ public class User {
     @Column(nullable = false, unique = true, length = 255)
     private String email;
 
-    @Column(name = "password_hash", nullable = false, length = 512)
+    // @Column(name = "password_hash", nullable = false, length = 512)
+    // private String passwordHash;
+
+    @Column(name = "password_hash", length = 512)
     private String passwordHash;
+
+    @Column(name = "provider_id", length = 255)       //recently added for social login
+    private String providerId;
+
+    @Enumerated(EnumType.STRING)                      //recently added for social login
+    @Column(name = "auth_provider", nullable = false)
+    private AuthProvider authProvider = AuthProvider.LOCAL;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -119,6 +130,22 @@ public class User {
 
     public void setPasswordHash(String passwordHash) {
         this.passwordHash = passwordHash;
+    }
+
+        public String getProviderId() {
+        return providerId;
+    }
+
+    public void setProviderId(String providerId) {
+        this.providerId = providerId;
+    }
+
+    public AuthProvider getAuthProvider() {
+        return authProvider;
+    }
+
+    public void setAuthProvider(AuthProvider authProvider) {
+        this.authProvider = authProvider;
     }
 
     public Role getRole() {

@@ -1,7 +1,6 @@
 package com.backend.medconsult.entity.appointment;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.UUID;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -26,7 +25,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -54,12 +53,12 @@ public class Appointment {
     private Doctor doctor;
 
     // FK → consultations (optional)
-    // @OneToOne(fetch = FetchType.LAZY)
-    // @JoinColumn(name = "consultation_id", unique = true)
-    // private Consultation consultation;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "consultation_id", unique = true)
+    private Consultation consultation;
 
-    @OneToMany(mappedBy = "appointment", fetch = FetchType.LAZY)
-    private List<Consultation> consultations;
+    // @OneToMany(mappedBy = "appointment", fetch = FetchType.LAZY)
+    // private List<Consultation> consultations;
 
     @Column(name = "appointment_type", nullable = false, length = 80)
     private String appointmentType;
@@ -123,13 +122,21 @@ public class Appointment {
         this.doctor = doctor;
     }
 
-    public List<Consultation> getConsultations() {
-        return consultations;
+    public Consultation getConsultation() {
+        return consultation;
     }
 
-    public void setConsultations(List<Consultation> consultations) {
-        this.consultations = consultations;
+    public void setConsultation(Consultation consultation) {
+        this.consultation = consultation;
     }
+
+    // public List<Consultation> getConsultations() {
+    //     return consultations;
+    // }
+
+    // public void setConsultations(List<Consultation> consultations) {
+    //     this.consultations = consultations;
+    // }
 
     public String getAppointmentType() {
         return appointmentType;

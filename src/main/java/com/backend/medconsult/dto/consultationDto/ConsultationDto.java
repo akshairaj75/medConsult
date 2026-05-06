@@ -6,6 +6,7 @@ import com.backend.medconsult.enums.ConsultationStatus;
 import com.backend.medconsult.enums.Priority;
 
 public class ConsultationDto {
+    private String consultationId;
     private String patientId;
     private String doctorId;
     private String caseId;
@@ -16,6 +17,14 @@ public class ConsultationDto {
     private String notes;
     private LocalDateTime startedAt;
     private LocalDateTime closedAt;
+
+    public String getConsultationId() {
+        return consultationId;
+    }
+
+    public void setConsultationId(String consultationId) {
+        this.consultationId = consultationId;
+    }
 
     public String getDoctorId() {
         return doctorId;

@@ -1,35 +1,43 @@
 package com.backend.medconsult.dto.appointmentDto;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
-import com.backend.medconsult.entity.auth.User;
+import com.backend.medconsult.entity.appointment.Appointment;
+
 
 public class BookAppointmentDto {
-    private String doctorId;
-    private String patientId;
+    private UUID appointmentId;
+    private UUID doctorId;
+    private UUID patientId;
     private String consultaionId;
-    private String appointmentType; 
     private LocalDateTime scheduledAt;
-    private int durationMinutes;
-    private String location;
+    private String appointmentType; 
     private String notes;
-    private boolean reminderSent;
-    private User cancelledBy;
-    private String cancelReason;
 
-    public String getDoctorId() {
+
+
+    public UUID getAppointmentId() {
+        return appointmentId;
+    }
+
+    public void setAppointmentId(UUID appointmentId) {
+        this.appointmentId = appointmentId;
+    }
+
+    public UUID getDoctorId() {
         return doctorId;
     }
 
-    public void setDoctorId(String doctorId) {
+    public void setDoctorId(UUID doctorId) {
         this.doctorId = doctorId;
     }
 
-    public String getPatientId() {
+    public UUID getPatientId() {
         return patientId;
     }
 
-    public void setPatientId(String patientId) {
+    public void setPatientId(UUID patientId) {
         this.patientId = patientId;
     }
 
@@ -57,22 +65,6 @@ public class BookAppointmentDto {
         this.scheduledAt = scheduledAt;
     }
 
-    public int getDurationMinutes() {
-        return durationMinutes;
-    }
-
-    public void setDurationMinutes(int durationMinutes) {
-        this.durationMinutes = durationMinutes;
-    }
-
-    public String getLocation() {
-        return location;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
-    }
-
     public String getNotes() {
         return notes;
     }
@@ -81,43 +73,15 @@ public class BookAppointmentDto {
         this.notes = notes;
     }
 
-    public boolean isReminderSent() {
-        return reminderSent;
-    }
 
-    public void setReminderSent(boolean reminderSent) {
-        this.reminderSent = reminderSent;
-    }
-
-    public User getCancelledBy() {
-        return cancelledBy;
-    }
-
-    public void setCancelledBy(User cancelledBy) {
-        this.cancelledBy = cancelledBy;
-    }
-
-    public String getCancelReason() {
-        return cancelReason;
-    }
-
-    public void setCancelReason(String cancelReason) {
-        this.cancelReason = cancelReason;
-    }
-
-    public static BookAppointmentDto fromEntity(com.backend.medconsult.entity.appointment.Appointment appointment) {
+    public static BookAppointmentDto fromEntity(Appointment appointment) {
         BookAppointmentDto dto = new BookAppointmentDto();
-        dto.setDoctorId(appointment.getDoctor().getDoctorId().toString());
-        dto.setPatientId(appointment.getPatient().getPatientId().toString());
-        // dto.setConsultaionId(appointment.getConsultaionId() != null ? appointment.getConsultaionId().toString() : null);
+        dto.setAppointmentId(appointment.getAppointmentId());
+        dto.setDoctorId(appointment.getDoctor().getDoctorId());
+        dto.setPatientId(appointment.getPatient().getPatientId());
         dto.setAppointmentType(appointment.getAppointmentType());
         dto.setScheduledAt(appointment.getScheduledAt());
-        dto.setDurationMinutes(appointment.getDurationMinutes());
-        dto.setLocation(appointment.getLocation());
         dto.setNotes(appointment.getNotes());
-        dto.setReminderSent(appointment.isReminderSent());
-        dto.setCancelledBy(appointment.getCancelledBy());
-        dto.setCancelReason(appointment.getCancelReason());
         return dto;
     }
 

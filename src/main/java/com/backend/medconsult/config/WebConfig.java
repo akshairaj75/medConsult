@@ -1,4 +1,4 @@
-package com.backend.medconsult.security;
+package com.backend.medconsult.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;

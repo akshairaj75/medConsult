@@ -9,10 +9,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.backend.medconsult.dto.appointmentDto.AppointmentDto;
 import com.backend.medconsult.dto.appointmentDto.BookAppointmentDto;
 import com.backend.medconsult.dto.doctorDto.DoctorDto;
 import com.backend.medconsult.dto.doctorDto.DoctorRegisterDto;
@@ -84,8 +86,29 @@ public class DoctorController {
     public ResponseEntity<List<BookAppointmentDto>> getDoctorAppointments(@PathVariable UUID doctorId) {
         List<BookAppointmentDto> appointments = doctorService.getDoctorAppointments(doctorId);
         if (appointments == null) {
-            return ResponseEntity.notFound().build();   
+            return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(appointments);
     }
+
+    @GetMapping("/{doctorId}/appointments/{appointmentId}")
+    public ResponseEntity<AppointmentDto> getDoctorAppointmentById(
+            @PathVariable UUID doctorId,
+            @PathVariable UUID appointmentId) {
+        AppointmentDto appointment = doctorService.getDoctorAppointmentById(doctorId, appointmentId);
+        return ResponseEntity.ok(appointment);
+    }
+
+    @PutMapping("/appointments/{appointmentId}/schedule")
+    public ResponseEntity<AppointmentDto> scheduleAppointment(
+            @PathVariable UUID appointmentId,
+            @RequestBody AppointmentDto appointmentDto) {
+        AppointmentDto updatedAppointment = doctorService.scheduleAppointment( appointmentId, appointmentDto);
+        if (updatedAppointment == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(updatedAppointment);
+    }
+
+    
 }
