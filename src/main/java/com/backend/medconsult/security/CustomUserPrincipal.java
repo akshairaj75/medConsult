@@ -1,48 +1,56 @@
 package com.backend.medconsult.security;
 
+import java.util.Collection;
 import java.util.UUID;
 
-import org.springframework.security.core.context.SecurityContext;
+import org.jspecify.annotations.Nullable;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
-import com.backend.medconsult.enums.Role;
+import com.backend.medconsult.entity.auth.User;
 
-public class CustomUserPrincipal {
+import java.util.Collections;
 
-    private UUID userId;
-    private String email;
-    private Role role;
+public class CustomUserPrincipal implements UserDetails {
 
-    // Getters and setters
+    private User user;
+
+    public CustomUserPrincipal(User user) {
+        this.user = user;
+
+    }
+
+    public User getUser() {
+        return user;
+    }
+
     public UUID getUserId() {
-        return userId;
+        return user.getUserId();
     }
 
-    public void setUserId(UUID userId) {
-        this.userId = userId;
+    @Override
+    public @Nullable String getPassword() {
+        return user.getPasswordHash();
     }
 
-    public String getEmail() {
-        return email;
+    @Override
+    public String getUsername() {
+        return user.getEmail();
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        String role = user.getRole().toString();
+
+        if (role.equals("PATIENT")) {
+            role = "ROLE_PATIENT";
+        } else if (role.equals("DOCTOR")) {
+            role = "ROLE_DOCTOR";
+        } else {
+            role = "ROLE_ADMIN";
+        }
+        return Collections.singleton(new SimpleGrantedAuthority(role));
     }
 
-    public Role getRole() {
-        return role;
-    }
-
-    public void setRole(Role role) {
-        this.role = role;
-    }
-
-    public CustomUserPrincipal(
-            UUID userId,
-            String email,
-            Role role) {
-        this.userId = userId;
-        this.email = email;
-        this.role = role;
-    }
 }

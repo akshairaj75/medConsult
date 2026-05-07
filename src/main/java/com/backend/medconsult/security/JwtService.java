@@ -4,6 +4,7 @@ import java.security.Key;
 import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import com.backend.medconsult.entity.auth.User;
@@ -53,6 +54,26 @@ public class JwtService {
                 .parseClaimsJws(token)
                 .getBody()
                 .getSubject();
+    }
+
+
+    public boolean validateToken(String token, UserDetails userDetails) {
+                return extractEmail(token)
+                .equals(userDetails
+                        .getUsername())
+                && !isTokenExpired(token);
+        
+    }
+
+
+    private boolean isTokenExpired(String token) {
+       Date expiration = Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .getExpiration();
+        return expiration.before(new Date());
     }
 
 }
