@@ -204,10 +204,12 @@ public class ClinicalServiceImpl implements ClinicalService {
         }
 
         @Override
-        public VitalsDto getLatestVitals(UUID patientId) {
+        public VitalsDto getLatestVitals(UUID patientId, CustomUserPrincipal authUser) {
+                User authUserEntity = userRepository.findById(authUser.getUserId())
+                                .orElseThrow(() -> new RuntimeException("User not found"));
 
                 Vital vitals = vitalRepository
-                                .findTopByPatient_PatientIdOrderByRecordedAtDesc(patientId)
+                                .findTopByPatient_PatientIdOrderByRecordedAtDesc(authUserEntity.getPatient().getPatientId())
                                 .orElseThrow(() -> new RuntimeException("No vitals found"));
 
                 return VitalsDto.fromEntity(vitals);

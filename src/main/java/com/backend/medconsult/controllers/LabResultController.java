@@ -81,9 +81,10 @@ public class LabResultController {
         return ResponseEntity.status(HttpStatus.CREATED).body(registered);
     }
 
-    @GetMapping("/{patientId}/vitals")
-    public ResponseEntity<VitalsDto> getLatestVitals(@PathVariable UUID patientId) {
-        VitalsDto vitals = clinicalService.getLatestVitals(patientId);
+    @GetMapping("/vitals")
+    public ResponseEntity<VitalsDto> getLatestVitals(@PathVariable UUID patientId, 
+        @AuthenticationPrincipal CustomUserPrincipal authUser) {
+        VitalsDto vitals = clinicalService.getLatestVitals(patientId, authUser);
         return ResponseEntity.ok(vitals);
     }
 

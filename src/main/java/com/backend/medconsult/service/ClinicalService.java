@@ -34,7 +34,7 @@ public interface ClinicalService {
     LabResultUpdateDto reviewLabResult(UUID labResultId, LabResultUpdateDto dto);
 
 
-    VitalsDto getLatestVitals(UUID patientId);
+    VitalsDto getLatestVitals(UUID patientId, CustomUserPrincipal authUser);
 
 
     VitalsDto updateVitals(UUID vitalId, VitalsDto dto);
