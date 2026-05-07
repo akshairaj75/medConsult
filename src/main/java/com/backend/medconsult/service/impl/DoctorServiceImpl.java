@@ -117,11 +117,11 @@ public class DoctorServiceImpl implements DoctorService {
         }
 
         @Override
-        public BookAppointmentDto bookAppointment(UUID doctorId, UUID patientId, BookAppointmentDto appointmentDto) {
+        public BookAppointmentDto bookAppointment(UUID doctorId, CustomUserPrincipal authUser, BookAppointmentDto appointmentDto) {
                 Doctor doctor = doctorRepository.findById(doctorId)
                                 .orElseThrow(() -> new RuntimeException("Doctor not found"));
 
-                Patient patient = patientRepository.findById(patientId)
+                Patient patient = patientRepository.findById(authUser.getUser().getPatient().getPatientId())
                                 .orElseThrow(() -> new RuntimeException("Patient not found"));
 
                 Appointment appointment = new Appointment();

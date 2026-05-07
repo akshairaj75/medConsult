@@ -77,9 +77,9 @@ public class DoctorController {
     @PostMapping("/{doctorId}/book_appointment/{patientId}")
     public ResponseEntity<BookAppointmentDto> bookAppointment(
             @PathVariable UUID doctorId,
-            @PathVariable UUID patientId,
+            @AuthenticationPrincipal CustomUserPrincipal authUser,
             @RequestBody BookAppointmentDto appointmentDto) {
-        BookAppointmentDto bookedAppointment = doctorService.bookAppointment(doctorId, patientId, appointmentDto);
+        BookAppointmentDto bookedAppointment = doctorService.bookAppointment(doctorId, authUser, appointmentDto);
         if (bookedAppointment == null) {
             return ResponseEntity.notFound().build();
         }
