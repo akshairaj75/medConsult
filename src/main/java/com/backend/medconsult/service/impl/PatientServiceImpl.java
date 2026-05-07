@@ -14,6 +14,7 @@ import com.backend.medconsult.entity.people.Patient;
 import com.backend.medconsult.repository.DoctorRepository;
 import com.backend.medconsult.repository.PatientRepository;
 import com.backend.medconsult.repository.UserRepository;
+import com.backend.medconsult.security.CustomUserPrincipal;
 import com.backend.medconsult.service.PatientService;
 
 @Service
@@ -29,12 +30,12 @@ public class PatientServiceImpl implements PatientService {
     DoctorRepository doctorRepository;
 
     @Override
-    public PatientRegisterDto registerPatient(PatientRegisterDto dto) {
-        UUID userId = dto.getUserId();
-        User user = userRepository.findById(userId)
+    public PatientRegisterDto registerPatient(PatientRegisterDto dto, CustomUserPrincipal authUser) {
+        User userEntity = userRepository.findById(authUser.getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
+                
         Patient patient = new Patient();
-        patient.setUser(user);
+        patient.setUser(userEntity);
         patient.setPatientCode(dto.getPatientCode());
         patient.setDateOfBirth(dto.getDateOfBirth());
         patient.setGender(dto.getGender());

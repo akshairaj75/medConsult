@@ -5,10 +5,11 @@ import java.util.UUID;
 
 import com.backend.medconsult.dto.patientDto.PatientDto;
 import com.backend.medconsult.dto.patientDto.PatientRegisterDto;
+import com.backend.medconsult.security.CustomUserPrincipal;
 
 public interface PatientService {
 
-    PatientRegisterDto registerPatient(PatientRegisterDto dto);
+    PatientRegisterDto registerPatient(PatientRegisterDto dto, CustomUserPrincipal authUser);
 
     List<PatientDto> getAllPatients();
 

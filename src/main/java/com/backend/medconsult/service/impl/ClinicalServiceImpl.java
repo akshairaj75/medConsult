@@ -35,6 +35,7 @@ import com.backend.medconsult.repository.LabResultRepository;
 import com.backend.medconsult.repository.PatientRepository;
 import com.backend.medconsult.repository.UserRepository;
 import com.backend.medconsult.repository.VitalRepository;
+import com.backend.medconsult.security.CustomUserPrincipal;
 import com.backend.medconsult.service.ClinicalService;
 
 @Service
@@ -158,8 +159,8 @@ public class ClinicalServiceImpl implements ClinicalService {
         }
 
         @Override
-        public VitalsDto addVitals(UUID patientId, VitalsDto dto) {
-                Patient patient = patientRepository.findById(patientId)
+        public VitalsDto addVitals(CustomUserPrincipal authUser, VitalsDto dto) {
+                Patient patient = patientRepository.findById(authUser.getUserId())
                                 .orElseThrow(() -> new RuntimeException("Patient not found"));
 
                 User recordeBy = userRepository.findById(dto.getRecordedByUserId())

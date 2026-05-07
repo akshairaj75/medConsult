@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,6 +26,7 @@ import com.backend.medconsult.dto.clinicalDataDto.LabResultListDto;
 import com.backend.medconsult.dto.clinicalDataDto.LabResultRegisterDto;
 import com.backend.medconsult.dto.clinicalDataDto.LabResultUpdateDto;
 import com.backend.medconsult.dto.clinicalDataDto.VitalsDto;
+import com.backend.medconsult.security.CustomUserPrincipal;
 import com.backend.medconsult.service.ClinicalService;
 
 @RestController
@@ -72,8 +74,8 @@ public class LabResultController {
     }
 
     @PostMapping("/{patientId}/vitals")
-    public ResponseEntity<VitalsDto> addVitals(@PathVariable UUID patientId, @RequestBody VitalsDto dto) {
-        VitalsDto registered = clinicalService.addVitals(patientId, dto);
+    public ResponseEntity<VitalsDto> addVitals(@AuthenticationPrincipal CustomUserPrincipal user, @RequestBody VitalsDto dto) {
+        VitalsDto registered = clinicalService.addVitals(user, dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(registered);
     }
 

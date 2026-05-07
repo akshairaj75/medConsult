@@ -12,6 +12,7 @@ import com.backend.medconsult.dto.clinicalDataDto.LabResultListDto;
 import com.backend.medconsult.dto.clinicalDataDto.LabResultRegisterDto;
 import com.backend.medconsult.dto.clinicalDataDto.LabResultUpdateDto;
 import com.backend.medconsult.dto.clinicalDataDto.VitalsDto;
+import com.backend.medconsult.security.CustomUserPrincipal;
 
 public interface ClinicalService {
     List<LabResultListDto> getAllLabResults();
@@ -23,7 +24,7 @@ public interface ClinicalService {
 
     LabResultDto getSingleResult(UUID resultId);
 
-    VitalsDto addVitals(UUID patientId, VitalsDto dto);
+    VitalsDto addVitals(CustomUserPrincipal authUser, VitalsDto dto);
 
     List<VitalsDto> getVitals(UUID patientId);
 
