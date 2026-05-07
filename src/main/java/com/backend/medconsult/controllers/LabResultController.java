@@ -73,8 +73,10 @@ public class LabResultController {
         return ResponseEntity.status(HttpStatus.CREATED).body(registered);
     }
 
-    @PostMapping("/{patientId}/vitals")
-    public ResponseEntity<VitalsDto> addVitals(@AuthenticationPrincipal CustomUserPrincipal user, @RequestBody VitalsDto dto) {
+    @PostMapping("/vitals")
+    public ResponseEntity<VitalsDto> addVitals(
+        @AuthenticationPrincipal CustomUserPrincipal user, 
+        @RequestBody VitalsDto dto) {
         VitalsDto registered = clinicalService.addVitals(user, dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(registered);
     }

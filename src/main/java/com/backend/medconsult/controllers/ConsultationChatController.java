@@ -23,7 +23,6 @@ public class ConsultationChatController {
    @MessageMapping("/consultation/send")
    public void sendMessage(ChatMessageDto dto) {
        MessageDto saved = messageService.saveMessage(dto);
-
        messagingTemplate.convertAndSend("/topic/consultation/" 
         + dto.getConsultationId(), saved);
      }

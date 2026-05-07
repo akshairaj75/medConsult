@@ -16,7 +16,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.backend.medconsult.security.JwtAuthenticationFilter;
-import com.backend.medconsult.service.CustomOAuth2UserService;
+import com.backend.medconsult.service.impl.CustomOAuth2UserService;
 
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -91,7 +91,7 @@ public class SecurityConfig {
                                         }
                                         """);
                                 }))
-                                
+
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/api/auth/logout")

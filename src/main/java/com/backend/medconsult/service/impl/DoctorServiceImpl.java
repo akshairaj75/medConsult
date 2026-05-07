@@ -99,8 +99,8 @@ public class DoctorServiceImpl implements DoctorService {
         }
 
         @Override
-        public DoctorScheduleDto addDoctorSchedule(UUID doctorId, DoctorScheduleDto scheduleDto) {
-                Doctor doctor = doctorRepository.findById(doctorId)
+        public DoctorScheduleDto addDoctorSchedule(CustomUserPrincipal authUser, DoctorScheduleDto scheduleDto) {
+                Doctor doctor = doctorRepository.findById(authUser.getUserId())
                                 .orElseThrow(() -> new RuntimeException("Doctor not found"));
 
                 DoctorSchedule schedule = new DoctorSchedule();

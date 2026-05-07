@@ -1,4 +1,4 @@
-package com.backend.medconsult.security;
+package com.backend.medconsult.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.backend.medconsult.entity.auth.User;
 import com.backend.medconsult.repository.UserRepository;
+import com.backend.medconsult.security.CustomUserPrincipal;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {

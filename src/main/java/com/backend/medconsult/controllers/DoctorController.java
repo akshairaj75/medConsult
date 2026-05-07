@@ -1,5 +1,6 @@
 package com.backend.medconsult.controllers;
 
+import java.nio.file.Path;
 import java.util.List;
 import java.util.UUID;
 
@@ -31,7 +32,8 @@ public class DoctorController {
     private DoctorService doctorService;
 
     @PostMapping("/register") // add userId as path variable after implementing auth
-    public ResponseEntity<DoctorRegisterDto> registerDoctor(@RequestBody DoctorRegisterDto dto, @AuthenticationPrincipal CustomUserPrincipal authUser) {
+    public ResponseEntity<DoctorRegisterDto> registerDoctor(@RequestBody DoctorRegisterDto dto, 
+        @AuthenticationPrincipal CustomUserPrincipal authUser) {
         DoctorRegisterDto registered = doctorService.registerDoctor(dto, authUser);
         return ResponseEntity.status(HttpStatus.CREATED).body(registered);
     }
@@ -63,9 +65,9 @@ public class DoctorController {
     }
 
     @PostMapping("/{doctorId}/schedules")
-    public ResponseEntity<DoctorScheduleDto> addDoctorSchedule(@PathVariable UUID doctorId,
+    public ResponseEntity<DoctorScheduleDto> addDoctorSchedule(@AuthenticationPrincipal CustomUserPrincipal authUser,
             @RequestBody DoctorScheduleDto scheduleDto) {
-        DoctorScheduleDto createdSchedule = doctorService.addDoctorSchedule(doctorId, scheduleDto);
+        DoctorScheduleDto createdSchedule = doctorService.addDoctorSchedule(authUser, scheduleDto);
         if (createdSchedule == null) {
             return ResponseEntity.notFound().build();
         }

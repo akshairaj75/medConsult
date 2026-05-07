@@ -43,33 +43,13 @@ public class AuthController {
                 "Logged out");
     }
 
-    // @GetMapping("/users")
-    // public ResponseEntity<List<UserDto>> getUsers() {
-    // List<UserDto> users = userService.getUsers()
-    // .stream().map(UserDto::fromEntity)
-    // .toList();
-    // return ResponseEntity.ok(users);
-    // }
-
-    // @GetMapping("/me")
-    // public String getCurrentUser(Authentication authentication) {
-    // return authentication.getName(); // returns email
-    // }
-
-    // @GetMapping("/patients")
-    // public ResponseEntity<List<UserDto>> getPatients() {
-    // List<UserDto> patients = userService.getPatients()
-    // .stream().map(UserDto::fromEntity)
-    // .toList();
-    // return ResponseEntity.ok(patients);
-    // }
-
     @GetMapping("/me")
     public ResponseEntity<?> currentUser(
             @AuthenticationPrincipal CustomUserPrincipal principal) {
 
         return ResponseEntity.ok(Map.of(
                 "userId", principal.getUserId(),
-                "email", principal.getUsername()));
+                "email", principal.getUsername(),
+                "role", principal.getUser().getRole()));
     }
 }

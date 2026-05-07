@@ -1,4 +1,4 @@
-package com.backend.medconsult.service;
+package com.backend.medconsult.service.impl;
 
 import java.time.LocalDateTime;
 

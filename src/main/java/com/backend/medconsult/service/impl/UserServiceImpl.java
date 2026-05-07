@@ -12,7 +12,6 @@ import com.backend.medconsult.dto.UserRegisterDto;
 import com.backend.medconsult.entity.auth.User;
 import com.backend.medconsult.enums.AuthProvider;
 import com.backend.medconsult.repository.UserRepository;
-import com.backend.medconsult.security.JwtService;
 import com.backend.medconsult.service.UserService;
 
 @Service
