@@ -73,7 +73,7 @@ public class LabResultController {
         return ResponseEntity.status(HttpStatus.CREATED).body(registered);
     }
 
-    @PostMapping("/vitals")
+    @PostMapping("/add-vitals")
     public ResponseEntity<VitalsDto> addVitals(
         @AuthenticationPrincipal CustomUserPrincipal user, 
         @RequestBody VitalsDto dto) {
@@ -81,7 +81,7 @@ public class LabResultController {
         return ResponseEntity.status(HttpStatus.CREATED).body(registered);
     }
 
-    @GetMapping("/vitals")
+    @GetMapping("/get-vitals/latest")
     public ResponseEntity<VitalsDto> getLatestVitals(@PathVariable UUID patientId, 
         @AuthenticationPrincipal CustomUserPrincipal authUser) {
         VitalsDto vitals = clinicalService.getLatestVitals(patientId, authUser);
