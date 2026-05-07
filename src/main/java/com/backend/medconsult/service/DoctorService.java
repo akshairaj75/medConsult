@@ -8,12 +8,13 @@ import com.backend.medconsult.dto.appointmentDto.BookAppointmentDto;
 import com.backend.medconsult.dto.doctorDto.DoctorDto;
 import com.backend.medconsult.dto.doctorDto.DoctorRegisterDto;
 import com.backend.medconsult.dto.doctorDto.DoctorScheduleDto;
+import com.backend.medconsult.security.CustomUserPrincipal;
 
 public interface DoctorService {
 
     public List<DoctorDto> getDoctors();
 
-    DoctorRegisterDto registerDoctor(DoctorRegisterDto dto);
+    DoctorRegisterDto registerDoctor(DoctorRegisterDto dto, CustomUserPrincipal authUser);
 
     DoctorDto getDoctorById(UUID id);
 

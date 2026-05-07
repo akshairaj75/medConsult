@@ -18,6 +18,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import com.backend.medconsult.security.JwtAuthenticationFilter;
 import com.backend.medconsult.service.CustomOAuth2UserService;
 
+import jakarta.servlet.http.HttpServletResponse;
+
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
@@ -78,7 +80,18 @@ public class SecurityConfig {
                         .userInfoEndpoint(user -> 
                                 user.userService(oauthService))
                         .successHandler(oAuth2successHandler))
-                        
+
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint((request, response, authException) -> {
+                                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                                response.setContentType("application/json");
+                                response.getWriter().write("""
+                                        {
+                                                "message": "Unauthorized"
+                                        }
+                                        """);
+                                }))
+                                
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/api/auth/logout")

@@ -149,9 +149,9 @@ public class ClinicalServiceImpl implements ClinicalService {
                 }
                 labResult.setAbnormal(isAbnormal);
                 // if (isAbnormal) {
-                //         labResult.setStatus(LabStatus.FLAGGED);
+                // labResult.setStatus(LabStatus.FLAGGED);
                 // } else {
-                //         labResult.setStatus(LabStatus.PENDING);
+                // labResult.setStatus(LabStatus.PENDING);
 
                 // }
                 labResultRepository.save(labResult);
@@ -160,11 +160,15 @@ public class ClinicalServiceImpl implements ClinicalService {
 
         @Override
         public VitalsDto addVitals(CustomUserPrincipal authUser, VitalsDto dto) {
-                Patient patient = patientRepository.findById(authUser.getUserId())
-                                .orElseThrow(() -> new RuntimeException("Patient not found"));
-
-                User recordeBy = userRepository.findById(dto.getRecordedByUserId())
+                User recordeBy = userRepository.findById(authUser.getUserId())
                                 .orElseThrow(() -> new RuntimeException("User not found"));
+
+                Patient patient = patientRepository.findById(authUser.getUser()
+                                .getPatient().getPatientId())
+                                        .orElseThrow(() -> new RuntimeException("Patient not found"));
+
+                // User recordeBy = userRepository.findById(dto.getRecordedByUserId())
+                //                 .orElseThrow(() -> new RuntimeException("User not found"));
 
                 Vital vital = new Vital();
                 vital.setPatient(patient);
@@ -192,7 +196,7 @@ public class ClinicalServiceImpl implements ClinicalService {
                 return vitals;
         }
 
-                @Override
+        @Override
         public VitalsDto getVitalsById(UUID vitalId) {
                 Vital vitals = vitalRepository.findById(vitalId)
                                 .orElseThrow(() -> new RuntimeException("Vital record not found"));
@@ -317,9 +321,8 @@ public class ClinicalServiceImpl implements ClinicalService {
                 return LabResultUpdateDto.fromEntity(labResult);
         }
 
-
-              //Helper method to calculate lab item status
-     //============================================================================
+        // Helper method to calculate lab item status
+        // ============================================================================
         private LabItemStatus calculateStatus(String value, String min, String max) {
                 try {
                         if (value == null || value.isBlank() ||
@@ -340,9 +343,6 @@ public class ClinicalServiceImpl implements ClinicalService {
                         return LabItemStatus.NORMAL;
                 }
         }
-     //============================================================================
-
-
-
+        // ============================================================================
 
 }

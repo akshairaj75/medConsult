@@ -22,6 +22,7 @@ import com.backend.medconsult.repository.DoctorRepository;
 import com.backend.medconsult.repository.DoctorScheduleRepository;
 import com.backend.medconsult.repository.PatientRepository;
 import com.backend.medconsult.repository.UserRepository;
+import com.backend.medconsult.security.CustomUserPrincipal;
 import com.backend.medconsult.service.DoctorService;
 
 @Service
@@ -50,26 +51,31 @@ public class DoctorServiceImpl implements DoctorService {
                                 .toList();
         }
 
-        public DoctorRegisterDto registerDoctor(DoctorRegisterDto dto) {
-                Doctor doctor = new Doctor();
-                UUID userId = dto.getUserId();
-                User user = userRepository.findById(userId)
+        public DoctorRegisterDto registerDoctor(DoctorRegisterDto dto, CustomUserPrincipal authUser) {
+                User user = userRepository.findById(authUser.getUserId())
                                 .orElseThrow(() -> new RuntimeException("User not found"));
-                doctor.setUser(user);
-                doctor.setDoctorCode(dto.getDoctorCode());
-                doctor.setSpeciality(dto.getSpeciality());
-                doctor.setSubSpecialities(dto.getSubSpecialities());
-                doctor.setLicenseNumber(dto.getLicenseNumber());
-                doctor.setLicenseAuthority(dto.getLicenseAuthority());
-                doctor.setYearsExperience(dto.getYearsExperience());
-                doctor.setHospitalAffiliation(dto.getHospitalAffiliation());
-                doctor.getUser().setRole(Role.DOCTOR);
-                doctor.setLanguagesSpoken(dto.getLanguagesSpoken());
-                doctor.setConsultationFee(dto.getConsultationFee());
-                doctor.setBio(dto.getBio());
-                doctorRepository.save(doctor);
-                // return DoctorRegisterDto.fromEntity(savedDoctor);
-                return dto;
+                if (user.getRole() != Role.DOCTOR) {
+                        Doctor doctor = new Doctor();
+                        doctor.setUser(user);
+                        doctor.setDoctorCode(dto.getDoctorCode());
+                        doctor.setSpeciality(dto.getSpeciality());
+                        doctor.setSubSpecialities(dto.getSubSpecialities());
+                        doctor.setLicenseNumber(dto.getLicenseNumber());
+                        doctor.setLicenseAuthority(dto.getLicenseAuthority());
+                        doctor.setYearsExperience(dto.getYearsExperience());
+                        doctor.setHospitalAffiliation(dto.getHospitalAffiliation());
+                        doctor.getUser().setRole(Role.DOCTOR);
+                        doctor.setLanguagesSpoken(dto.getLanguagesSpoken());
+                        doctor.setConsultationFee(dto.getConsultationFee());
+                        doctor.setBio(dto.getBio());
+                        doctorRepository.save(doctor);
+                        // return DoctorRegisterDto.fromEntity(savedDoctor);
+                        return dto;
+
+                } else {
+                        throw new RuntimeException("User is already registered as a doctor");
+                }
+
         }
 
         @Override
@@ -147,7 +153,7 @@ public class DoctorServiceImpl implements DoctorService {
         }
 
         @Override
-        public AppointmentDto scheduleAppointment( UUID appointmentId, AppointmentDto appointmentDto) {
+        public AppointmentDto scheduleAppointment(UUID appointmentId, AppointmentDto appointmentDto) {
                 Appointment appointment = appointmentRepository.findById(appointmentId)
                                 .orElseThrow(() -> new RuntimeException("Appointment not found"));
 
@@ -157,7 +163,8 @@ public class DoctorServiceImpl implements DoctorService {
                                 : null;
 
                 // if (!appointment.getDoctor().getDoctorId().equals(doctorId)) {
-                //         throw new RuntimeException("Appointment does not belong to the specified doctor");
+                // throw new RuntimeException("Appointment does not belong to the specified
+                // doctor");
                 // }
                 appointment.setScheduledAt(appointmentDto.getScheduledAt());
                 appointment.setDurationMinutes(appointmentDto.getDurationMinutes());

@@ -6,6 +6,7 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,6 +20,7 @@ import com.backend.medconsult.dto.appointmentDto.BookAppointmentDto;
 import com.backend.medconsult.dto.doctorDto.DoctorDto;
 import com.backend.medconsult.dto.doctorDto.DoctorRegisterDto;
 import com.backend.medconsult.dto.doctorDto.DoctorScheduleDto;
+import com.backend.medconsult.security.CustomUserPrincipal;
 import com.backend.medconsult.service.DoctorService;
 
 @RestController
@@ -29,8 +31,8 @@ public class DoctorController {
     private DoctorService doctorService;
 
     @PostMapping("/register") // add userId as path variable after implementing auth
-    public ResponseEntity<DoctorRegisterDto> registerDoctor(@RequestBody DoctorRegisterDto dto) {
-        DoctorRegisterDto registered = doctorService.registerDoctor(dto);
+    public ResponseEntity<DoctorRegisterDto> registerDoctor(@RequestBody DoctorRegisterDto dto, @AuthenticationPrincipal CustomUserPrincipal authUser) {
+        DoctorRegisterDto registered = doctorService.registerDoctor(dto, authUser);
         return ResponseEntity.status(HttpStatus.CREATED).body(registered);
     }
 
