@@ -118,7 +118,8 @@ public class DoctorServiceImpl implements DoctorService {
         public DoctorScheduleDto addDoctorSchedule(CustomUserPrincipal authUser, DoctorScheduleDto scheduleDto) {
 
                 if (authUser.getUser().getRole() == Role.DOCTOR || authUser.getUser().getRole() == Role.ADMIN) {
-                        Doctor doctor = doctorRepository.findById(authUser.getUserId())
+                        Doctor doctor = doctorRepository.findById(
+                                authUser.getUser().getDoctor().getDoctorId())
                                         .orElseThrow(() -> new RuntimeException("Doctor not found"));
 
                         DoctorSchedule schedule = new DoctorSchedule();
