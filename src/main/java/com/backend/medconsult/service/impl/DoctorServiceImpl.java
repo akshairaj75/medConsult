@@ -157,14 +157,14 @@ public class DoctorServiceImpl implements DoctorService {
         }
 
         @Override
-        public List<BookAppointmentDto> getDoctorAppointments(CustomUserPrincipal authUser) {
+        public List<AppointmentDto> getDoctorAppointments(CustomUserPrincipal authUser) {
                 User authUserEntity = userRepository.findById(authUser.getUserId())
                                 .orElseThrow(() -> new RuntimeException("User not found"));
                 if (authUserEntity.getRole() == Role.DOCTOR) {
                         UUID doctorId = authUserEntity.getDoctor().getDoctorId();
                         List<Appointment> appointments = appointmentRepository.findByDoctor_DoctorId(doctorId);
                         return appointments.stream()
-                                        .map(BookAppointmentDto::fromEntity)
+                                        .map(AppointmentDto::fromEntity)
                                         .toList();
 
                 }
@@ -172,7 +172,7 @@ public class DoctorServiceImpl implements DoctorService {
                 UUID patientId = authUserEntity.getPatient().getPatientId();
                 List<Appointment> appointments = appointmentRepository.findByPatient_PatientId(patientId);
                 return appointments.stream()
-                                .map(BookAppointmentDto::fromEntity)
+                                .map(AppointmentDto::fromEntity)
                                 .toList();
         }
 
