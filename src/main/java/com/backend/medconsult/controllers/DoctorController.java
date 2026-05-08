@@ -73,7 +73,7 @@ public class DoctorController {
         return ResponseEntity.ok(schedule);
     }
 
-    @PostMapping("/{doctorId}/schedules")
+    @PostMapping("/add-schedules")
     public ResponseEntity<DoctorScheduleDto> addDoctorSchedule(@AuthenticationPrincipal CustomUserPrincipal authUser,
             @RequestBody DoctorScheduleDto scheduleDto) {
         DoctorScheduleDto createdSchedule = doctorService.addDoctorSchedule(authUser, scheduleDto);

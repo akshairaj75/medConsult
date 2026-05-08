@@ -116,20 +116,25 @@ public class DoctorServiceImpl implements DoctorService {
 
         @Override
         public DoctorScheduleDto addDoctorSchedule(CustomUserPrincipal authUser, DoctorScheduleDto scheduleDto) {
-                Doctor doctor = doctorRepository.findById(authUser.getUserId())
-                                .orElseThrow(() -> new RuntimeException("Doctor not found"));
 
-                DoctorSchedule schedule = new DoctorSchedule();
-                schedule.setDoctor(doctor);
-                schedule.setDayOfWeek(scheduleDto.getDayOfWeek());
-                schedule.setStartTime(scheduleDto.getStartTime());
-                schedule.setEndTime(scheduleDto.getEndTime());
-                schedule.setScheduleType(scheduleDto.getScheduleType());
-                schedule.setEffectiveFrom(scheduleDto.getEffectiveFrom());
-                schedule.setEffectiveUntil(scheduleDto.getEffectiveUntil());
+                if (authUser.getUser().getRole() == Role.DOCTOR || authUser.getUser().getRole() == Role.ADMIN) {
+                        Doctor doctor = doctorRepository.findById(authUser.getUserId())
+                                        .orElseThrow(() -> new RuntimeException("Doctor not found"));
 
-                DoctorSchedule savedSchedule = doctorScheduleRepository.save(schedule);
-                return DoctorScheduleDto.fromEntity(savedSchedule);
+                        DoctorSchedule schedule = new DoctorSchedule();
+                        schedule.setDoctor(doctor);
+                        schedule.setDayOfWeek(scheduleDto.getDayOfWeek());
+                        schedule.setStartTime(scheduleDto.getStartTime());
+                        schedule.setEndTime(scheduleDto.getEndTime());
+                        schedule.setScheduleType(scheduleDto.getScheduleType());
+                        schedule.setEffectiveFrom(scheduleDto.getEffectiveFrom());
+                        schedule.setEffectiveUntil(scheduleDto.getEffectiveUntil());
+
+                        DoctorSchedule savedSchedule = doctorScheduleRepository.save(schedule);
+                        return DoctorScheduleDto.fromEntity(savedSchedule);
+
+                }
+                throw new RuntimeException("Not authorised to modify");
         }
 
         @Override
