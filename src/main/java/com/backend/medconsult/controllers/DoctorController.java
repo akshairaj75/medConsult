@@ -74,7 +74,7 @@ public class DoctorController {
         return ResponseEntity.status(HttpStatus.CREATED).body(createdSchedule);
     }
 
-    @PostMapping("/{doctorId}/book_appointment/{patientId}")
+    @PostMapping("/{doctorId}/book_appointment")
     public ResponseEntity<BookAppointmentDto> bookAppointment(
             @PathVariable UUID doctorId,
             @AuthenticationPrincipal CustomUserPrincipal authUser,
