@@ -30,4 +30,6 @@ public interface DoctorService {
 
     public AppointmentDto scheduleAppointment( UUID appointmentId, AppointmentDto appointmentDto);
 
+    public List<DoctorScheduleDto> getMySchedules(CustomUserPrincipal authUser);
+
 }

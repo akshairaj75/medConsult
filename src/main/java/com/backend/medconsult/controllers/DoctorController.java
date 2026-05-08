@@ -64,6 +64,15 @@ public class DoctorController {
         return ResponseEntity.ok(schedule);
     }
 
+    @GetMapping("/my-schedules")
+    public ResponseEntity<List<DoctorScheduleDto>> getMySchedules(@AuthenticationPrincipal CustomUserPrincipal authUser) {
+        List<DoctorScheduleDto> schedule = doctorService.getMySchedules(authUser);
+        if (schedule == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(schedule);
+    }
+
     @PostMapping("/{doctorId}/schedules")
     public ResponseEntity<DoctorScheduleDto> addDoctorSchedule(@AuthenticationPrincipal CustomUserPrincipal authUser,
             @RequestBody DoctorScheduleDto scheduleDto) {
