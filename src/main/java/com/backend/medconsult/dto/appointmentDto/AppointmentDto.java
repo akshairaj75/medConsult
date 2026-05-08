@@ -21,6 +21,7 @@ public class AppointmentDto {
     private boolean reminderSent;
     private UUID cancelledBy;
     private String cancelReason;
+    
     public UUID getAppointmentId() {
         return appointmentId;
     }

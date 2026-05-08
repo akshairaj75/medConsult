@@ -13,11 +13,14 @@ import com.backend.medconsult.dto.doctorDto.DoctorRegisterDto;
 import com.backend.medconsult.dto.doctorDto.DoctorScheduleDto;
 import com.backend.medconsult.entity.appointment.Appointment;
 import com.backend.medconsult.entity.auth.User;
+import com.backend.medconsult.entity.consultations.Consultation;
 import com.backend.medconsult.entity.people.Doctor;
 import com.backend.medconsult.entity.people.DoctorSchedule;
 import com.backend.medconsult.entity.people.Patient;
+import com.backend.medconsult.enums.AppointmentStatus;
 import com.backend.medconsult.enums.Role;
 import com.backend.medconsult.repository.AppointmentRepository;
+import com.backend.medconsult.repository.ConsultationRepository;
 import com.backend.medconsult.repository.DoctorRepository;
 import com.backend.medconsult.repository.DoctorScheduleRepository;
 import com.backend.medconsult.repository.PatientRepository;
@@ -43,6 +46,9 @@ public class DoctorServiceImpl implements DoctorService {
         @Autowired
         AppointmentRepository appointmentRepository;
 
+        @Autowired
+        ConsultationRepository consultationRepository;
+
         @Override
         public List<DoctorDto> getDoctors() {
                 return doctorRepository.findAll()
@@ -51,30 +57,34 @@ public class DoctorServiceImpl implements DoctorService {
                                 .toList();
         }
 
-        public DoctorRegisterDto registerDoctor(DoctorRegisterDto dto, CustomUserPrincipal authUser) {
+        @Override
+        public DoctorRegisterDto registerDoctor(
+                        DoctorRegisterDto dto,
+                        CustomUserPrincipal authUser) {
                 User user = userRepository.findById(authUser.getUserId())
                                 .orElseThrow(() -> new RuntimeException("User not found"));
-                if (user.getRole() != Role.DOCTOR) {
-                        Doctor doctor = new Doctor();
-                        doctor.setUser(user);
-                        doctor.setDoctorCode(dto.getDoctorCode());
-                        doctor.setSpeciality(dto.getSpeciality());
-                        doctor.setSubSpecialities(dto.getSubSpecialities());
-                        doctor.setLicenseNumber(dto.getLicenseNumber());
-                        doctor.setLicenseAuthority(dto.getLicenseAuthority());
-                        doctor.setYearsExperience(dto.getYearsExperience());
-                        doctor.setHospitalAffiliation(dto.getHospitalAffiliation());
-                        doctor.getUser().setRole(Role.DOCTOR);
-                        doctor.setLanguagesSpoken(dto.getLanguagesSpoken());
-                        doctor.setConsultationFee(dto.getConsultationFee());
-                        doctor.setBio(dto.getBio());
-                        doctorRepository.save(doctor);
-                        // return DoctorRegisterDto.fromEntity(savedDoctor);
-                        return dto;
-
-                } else {
+                if (user.getDoctor() != null) {
                         throw new RuntimeException("User is already registered as a doctor");
                 }
+
+                user.setRole(Role.DOCTOR);
+                userRepository.save(user);
+
+                Doctor doctor = new Doctor();
+                doctor.setUser(user);
+                doctor.setDoctorCode(dto.getDoctorCode());
+                doctor.setSpeciality(dto.getSpeciality());
+                doctor.setSubSpecialities(dto.getSubSpecialities());
+                doctor.setLicenseNumber(dto.getLicenseNumber());
+                doctor.setLicenseAuthority(dto.getLicenseAuthority());
+                doctor.setYearsExperience(dto.getYearsExperience());
+                doctor.setHospitalAffiliation(dto.getHospitalAffiliation());
+                doctor.setLanguagesSpoken(dto.getLanguagesSpoken());
+                doctor.setConsultationFee(dto.getConsultationFee());
+                doctor.setBio(dto.getBio());
+                Doctor savedDoctor = doctorRepository.save(doctor);
+                // return DoctorRegisterDto.fromEntity(savedDoctor);
+                return DoctorRegisterDto.fromEntity(savedDoctor);
 
         }
 
@@ -119,7 +129,7 @@ public class DoctorServiceImpl implements DoctorService {
 
                 if (authUser.getUser().getRole() == Role.DOCTOR || authUser.getUser().getRole() == Role.ADMIN) {
                         Doctor doctor = doctorRepository.findById(
-                                authUser.getUser().getDoctor().getDoctorId())
+                                        authUser.getUser().getDoctor().getDoctorId())
                                         .orElseThrow(() -> new RuntimeException("Doctor not found"));
 
                         DoctorSchedule schedule = new DoctorSchedule();
@@ -207,6 +217,31 @@ public class DoctorServiceImpl implements DoctorService {
                 appointment.setCancelledBy(cancellingUser);
                 appointment.setCancelReason(appointmentDto.getCancelReason());
                 appointmentRepository.save(appointment);
+                return AppointmentDto.fromEntity(appointment);
+        }
+
+        @Override
+        public AppointmentDto updateAppointmentById(UUID doctorId, UUID appointmentId, AppointmentDto dto) {
+
+                Appointment appointment = appointmentRepository.findById(appointmentId)
+                                .orElseThrow(() -> new RuntimeException("Appointment not found"));
+                Patient patient = patientRepository.findById(dto.getPatientId())
+                                .orElseThrow(() -> new RuntimeException("Patient now found"));
+                Doctor doctor = doctorRepository.findById(doctorId)
+                                .orElseThrow(() -> new RuntimeException("Doctor not found"));
+                if (dto.getStatus() != null) {
+                        appointment.setStatus(dto.getStatus());
+                }
+                if (dto.getStatus() == AppointmentStatus.CONFIRMED) {
+                        Consultation consultation = new Consultation();
+                        consultation.setPatient(patient);
+                        consultation.setDoctor(doctor);
+                        consultation.setChiefComplaint("complaint not specfies");
+                        consultationRepository.save(consultation);
+                }
+
+                appointmentRepository.save(appointment);
+
                 return AppointmentDto.fromEntity(appointment);
         }
 

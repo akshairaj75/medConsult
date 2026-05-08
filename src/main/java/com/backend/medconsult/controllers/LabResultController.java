@@ -37,8 +37,9 @@ public class LabResultController {
     private ClinicalService clinicalService;
 
     @GetMapping("/all")
-    public ResponseEntity<List<LabResultListDto>> getAllLabResults() {
-        List<LabResultListDto> labResults = clinicalService.getAllLabResults();
+    public ResponseEntity<List<LabResultListDto>> getAllLabResults(
+        @AuthenticationPrincipal CustomUserPrincipal authUser) {
+        List<LabResultListDto> labResults = clinicalService.getAllLabResults(authUser);
         return ResponseEntity.ok(labResults);
     }
 

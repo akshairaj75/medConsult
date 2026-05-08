@@ -32,8 +32,8 @@ public class DoctorController {
     private DoctorService doctorService;
 
     @PostMapping("/register") // add userId as path variable after implementing auth
-    public ResponseEntity<DoctorRegisterDto> registerDoctor(@RequestBody DoctorRegisterDto dto, 
-        @AuthenticationPrincipal CustomUserPrincipal authUser) {
+    public ResponseEntity<DoctorRegisterDto> registerDoctor(@RequestBody DoctorRegisterDto dto,
+            @AuthenticationPrincipal CustomUserPrincipal authUser) {
         DoctorRegisterDto registered = doctorService.registerDoctor(dto, authUser);
         return ResponseEntity.status(HttpStatus.CREATED).body(registered);
     }
@@ -65,7 +65,8 @@ public class DoctorController {
     }
 
     @GetMapping("/my-schedules")
-    public ResponseEntity<List<DoctorScheduleDto>> getMySchedules(@AuthenticationPrincipal CustomUserPrincipal authUser) {
+    public ResponseEntity<List<DoctorScheduleDto>> getMySchedules(
+            @AuthenticationPrincipal CustomUserPrincipal authUser) {
         List<DoctorScheduleDto> schedule = doctorService.getMySchedules(authUser);
         if (schedule == null) {
             return ResponseEntity.notFound().build();
@@ -97,8 +98,8 @@ public class DoctorController {
 
     @GetMapping("/appointments")
     public ResponseEntity<List<AppointmentDto>> getDoctorAppointments(
-        @AuthenticationPrincipal CustomUserPrincipal authUser) {
-        List<AppointmentDto> appointments = doctorService.getDoctorAppointments( authUser);
+            @AuthenticationPrincipal CustomUserPrincipal authUser) {
+        List<AppointmentDto> appointments = doctorService.getDoctorAppointments(authUser);
         if (appointments == null) {
             return ResponseEntity.notFound().build();
         }
@@ -113,16 +114,25 @@ public class DoctorController {
         return ResponseEntity.ok(appointment);
     }
 
+    @PutMapping("/{doctorId}/appointments/{appointmentId}")
+    public ResponseEntity<AppointmentDto> updateAppointmentById(
+            @PathVariable UUID doctorId,
+            @PathVariable UUID appointmentId,
+            @RequestBody AppointmentDto dto
+        ) {
+        AppointmentDto appointment = doctorService.updateAppointmentById(doctorId, appointmentId, dto);
+        return ResponseEntity.ok(appointment);
+    }
+
     @PutMapping("/appointments/{appointmentId}/schedule")
     public ResponseEntity<AppointmentDto> scheduleAppointment(
             @PathVariable UUID appointmentId,
             @RequestBody AppointmentDto appointmentDto) {
-        AppointmentDto updatedAppointment = doctorService.scheduleAppointment( appointmentId, appointmentDto);
+        AppointmentDto updatedAppointment = doctorService.scheduleAppointment(appointmentId, appointmentDto);
         if (updatedAppointment == null) {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(updatedAppointment);
     }
 
-    
 }

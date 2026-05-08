@@ -11,4 +11,6 @@ public interface LabResultRepository extends JpaRepository<LabResult, UUID>{
 
     List<LabResult> findByPatient_PatientId(UUID patientId);
 
+    List<LabResult> findByOrderedBy_DoctorId(UUID doctorId);
+
 }

@@ -66,9 +66,26 @@ public class ClinicalServiceImpl implements ClinicalService {
         FileRepository fileRepository;
 
         @Override
-        public List<LabResultListDto> getAllLabResults() {
-                return labResultRepository.findAll()
-                                .stream()
+        public List<LabResultListDto> getAllLabResults(CustomUserPrincipal authUser) {
+
+                User userEntity = authUser.getUser();
+
+                List<LabResult> labResults;
+
+                if (userEntity.getDoctor() != null) {
+                        UUID doctorId = userEntity.getDoctor().getDoctorId();
+                        labResults = labResultRepository.findByOrderedBy_DoctorId(doctorId);
+                        
+                } else if (userEntity.getPatient() != null) {
+
+                        UUID patientId = userEntity.getPatient().getPatientId();
+                        labResults = labResultRepository
+                                        .findByPatient_PatientId(patientId);
+
+                } else {
+                        throw new RuntimeException("User is neither doctor nor patient");
+                }
+                return labResults.stream()
                                 .map(LabResultListDto::fromEntity)
                                 .toList();
         }
@@ -165,10 +182,10 @@ public class ClinicalServiceImpl implements ClinicalService {
 
                 Patient patient = patientRepository.findById(authUser.getUser()
                                 .getPatient().getPatientId())
-                                        .orElseThrow(() -> new RuntimeException("Patient not found"));
+                                .orElseThrow(() -> new RuntimeException("Patient not found"));
 
                 // User recordeBy = userRepository.findById(dto.getRecordedByUserId())
-                //                 .orElseThrow(() -> new RuntimeException("User not found"));
+                // .orElseThrow(() -> new RuntimeException("User not found"));
 
                 Vital vital = new Vital();
                 vital.setPatient(patient);
@@ -204,12 +221,13 @@ public class ClinicalServiceImpl implements ClinicalService {
         }
 
         @Override
-        public VitalsDto getLatestVitals( CustomUserPrincipal authUser) {
+        public VitalsDto getLatestVitals(CustomUserPrincipal authUser) {
                 User authUserEntity = userRepository.findById(authUser.getUserId())
                                 .orElseThrow(() -> new RuntimeException("User not found"));
 
                 Vital vitals = vitalRepository
-                                .findTopByPatient_PatientIdOrderByRecordedAtDesc(authUserEntity.getPatient().getPatientId())
+                                .findTopByPatient_PatientIdOrderByRecordedAtDesc(
+                                                authUserEntity.getPatient().getPatientId())
                                 .orElseThrow(() -> new RuntimeException("No vitals found"));
 
                 return VitalsDto.fromEntity(vitals);

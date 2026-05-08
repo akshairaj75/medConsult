@@ -15,7 +15,7 @@ import com.backend.medconsult.dto.clinicalDataDto.VitalsDto;
 import com.backend.medconsult.security.CustomUserPrincipal;
 
 public interface ClinicalService {
-    List<LabResultListDto> getAllLabResults();
+    List<LabResultListDto> getAllLabResults(CustomUserPrincipal authUser);
 
 
     LabResultRegisterDto createLabResult(LabResultRegisterDto dto, List<MultipartFile> file);

@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
+import com.backend.medconsult.entity.people.Doctor;
+
 public class DoctorRegisterDto {
     public UUID userId;
     public String doctorCode;
@@ -105,18 +107,20 @@ public class DoctorRegisterDto {
         this.bio = bio;
     }
 
-    // public static DoctorRegisterDto fromEntity(Doctor savedDoctor) {
+    public static DoctorRegisterDto fromEntity(Doctor savedDoctor) {
 
-    // DoctorRegisterDto dto = new DoctorRegisterDto();
-    // dto.userId = savedDoctor.getDoctorId();
-    // dto.doctorCode = savedDoctor.getDoctorCode();
-    // dto.speciality = savedDoctor.getSpeciality();
-    // dto.licenseNumber = savedDoctor.getLicenseNumber();
-    // dto.licenseAuthority = savedDoctor.getLicenseAuthority();
-    // dto.yearsExperience = savedDoctor.getYearsExperience();
-    // dto.hospitalAffiliation = savedDoctor.getHospitalAffiliation();
-    // dto.consultationFee = savedDoctor.getConsultationFee();
-    // dto.bio = savedDoctor.getBio();
-    // throw new UnsupportedOperationException("Unimplemented method 'fromEntity'");
-    // }
+        DoctorRegisterDto dto = new DoctorRegisterDto();
+        dto.setUserId(savedDoctor.getDoctorId());
+        dto.setBio(savedDoctor.getBio());
+        dto.setDoctorCode(savedDoctor.getDoctorCode());
+        dto.setSpeciality(savedDoctor.getSpeciality());
+        dto.setLicenseNumber(savedDoctor.getLicenseNumber());
+        dto.setLicenseAuthority(savedDoctor.getLicenseAuthority());
+        dto.setLanguagesSpoken(savedDoctor.getLanguagesSpoken());
+        dto.setYearsExperience(savedDoctor.getYearsExperience());
+        dto.setHospitalAffiliation(savedDoctor.getHospitalAffiliation());;
+        dto.setConsultationFee(savedDoctor.getConsultationFee());
+        return dto;
+        // throw new UnsupportedOperationException("Unimplemented method 'fromEntity'");
+    }
 }
