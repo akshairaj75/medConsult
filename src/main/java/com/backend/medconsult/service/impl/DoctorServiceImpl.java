@@ -117,7 +117,8 @@ public class DoctorServiceImpl implements DoctorService {
         }
 
         @Override
-        public BookAppointmentDto bookAppointment(UUID doctorId, CustomUserPrincipal authUser, BookAppointmentDto appointmentDto) {
+        public BookAppointmentDto bookAppointment(UUID doctorId, CustomUserPrincipal authUser,
+                        BookAppointmentDto appointmentDto) {
                 Doctor doctor = doctorRepository.findById(doctorId)
                                 .orElseThrow(() -> new RuntimeException("Doctor not found"));
 
@@ -135,8 +136,20 @@ public class DoctorServiceImpl implements DoctorService {
         }
 
         @Override
-        public List<BookAppointmentDto> getDoctorAppointments(UUID doctorId) {
-                List<Appointment> appointments = appointmentRepository.findByDoctor_DoctorId(doctorId);
+        public List<BookAppointmentDto> getDoctorAppointments(CustomUserPrincipal authUser) {
+                User authUserEntity = userRepository.findById(authUser.getUserId())
+                                .orElseThrow(() -> new RuntimeException("User not found"));
+                if ( authUserEntity.getRole() == Role.DOCTOR) {
+                        UUID doctorId = authUserEntity.getDoctor().getDoctorId();
+                                List<Appointment> appointments = appointmentRepository.findByDoctor_DoctorId(doctorId);
+                                return appointments.stream()
+                                                .map(BookAppointmentDto::fromEntity)
+                                                .toList();
+                        
+                }
+                
+                UUID patientId = authUserEntity.getPatient().getPatientId();
+                List<Appointment> appointments = appointmentRepository.findByPatient_PatientId(patientId);
                 return appointments.stream()
                                 .map(BookAppointmentDto::fromEntity)
                                 .toList();

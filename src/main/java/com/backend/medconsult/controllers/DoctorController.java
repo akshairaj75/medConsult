@@ -86,9 +86,10 @@ public class DoctorController {
         return ResponseEntity.status(HttpStatus.CREATED).body(bookedAppointment);
     }
 
-    @GetMapping("/{doctorId}/appointments")
-    public ResponseEntity<List<BookAppointmentDto>> getDoctorAppointments(@PathVariable UUID doctorId) {
-        List<BookAppointmentDto> appointments = doctorService.getDoctorAppointments(doctorId);
+    @GetMapping("/appointments")
+    public ResponseEntity<List<BookAppointmentDto>> getDoctorAppointments(
+        @AuthenticationPrincipal CustomUserPrincipal authUser) {
+        List<BookAppointmentDto> appointments = doctorService.getDoctorAppointments( authUser);
         if (appointments == null) {
             return ResponseEntity.notFound().build();
         }

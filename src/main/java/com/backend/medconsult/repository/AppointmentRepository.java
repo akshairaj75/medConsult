@@ -11,4 +11,6 @@ public interface AppointmentRepository extends JpaRepository<Appointment, UUID> 
     // Custom query to find appointments by doctor ID
     List<Appointment> findByDoctor_DoctorId(UUID doctorId);
 
+    List<Appointment> findByPatient_PatientId(UUID patientId);
+
 }
