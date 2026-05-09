@@ -10,10 +10,14 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.backend.medconsult.dto.UserDto;
 import com.backend.medconsult.dto.patientDto.PatientDto;
 import com.backend.medconsult.dto.patientDto.PatientRegisterDto;
 import com.backend.medconsult.security.CustomUserPrincipal;
@@ -38,6 +42,16 @@ public class PatientController {
     public ResponseEntity<List<PatientDto>> getAllPatients() {
         List<PatientDto> patients = patientService.getAllPatients();
         return ResponseEntity.ok(patients);
+    }
+
+    @PutMapping("/update-profile")
+    public ResponseEntity<UserDto> updateUserProfile(
+            @AuthenticationPrincipal CustomUserPrincipal authUser,
+            @RequestPart("data") UserDto dto,
+            @RequestPart(value = "profilePhoto", required = false) MultipartFile profilePhoto) {
+        UserDto response = patientService.updateUserProfile(authUser, dto, profilePhoto);
+        return ResponseEntity.ok(response);
+
     }
 
     @GetMapping("/{patientId}")

@@ -228,57 +228,96 @@ public class DoctorServiceImpl implements DoctorService {
                 Appointment appointment = appointmentRepository.findById(appointmentId)
                                 .orElseThrow(() -> new RuntimeException("Appointment not found"));
 
-                Patient patient = patientRepository.findById(appointment.getPatient().getPatientId())
-                                .orElseThrow(() -> new RuntimeException("Patient now found"));
-
                 User userEntity = userRepository.findById(authUser.getUserId())
                                 .orElseThrow(() -> new RuntimeException("User not found"));
+                AppointmentStatus status = dto.getStatus();
 
-                if (dto.getStatus() != null) {
+                if (status == null) {
+                        return AppointmentDto.fromEntity(appointment);
+                }
 
-                        appointment.setStatus(dto.getStatus());
-                        if (userEntity.getRole() == Role.DOCTOR) {
-                                Doctor doctor = doctorRepository.findById(userEntity.getDoctor().getDoctorId())
-                                                .orElseThrow(() -> new RuntimeException("Doctor not found"));
-                                if (dto.getStatus() == AppointmentStatus.CONFIRMED) {
+                if (userEntity.getRole() == Role.DOCTOR) {
 
-                                        Priority priority = dto.getPriority() != null
-                                                        ? dto.getPriority()
-                                                        : Priority.NORMAL;
+                        Doctor doctor = doctorRepository.findById(
+                                        userEntity.getDoctor().getDoctorId())
+                                        .orElseThrow(() -> new RuntimeException("Doctor not found"));
 
-                                        Consultation consultation = new Consultation();
+                        switch (status) {
 
-                                        consultation.setPatient(patient);
-                                        consultation.setDoctor(doctor);
-                                        consultation.setPriority(priority);
-                                        consultation.setChiefComplaint(appointment.getNotes() != null
-                                                        ? appointment.getNotes()
-                                                        : "complaint not specfied");
+                                case CONFIRMED:
 
-                                        consultationRepository.save(consultation);
+                                        appointment.setStatus(AppointmentStatus.CONFIRMED);
 
-                                        appointment.setConsultation(consultation);
+                                        // Avoid duplicate consultation creation
+                                        if (appointment.getConsultation() == null) {
 
-                                } else if (dto.getStatus() == AppointmentStatus.CANCELLED) {
+                                                Consultation consultation = new Consultation();
 
+                                                consultation.setPatient(appointment.getPatient());
+                                                consultation.setDoctor(doctor);
+
+                                                consultation.setPriority(
+                                                                dto.getPriority() != null
+                                                                                ? dto.getPriority()
+                                                                                : Priority.NORMAL);
+
+                                                String chiefComplaint = appointment.getNotes() != null
+                                                                && !appointment.getNotes().isBlank()
+                                                                                ? appointment.getNotes()
+                                                                                : "Complaint not specified";
+
+                                                consultation.setChiefComplaint(chiefComplaint);
+
+                                                consultationRepository.save(consultation);
+
+                                                appointment.setConsultation(consultation);
+                                        }
+
+                                        break;
+
+                                case CANCELLED:
+
+                                        appointment.setStatus(AppointmentStatus.CANCELLED);
                                         appointment.setCancelledBy(userEntity);
-                                        if (dto.getCancelReason() != null) {
+
+                                        if (dto.getCancelReason() != null
+                                                        && !dto.getCancelReason().isBlank()) {
+
                                                 appointment.setCancelReason(dto.getCancelReason());
                                         }
-                                }
 
-                        } else if( userEntity.getRole() == Role.PATIENT ) {
-                                AppointmentStatus status = dto.getStatus() == AppointmentStatus.CANCELLED 
-                                ? AppointmentStatus.CANCELLED 
-                                : AppointmentStatus.CONFIRMED ; 
+                                        break;
 
-                                appointment.setCancelledBy(userEntity);
-                                if (dto.getCancelReason() != null) {
-                                        appointment.setCancelReason(dto.getCancelReason());
-                                }
+                                case COMPLETED:
+
+                                        appointment.setStatus(AppointmentStatus.COMPLETED);
+                                        break;
+
+                                case NO_SHOW:
+
+                                        appointment.setStatus(AppointmentStatus.NO_SHOW);
+                                        break;
+
+                                default:
+                                        throw new RuntimeException(
+                                                        "Doctors cannot set this status");
                         }
 
+                } else if (userEntity.getRole() == Role.PATIENT) {
+                        if (status != AppointmentStatus.CANCELLED) {
+                                throw new RuntimeException(
+                                                "Patients can only cancel appointments");
+                        }
+                        appointment.setStatus(AppointmentStatus.CANCELLED);
+                        appointment.setCancelledBy(userEntity);
+
+                        if (dto.getCancelReason() != null
+                                        && !dto.getCancelReason().isBlank()) {
+
+                                appointment.setCancelReason(dto.getCancelReason());
+                        }
                 }
+                // }
                 appointmentRepository.save(appointment);
 
                 return AppointmentDto.fromEntity(appointment);

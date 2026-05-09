@@ -1,11 +1,14 @@
 package com.backend.medconsult.service.impl;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.backend.medconsult.dto.UserDto;
 import com.backend.medconsult.dto.patientDto.PatientDto;
 import com.backend.medconsult.dto.patientDto.PatientRegisterDto;
 import com.backend.medconsult.entity.auth.User;
@@ -29,11 +32,14 @@ public class PatientServiceImpl implements PatientService {
     @Autowired
     DoctorRepository doctorRepository;
 
+    @Autowired
+    FileStorageService fileStorageService;
+
     @Override
     public PatientRegisterDto registerPatient(PatientRegisterDto dto, CustomUserPrincipal authUser) {
         User userEntity = userRepository.findById(authUser.getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
-                
+
         Patient patient = new Patient();
         patient.setUser(userEntity);
         patient.setPatientCode(dto.getPatientCode());
@@ -50,7 +56,7 @@ public class PatientServiceImpl implements PatientService {
         if (dto.getAssignedDoctor() != null) {
             Doctor doctor = doctorRepository.findById(dto.getAssignedDoctor())
                     .orElseThrow(() -> new RuntimeException("Doctor not found"));
-            patient.setAssignedDoctor(doctor) ;
+            patient.setAssignedDoctor(doctor);
         }
         patient.setAssignedDoctor(null);
 
@@ -73,7 +79,40 @@ public class PatientServiceImpl implements PatientService {
                 .map(PatientDto::fromEntity)
                 .orElseThrow(() -> new RuntimeException("Doctor not found"));
         return doctorDetails;
-        
+
+    }
+
+    @Override
+    public UserDto updateUserProfile(
+            CustomUserPrincipal authUser,
+            UserDto dto,
+            MultipartFile profilePhoto) {
+        User user = userRepository.findById(authUser.getUserId())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (dto.getFullName() != null) {
+            user.setFullName(dto.getFullName());
+        }
+        if (dto.getLanguage() != null) {
+            user.setLanguage(dto.getLanguage());
+        }
+        if (dto.getPhone() != null) {
+            user.setPhone(dto.getPhone());
+        }
+        if (profilePhoto != null && !profilePhoto.isEmpty()) {
+            try {
+
+                String fileName = fileStorageService.storeFile(profilePhoto);
+
+                user.setProfilePhotoUrl(fileName);
+
+            } catch (IOException e) {
+                throw new RuntimeException(
+                        "Failed to upload profile photo");
+            }
+        }
+
+        return UserDto.fromEntity(user);
     }
 
 }
