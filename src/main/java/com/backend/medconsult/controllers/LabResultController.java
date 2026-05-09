@@ -38,7 +38,7 @@ public class LabResultController {
 
     @GetMapping("/all")
     public ResponseEntity<List<LabResultListDto>> getAllLabResults(
-        @AuthenticationPrincipal CustomUserPrincipal authUser) {
+            @AuthenticationPrincipal CustomUserPrincipal authUser) {
         List<LabResultListDto> labResults = clinicalService.getAllLabResults(authUser);
         return ResponseEntity.ok(labResults);
     }
@@ -76,16 +76,16 @@ public class LabResultController {
 
     @PostMapping("/add-vitals")
     public ResponseEntity<VitalsDto> addVitals(
-        @AuthenticationPrincipal CustomUserPrincipal user, 
-        @RequestBody VitalsDto dto) {
+            @AuthenticationPrincipal CustomUserPrincipal user,
+            @RequestBody VitalsDto dto) {
         VitalsDto registered = clinicalService.addVitals(user, dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(registered);
     }
 
     @GetMapping("/get-vitals/latest")
-    public ResponseEntity<VitalsDto> getLatestVitals( 
-        @AuthenticationPrincipal CustomUserPrincipal authUser) {
-        VitalsDto vitals = clinicalService.getLatestVitals( authUser);
+    public ResponseEntity<VitalsDto> getLatestVitals(
+            @AuthenticationPrincipal CustomUserPrincipal authUser) {
+        VitalsDto vitals = clinicalService.getLatestVitals(authUser);
         return ResponseEntity.ok(vitals);
     }
 
@@ -111,9 +111,11 @@ public class LabResultController {
     }
 
     @PutMapping("/{labResultId}/review")
-    public ResponseEntity<LabResultUpdateDto> reviewLabResult(@PathVariable UUID labResultId,
+    public ResponseEntity<LabResultUpdateDto> reviewLabResult(
+            @PathVariable UUID labResultId,
+            @AuthenticationPrincipal CustomUserPrincipal authUser,
             @RequestBody LabResultUpdateDto dto) {
-        LabResultUpdateDto reviewedResult = clinicalService.reviewLabResult(labResultId, dto);
+        LabResultUpdateDto reviewedResult = clinicalService.reviewLabResult(labResultId, dto, authUser);
         return ResponseEntity.ok(reviewedResult);
     }
 }

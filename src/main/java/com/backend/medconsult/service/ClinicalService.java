@@ -31,7 +31,7 @@ public interface ClinicalService {
     List<FileDto> uploadFiles(FileUploadRequestDto dto, List<MultipartFile> files, UUID uploadedById);
 
 
-    LabResultUpdateDto reviewLabResult(UUID labResultId, LabResultUpdateDto dto);
+    LabResultUpdateDto reviewLabResult(UUID labResultId, LabResultUpdateDto dto,CustomUserPrincipal authUser);
 
 
     VitalsDto getLatestVitals(CustomUserPrincipal authUser);

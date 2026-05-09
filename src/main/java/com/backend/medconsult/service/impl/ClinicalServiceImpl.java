@@ -310,7 +310,13 @@ public class ClinicalServiceImpl implements ClinicalService {
         }
 
         @Override
-        public LabResultUpdateDto reviewLabResult(UUID labResultId, LabResultUpdateDto dto) {
+        public LabResultUpdateDto reviewLabResult(
+                UUID labResultId, 
+                LabResultUpdateDto dto, 
+                CustomUserPrincipal authUser) {
+                Doctor reviewedBy = doctorRepository.findById(authUser.getUser().getDoctor().getDoctorId())
+                        .orElseThrow(() -> new RuntimeException("Patient not found"));
+
                 LabResult labResult = labResultRepository.findById(labResultId)
                                 .orElseThrow(() -> new RuntimeException("Lab result not found"));
                 if (dto.getDoctorNotes() != null) {
@@ -332,9 +338,7 @@ public class ClinicalServiceImpl implements ClinicalService {
                 }
 
                 if (dto.getReviewedBy() != null) {
-                        Doctor reviewer = doctorRepository.findById(dto.getReviewedBy())
-                                        .orElseThrow(() -> new RuntimeException("Reviewer doctor not found"));
-                        labResult.setReviewedBy(reviewer);
+                        labResult.setReviewedBy(reviewedBy);
                 }
                 labResultRepository.save(labResult);
                 // Implementation for reviewing lab result
