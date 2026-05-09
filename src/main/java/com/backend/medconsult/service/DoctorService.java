@@ -32,6 +32,6 @@ public interface DoctorService {
 
     public List<DoctorScheduleDto> getMySchedules(CustomUserPrincipal authUser);
 
-    public AppointmentDto updateAppointmentById(UUID doctorId, UUID appointmentId, AppointmentDto dto);
+    public AppointmentDto updateAppointmentById(CustomUserPrincipal authUser, UUID appointmentId, AppointmentDto dto);
 
 }

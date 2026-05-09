@@ -221,13 +221,15 @@ public class DoctorServiceImpl implements DoctorService {
         }
 
         @Override
-        public AppointmentDto updateAppointmentById(UUID doctorId, UUID appointmentId, AppointmentDto dto) {
+        public AppointmentDto updateAppointmentById(CustomUserPrincipal authUser, UUID appointmentId, AppointmentDto dto) {
 
                 Appointment appointment = appointmentRepository.findById(appointmentId)
                                 .orElseThrow(() -> new RuntimeException("Appointment not found"));
                 Patient patient = patientRepository.findById(dto.getPatientId())
                                 .orElseThrow(() -> new RuntimeException("Patient now found"));
-                Doctor doctor = doctorRepository.findById(doctorId)
+                User userEntity = userRepository.findById(authUser.getUserId())
+                                .orElseThrow(()-> new RuntimeException("User not found"));
+                Doctor doctor = doctorRepository.findById(userEntity.getDoctor().getDoctorId())
                                 .orElseThrow(() -> new RuntimeException("Doctor not found"));
                 if (dto.getStatus() != null) {
                         appointment.setStatus(dto.getStatus());

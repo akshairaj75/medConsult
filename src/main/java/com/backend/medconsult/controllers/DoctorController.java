@@ -114,13 +114,13 @@ public class DoctorController {
         return ResponseEntity.ok(appointment);
     }
 
-    @PutMapping("/{doctorId}/appointments/{appointmentId}")
+    @PutMapping("/appointments/{appointmentId}")
     public ResponseEntity<AppointmentDto> updateAppointmentById(
-            @PathVariable UUID doctorId,
+            @AuthenticationPrincipal CustomUserPrincipal authUser,
             @PathVariable UUID appointmentId,
             @RequestBody AppointmentDto dto
         ) {
-        AppointmentDto appointment = doctorService.updateAppointmentById(doctorId, appointmentId, dto);
+        AppointmentDto appointment = doctorService.updateAppointmentById(authUser, appointmentId, dto);
         return ResponseEntity.ok(appointment);
     }
 
