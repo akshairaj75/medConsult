@@ -18,6 +18,7 @@ import com.backend.medconsult.entity.people.Doctor;
 import com.backend.medconsult.entity.people.DoctorSchedule;
 import com.backend.medconsult.entity.people.Patient;
 import com.backend.medconsult.enums.AppointmentStatus;
+import com.backend.medconsult.enums.Priority;
 import com.backend.medconsult.enums.Role;
 import com.backend.medconsult.repository.AppointmentRepository;
 import com.backend.medconsult.repository.ConsultationRepository;
@@ -221,27 +222,63 @@ public class DoctorServiceImpl implements DoctorService {
         }
 
         @Override
-        public AppointmentDto updateAppointmentById(CustomUserPrincipal authUser, UUID appointmentId, AppointmentDto dto) {
+        public AppointmentDto updateAppointmentById(CustomUserPrincipal authUser, UUID appointmentId,
+                        AppointmentDto dto) {
 
                 Appointment appointment = appointmentRepository.findById(appointmentId)
                                 .orElseThrow(() -> new RuntimeException("Appointment not found"));
-                Patient patient = patientRepository.findById(dto.getPatientId())
-                                .orElseThrow(() -> new RuntimeException("Patient now found"));
-                User userEntity = userRepository.findById(authUser.getUserId())
-                                .orElseThrow(()-> new RuntimeException("User not found"));
-                Doctor doctor = doctorRepository.findById(userEntity.getDoctor().getDoctorId())
-                                .orElseThrow(() -> new RuntimeException("Doctor not found"));
-                if (dto.getStatus() != null) {
-                        appointment.setStatus(dto.getStatus());
-                }
-                if (dto.getStatus() == AppointmentStatus.CONFIRMED) {
-                        Consultation consultation = new Consultation();
-                        consultation.setPatient(patient);
-                        consultation.setDoctor(doctor);
-                        consultation.setChiefComplaint("complaint not specfies");
-                        consultationRepository.save(consultation);
-                }
 
+                Patient patient = patientRepository.findById(appointment.getPatient().getPatientId())
+                                .orElseThrow(() -> new RuntimeException("Patient now found"));
+
+                User userEntity = userRepository.findById(authUser.getUserId())
+                                .orElseThrow(() -> new RuntimeException("User not found"));
+
+                if (dto.getStatus() != null) {
+
+                        appointment.setStatus(dto.getStatus());
+                        if (userEntity.getRole() == Role.DOCTOR) {
+                                Doctor doctor = doctorRepository.findById(userEntity.getDoctor().getDoctorId())
+                                                .orElseThrow(() -> new RuntimeException("Doctor not found"));
+                                if (dto.getStatus() == AppointmentStatus.CONFIRMED) {
+
+                                        Priority priority = dto.getPriority() != null
+                                                        ? dto.getPriority()
+                                                        : Priority.NORMAL;
+
+                                        Consultation consultation = new Consultation();
+
+                                        consultation.setPatient(patient);
+                                        consultation.setDoctor(doctor);
+                                        consultation.setPriority(priority);
+                                        consultation.setChiefComplaint(appointment.getNotes() != null
+                                                        ? appointment.getNotes()
+                                                        : "complaint not specfied");
+
+                                        consultationRepository.save(consultation);
+
+                                        appointment.setConsultation(consultation);
+
+                                } else if (dto.getStatus() == AppointmentStatus.CANCELLED) {
+
+                                        appointment.setCancelledBy(userEntity);
+                                        if (dto.getCancelReason() != null) {
+                                                appointment.setCancelReason(dto.getCancelReason());
+                                        }
+                                }
+
+                        } else if( userEntity.getRole() == Role.PATIENT ) {
+                                AppointmentStatus status = dto.getStatus() == AppointmentStatus.CANCELLED 
+                                ? AppointmentStatus.CANCELLED 
+                                : AppointmentStatus.CONFIRMED ; 
+
+                                appointment.setCancelledBy(userEntity);
+                                if (dto.getCancelReason() != null) {
+                                        appointment.setCancelReason(dto.getCancelReason());
+                                }
+                        }
+
+                }
                 appointmentRepository.save(appointment);
 
                 return AppointmentDto.fromEntity(appointment);

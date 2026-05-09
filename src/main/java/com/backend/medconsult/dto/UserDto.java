@@ -3,12 +3,16 @@ package com.backend.medconsult.dto;
 import java.util.UUID;
 
 import com.backend.medconsult.entity.auth.User;
+import com.backend.medconsult.enums.Role;
 
 public class UserDto {
     private UUID id;
     private String fullName;
+    private Role role;
     private String email;
     private String phone;
+    private String language;
+    private String profilePhoto;
 
     public UUID getId() {
         return id;
@@ -24,6 +28,14 @@ public class UserDto {
 
     public void setFullName(String fullName) {
         this.fullName = fullName;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
     }
 
     public String getEmail() {
@@ -42,8 +54,29 @@ public class UserDto {
         this.phone = phone;
     }
 
+    public String getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(String language) {
+        this.language = language;
+    }
+
+    public String getProfilePhoto() {
+        return profilePhoto;
+    }
+
+    public void setProfilePhoto(String profilePhoto) {
+        this.profilePhoto = profilePhoto;
+    }
+
     public static UserDto fromEntity(User user) {
         UserDto dto = new UserDto();
+        dto.setLanguage(user.getLanguage());
+        dto.setProfilePhoto(user.getProfilePhotoUrl() != null
+                ? user.getProfilePhotoUrl()
+                : null);
+                dto.setRole(user.getRole());
         dto.setId(user.getUserId());
         dto.setFullName(user.getFullName());
         dto.setEmail(user.getEmail());

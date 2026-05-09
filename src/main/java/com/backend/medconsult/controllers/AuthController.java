@@ -12,8 +12,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.backend.medconsult.dto.AuthResponseDto;
+import com.backend.medconsult.dto.UserDto;
 import com.backend.medconsult.dto.UserLoginDto;
 import com.backend.medconsult.dto.UserRegisterDto;
+import com.backend.medconsult.entity.auth.User;
+import com.backend.medconsult.repository.UserRepository;
 import com.backend.medconsult.security.CustomUserPrincipal;
 import com.backend.medconsult.service.UserService;
 
@@ -25,6 +28,9 @@ public class AuthController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @PostMapping("/register")
     public ResponseEntity<AuthResponseDto> register(@Valid @RequestBody UserRegisterDto dto) {
@@ -44,13 +50,13 @@ public class AuthController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<?> currentUser(
+    public ResponseEntity<UserDto> currentUser(
             @AuthenticationPrincipal CustomUserPrincipal principal) {
 
-        return ResponseEntity.ok(Map.of(
-                "userId", principal.getUserId(),
-                "email", principal.getUsername(),
-                "fullName",principal.getUser().getFullName(),
-                "role", principal.getUser().getRole()));
+        User user = userRepository.findById(principal.getUserId())
+                .orElseThrow(() -> new RuntimeException("user not found"));
+                
+        return ResponseEntity.ok(UserDto.fromEntity(user));
+
     }
 }
