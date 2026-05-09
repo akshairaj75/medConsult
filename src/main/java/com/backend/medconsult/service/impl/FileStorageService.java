@@ -14,6 +14,8 @@ import org.springframework.web.multipart.MultipartFile;
 public class FileStorageService {
 
     private final String uploadDir = "uploads/";
+    private final String baseUrl =
+            "http://localhost:8080/";
 
     public String storeFile(MultipartFile file) throws IOException {
         if (file.isEmpty()) {
@@ -30,7 +32,7 @@ public class FileStorageService {
         Files.copy(file.getInputStream(),
                 uploadPath.resolve(fileName),
                 StandardCopyOption.REPLACE_EXISTING);
-        return fileName;
+        return baseUrl + "uploads/" + fileName;
     }
 
 }

@@ -111,8 +111,9 @@ public class PatientServiceImpl implements PatientService {
                         "Failed to upload profile photo");
             }
         }
+        User savedUser = userRepository.save(user);
 
-        return UserDto.fromEntity(user);
+        return UserDto.fromEntity(savedUser);
     }
 
 }

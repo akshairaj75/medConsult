@@ -30,7 +30,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/uploads/**")
-                .addResourceLocations("file:/home/pc4/development/MEDCONSULT/SPRINGBOOT/uploads/");
+                .addResourceLocations("file:uploads/");
                 // .addResourceLocations("file:/home/ubuntu/uploads/");
     }
 }
