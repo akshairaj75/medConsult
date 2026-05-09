@@ -178,7 +178,6 @@ public class DoctorServiceImpl implements DoctorService {
                         return appointments.stream()
                                         .map(AppointmentDto::fromEntity)
                                         .toList();
-
                 }
 
                 UUID patientId = authUserEntity.getPatient().getPatientId();
@@ -231,6 +230,7 @@ public class DoctorServiceImpl implements DoctorService {
                 User userEntity = userRepository.findById(authUser.getUserId())
                                 .orElseThrow(() -> new RuntimeException("User not found"));
                 AppointmentStatus status = dto.getStatus();
+                Patient patient = appointment.getPatient();
 
                 if (status == null) {
                         return AppointmentDto.fromEntity(appointment);
@@ -245,15 +245,15 @@ public class DoctorServiceImpl implements DoctorService {
                         switch (status) {
 
                                 case CONFIRMED:
-
                                         appointment.setStatus(AppointmentStatus.CONFIRMED);
+                                        patient.setAssignedDoctor(doctor);
 
                                         // Avoid duplicate consultation creation
                                         if (appointment.getConsultation() == null) {
 
                                                 Consultation consultation = new Consultation();
 
-                                                consultation.setPatient(appointment.getPatient());
+                                                consultation.setPatient(patient);
                                                 consultation.setDoctor(doctor);
 
                                                 consultation.setPriority(
@@ -267,9 +267,7 @@ public class DoctorServiceImpl implements DoctorService {
                                                                                 : "Complaint not specified";
 
                                                 consultation.setChiefComplaint(chiefComplaint);
-
                                                 consultationRepository.save(consultation);
-
                                                 appointment.setConsultation(consultation);
                                         }
 

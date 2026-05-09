@@ -3,6 +3,8 @@ package com.backend.medconsult.dto.appointmentDto;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import com.backend.medconsult.dto.doctorDto.DoctorDto;
+import com.backend.medconsult.dto.patientDto.PatientDto;
 import com.backend.medconsult.entity.appointment.Appointment;
 import com.backend.medconsult.enums.AppointmentStatus;
 import com.backend.medconsult.enums.Priority;
@@ -12,6 +14,10 @@ public class AppointmentDto {
     private UUID appointmentId;
     private UUID doctorId;
     private UUID patientId;
+    private PatientDto patient; 
+    private DoctorDto doctor; 
+
+
     private UUID consultaionId;
     private String appointmentType;
     private LocalDateTime scheduledAt;
@@ -48,6 +54,21 @@ public class AppointmentDto {
         this.patientId = patientId;
     }
 
+        public PatientDto getPatient() {
+        return patient;
+    }
+
+    public void setPatient(PatientDto patient) {
+        this.patient = patient;
+    }
+
+    public DoctorDto getDoctor() {
+        return doctor;
+    }
+
+    public void setDoctor(DoctorDto doctor) {
+        this.doctor = doctor;
+    }
     public UUID getConsultaionId() {
         return consultaionId;
     }
@@ -140,6 +161,15 @@ public class AppointmentDto {
         AppointmentDto dto = new AppointmentDto();
         dto.setAppointmentId(appointment.getAppointmentId());
         dto.setDoctorId(appointment.getDoctor().getDoctorId());
+        // dto.setDoctor(appointment.getDoctor());
+        dto.setDoctor(
+                appointment.getDoctor() != null
+                        ? DoctorDto.fromEntity(appointment.getDoctor())
+                        : null);
+        dto.setPatient(
+                appointment.getPatient() != null
+                        ? PatientDto.fromEntity(appointment.getPatient())
+                        : null);
         dto.setPatientId(appointment.getPatient().getPatientId());
         dto.setConsultaionId(
                 appointment.getConsultation() != null
