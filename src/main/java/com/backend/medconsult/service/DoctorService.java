@@ -3,6 +3,8 @@ package com.backend.medconsult.service;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.http.ResponseEntity;
+
 import com.backend.medconsult.dto.appointmentDto.AppointmentDto;
 import com.backend.medconsult.dto.appointmentDto.BookAppointmentDto;
 import com.backend.medconsult.dto.doctorDto.DoctorDto;
@@ -36,5 +38,7 @@ public interface DoctorService {
     public AppointmentDto updateAppointmentById(CustomUserPrincipal authUser, UUID appointmentId, AppointmentDto dto);
 
     public List<PatientDto> myPatients(CustomUserPrincipal authUser);
+
+    public ResponseEntity<String> deleteSchedule(CustomUserPrincipal authUser, UUID scheduleId2);
 
 }

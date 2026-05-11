@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.backend.medconsult.entity.people.DoctorSchedule;
 
-public interface DoctorScheduleRepository extends JpaRepository<DoctorSchedule, Long> {
+public interface DoctorScheduleRepository extends JpaRepository<DoctorSchedule, UUID> {
 
     List<DoctorSchedule> findByDoctor_DoctorIdOrderByDayOfWeekAsc(UUID doctorId);
 }

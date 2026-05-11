@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.backend.medconsult.dto.appointmentDto.AppointmentDto;
@@ -348,6 +350,32 @@ public class DoctorServiceImpl implements DoctorService {
                 return patients.stream()
                                 .map(PatientDto::fromEntity)
                                 .toList();
+        }
+
+        @Override
+        public ResponseEntity<String> deleteSchedule(CustomUserPrincipal authUser, UUID scheduleId) {
+
+                if (authUser.getUser().getRole() != Role.DOCTOR) {
+                        return ResponseEntity
+                                        .status(HttpStatus.FORBIDDEN)
+                                        .body("Only doctors can delete schedules");
+                }
+
+                DoctorSchedule schedule = doctorScheduleRepository.findById(scheduleId)
+                                .orElseThrow(() -> new RuntimeException("Schedule not found"));
+
+                if (!schedule.getDoctor().getDoctorId()
+                                .equals(authUser.getUser().getDoctor().getDoctorId())) {
+
+                        return ResponseEntity
+                                        .status(HttpStatus.FORBIDDEN)
+                                        .body("Unauthorized");
+                }
+                doctorScheduleRepository.delete(schedule);
+                return ResponseEntity
+                                .status(HttpStatus.OK)
+                                .body("Schedule deleted successfully");
+
         }
 
 }

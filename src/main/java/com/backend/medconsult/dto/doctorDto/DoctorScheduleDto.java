@@ -10,6 +10,7 @@ import com.backend.medconsult.enums.Weekday;
 
 public class DoctorScheduleDto {
     private UUID doctorId;
+    private UUID scheduleId;
     private String doctorName;
     private Weekday dayOfWeek;
     private LocalTime startTime;
@@ -24,6 +25,14 @@ public class DoctorScheduleDto {
 
     public void setDoctorId(UUID doctorId) {
         this.doctorId = doctorId;
+    }
+
+        public UUID getScheduleId() {
+        return scheduleId;
+    }
+
+    public void setScheduleId(UUID scheduleId) {
+        this.scheduleId = scheduleId;
     }
 
     public String getDoctorName() {
@@ -85,6 +94,7 @@ public class DoctorScheduleDto {
     public static DoctorScheduleDto fromEntity(DoctorSchedule schedule) {
         DoctorScheduleDto dto = new DoctorScheduleDto();
         dto.setDoctorId(schedule.getDoctor().getDoctorId());
+        dto.setScheduleId(schedule.getScheduleId());
         dto.setDoctorName(schedule.getDoctor().getUser().getFullName());
         dto.setDayOfWeek(schedule.getDayOfWeek());
         dto.setStartTime(schedule.getStartTime());
