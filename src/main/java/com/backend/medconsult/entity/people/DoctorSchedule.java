@@ -41,7 +41,7 @@ public class DoctorSchedule {
     @JoinColumn(name = "doctor_id", nullable = false)
     private Doctor doctor;
 
-    @Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.ORDINAL)
     @Column(name = "day_of_week", nullable = false)
     private Weekday dayOfWeek; // 0=Sunday … 6=Saturday
 

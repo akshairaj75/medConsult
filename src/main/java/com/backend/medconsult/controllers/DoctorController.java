@@ -1,12 +1,12 @@
 package com.backend.medconsult.controllers;
 
-import java.nio.file.Path;
 import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authorization.method.AuthorizeReturnObject;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,6 +21,7 @@ import com.backend.medconsult.dto.appointmentDto.BookAppointmentDto;
 import com.backend.medconsult.dto.doctorDto.DoctorDto;
 import com.backend.medconsult.dto.doctorDto.DoctorRegisterDto;
 import com.backend.medconsult.dto.doctorDto.DoctorScheduleDto;
+import com.backend.medconsult.dto.patientDto.PatientDto;
 import com.backend.medconsult.security.CustomUserPrincipal;
 import com.backend.medconsult.service.DoctorService;
 
@@ -72,6 +73,12 @@ public class DoctorController {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(schedule);
+    }
+
+    @GetMapping("/my-patients")
+    public ResponseEntity<List<PatientDto>> myPatients(@AuthenticationPrincipal CustomUserPrincipal authUser){
+        List<PatientDto> dto = doctorService.myPatients(authUser);
+        return ResponseEntity.ok(dto);
     }
 
     @PostMapping("/add-schedules")
@@ -127,8 +134,9 @@ public class DoctorController {
     @PutMapping("/appointments/{appointmentId}/schedule")
     public ResponseEntity<AppointmentDto> scheduleAppointment(
             @PathVariable UUID appointmentId,
-            @RequestBody AppointmentDto appointmentDto) {
-        AppointmentDto updatedAppointment = doctorService.scheduleAppointment(appointmentId, appointmentDto);
+            @RequestBody AppointmentDto appointmentDto,
+            @AuthenticationPrincipal CustomUserPrincipal authUser) {
+        AppointmentDto updatedAppointment = doctorService.scheduleAppointment(appointmentId, appointmentDto,authUser);
         if (updatedAppointment == null) {
             return ResponseEntity.notFound().build();
         }

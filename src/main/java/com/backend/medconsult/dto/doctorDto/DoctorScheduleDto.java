@@ -2,13 +2,14 @@ package com.backend.medconsult.dto.doctorDto;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.UUID;
 
 import com.backend.medconsult.entity.people.DoctorSchedule;
 import com.backend.medconsult.enums.ScheduleType;
 import com.backend.medconsult.enums.Weekday;
 
 public class DoctorScheduleDto {
-    private String doctorId;
+    private UUID doctorId;
     private String doctorName;
     private Weekday dayOfWeek;
     private LocalTime startTime;
@@ -17,11 +18,11 @@ public class DoctorScheduleDto {
     private LocalDate effectiveFrom;
     private LocalDate effectiveUntil;
 
-    public String getDoctorId() {
+    public UUID getDoctorId() {
         return doctorId;
     }
 
-    public void setDoctorId(String doctorId) {
+    public void setDoctorId(UUID doctorId) {
         this.doctorId = doctorId;
     }
 
@@ -83,7 +84,7 @@ public class DoctorScheduleDto {
 
     public static DoctorScheduleDto fromEntity(DoctorSchedule schedule) {
         DoctorScheduleDto dto = new DoctorScheduleDto();
-        dto.setDoctorId(schedule.getDoctor().getDoctorId().toString());
+        dto.setDoctorId(schedule.getDoctor().getDoctorId());
         dto.setDoctorName(schedule.getDoctor().getUser().getFullName());
         dto.setDayOfWeek(schedule.getDayOfWeek());
         dto.setStartTime(schedule.getStartTime());

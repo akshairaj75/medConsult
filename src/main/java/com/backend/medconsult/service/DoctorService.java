@@ -8,6 +8,7 @@ import com.backend.medconsult.dto.appointmentDto.BookAppointmentDto;
 import com.backend.medconsult.dto.doctorDto.DoctorDto;
 import com.backend.medconsult.dto.doctorDto.DoctorRegisterDto;
 import com.backend.medconsult.dto.doctorDto.DoctorScheduleDto;
+import com.backend.medconsult.dto.patientDto.PatientDto;
 import com.backend.medconsult.security.CustomUserPrincipal;
 
 public interface DoctorService {
@@ -28,10 +29,12 @@ public interface DoctorService {
 
     public AppointmentDto getDoctorAppointmentById(UUID doctorId, UUID appointmentId);
 
-    public AppointmentDto scheduleAppointment( UUID appointmentId, AppointmentDto appointmentDto);
+    public AppointmentDto scheduleAppointment( UUID appointmentId, AppointmentDto appointmentDto, CustomUserPrincipal authUser);
 
     public List<DoctorScheduleDto> getMySchedules(CustomUserPrincipal authUser);
 
     public AppointmentDto updateAppointmentById(CustomUserPrincipal authUser, UUID appointmentId, AppointmentDto dto);
+
+    public List<PatientDto> myPatients(CustomUserPrincipal authUser);
 
 }
