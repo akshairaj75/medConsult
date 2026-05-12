@@ -353,6 +353,15 @@ public class DoctorServiceImpl implements DoctorService {
         }
 
         @Override
+        public List<PatientDto> labResultPatients(CustomUserPrincipal authUser) {
+                UUID doctorId = authUser.getUser().getDoctor().getDoctorId();
+                List<Patient> patients = patientRepository.findPatientsAccessibleToDoctor(doctorId);
+                return patients.stream()
+                                .map(PatientDto::fromEntity)
+                                .toList();
+        }
+
+        @Override
         public ResponseEntity<String> deleteSchedule(CustomUserPrincipal authUser, UUID scheduleId) {
 
                 if (authUser.getUser().getRole() != Role.DOCTOR) {

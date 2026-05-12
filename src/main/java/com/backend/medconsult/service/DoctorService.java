@@ -41,4 +41,6 @@ public interface DoctorService {
 
     public ResponseEntity<String> deleteSchedule(CustomUserPrincipal authUser, UUID scheduleId2);
 
+    public List<PatientDto> labResultPatients(CustomUserPrincipal authUser);
+
 }

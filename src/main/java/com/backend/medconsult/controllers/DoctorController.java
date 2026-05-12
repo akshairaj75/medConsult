@@ -90,6 +90,13 @@ public class DoctorController {
         return ResponseEntity.ok(dto);
     }
 
+    @GetMapping("/lab-patient")
+    public ResponseEntity<List<PatientDto>> labResultPatients(@AuthenticationPrincipal CustomUserPrincipal authUser){
+        List<PatientDto> dto = doctorService.labResultPatients(authUser);
+        return ResponseEntity.ok(dto);
+    }
+
+
     @PostMapping("/add-schedules")
     public ResponseEntity<DoctorScheduleDto> addDoctorSchedule(@AuthenticationPrincipal CustomUserPrincipal authUser,
             @RequestBody DoctorScheduleDto scheduleDto) {
