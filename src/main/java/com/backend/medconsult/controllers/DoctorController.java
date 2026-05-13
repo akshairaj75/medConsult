@@ -119,10 +119,20 @@ public class DoctorController {
         return ResponseEntity.status(HttpStatus.CREATED).body(bookedAppointment);
     }
 
-    @GetMapping("/appointments")
+    @GetMapping("/appointments/today")
     public ResponseEntity<List<AppointmentDto>> getDoctorAppointments(
             @AuthenticationPrincipal CustomUserPrincipal authUser) {
         List<AppointmentDto> appointments = doctorService.getDoctorAppointments(authUser);
+        if (appointments == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(appointments);
+    }
+
+    @GetMapping("/appointments/all")
+    public ResponseEntity<List<AppointmentDto>> getAllDoctorAppointments(
+            @AuthenticationPrincipal CustomUserPrincipal authUser) {
+        List<AppointmentDto> appointments = doctorService.getAllDoctorAppointments(authUser);
         if (appointments == null) {
             return ResponseEntity.notFound().build();
         }

@@ -43,4 +43,6 @@ public interface DoctorService {
 
     public List<PatientDto> labResultPatients(CustomUserPrincipal authUser);
 
+    public List<AppointmentDto> getAllDoctorAppointments(CustomUserPrincipal authUser);
+
 }

@@ -184,8 +184,6 @@ public class DoctorServiceImpl implements DoctorService {
                                 .orElseThrow(() -> new RuntimeException("User not found"));
                 if (authUserEntity.getRole() == Role.DOCTOR) {
                         UUID doctorId = authUserEntity.getDoctor().getDoctorId();
-                        // List<Appointment> appointments =
-                        // appointmentRepository.findByDoctor_DoctorId(doctorId);
                         List<Appointment> appointments = appointmentRepository
                                         .findByDoctor_DoctorIdAndScheduledAtBetweenOrderByScheduledAtDesc(doctorId,
                                                         start, end);
@@ -199,6 +197,28 @@ public class DoctorServiceImpl implements DoctorService {
                                 .findByPatient_PatientIdOrderByScheduledAtDesc(patientId);
                 // List<Appointment> appointments = appointmentRepository
                 // .findBypatient_patientIdAndScheduledAtBetween(patientId, start, end);
+                return appointments.stream()
+                                .map(AppointmentDto::fromEntity)
+                                .toList();
+        }
+
+        @Override
+        public List<AppointmentDto> getAllDoctorAppointments(CustomUserPrincipal authUser) {
+
+                User authUserEntity = userRepository.findById(authUser.getUserId())
+                                .orElseThrow(() -> new RuntimeException("User not found"));
+                if (authUserEntity.getRole() == Role.DOCTOR) {
+                        UUID doctorId = authUserEntity.getDoctor().getDoctorId();
+                        List<Appointment> appointments = appointmentRepository
+                                        .findActiveDoctorAppointments(doctorId, List.of());
+                        return appointments.stream()
+                                        .map(AppointmentDto::fromEntity)
+                                        .toList();
+                }
+
+                UUID patientId = authUserEntity.getPatient().getPatientId();
+                List<Appointment> appointments = appointmentRepository
+                                .findByPatient_PatientIdOrderByScheduledAtDesc(patientId);
                 return appointments.stream()
                                 .map(AppointmentDto::fromEntity)
                                 .toList();
