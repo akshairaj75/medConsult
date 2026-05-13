@@ -2,6 +2,7 @@ package com.backend.medconsult.repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -22,5 +23,6 @@ public interface AppointmentRepository extends JpaRepository<Appointment, UUID> 
         LocalDateTime end);
 
     List<Appointment> findByPatient_PatientIdOrderByScheduledAtDesc(UUID patientId);
+    Optional<Appointment> findTopByPatient_PatientIdOrderByScheduledAtDesc(UUID patientId);
 
 }

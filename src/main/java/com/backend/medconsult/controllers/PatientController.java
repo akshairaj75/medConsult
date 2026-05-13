@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.backend.medconsult.dto.UserDto;
+import com.backend.medconsult.dto.appointmentDto.AppointmentDto;
 import com.backend.medconsult.dto.patientDto.PatientDto;
 import com.backend.medconsult.dto.patientDto.PatientRegisterDto;
 import com.backend.medconsult.security.CustomUserPrincipal;
@@ -58,5 +59,12 @@ public class PatientController {
     public ResponseEntity<PatientDto> getPatientDetails(@PathVariable UUID patientId) {
         PatientDto patient = patientService.getPatientDetails(patientId);
         return ResponseEntity.ok(patient);
+    }
+
+    @GetMapping("/next-appointment")
+    public ResponseEntity<AppointmentDto> getLatestAppointment(@AuthenticationPrincipal CustomUserPrincipal authUser){
+
+        AppointmentDto dto = patientService.getLatestAppointment(authUser);
+        return ResponseEntity.ok(dto);
     }
 }

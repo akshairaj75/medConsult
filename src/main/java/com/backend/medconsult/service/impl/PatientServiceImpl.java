@@ -2,6 +2,7 @@ package com.backend.medconsult.service.impl;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,11 +10,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.backend.medconsult.dto.UserDto;
+import com.backend.medconsult.dto.appointmentDto.AppointmentDto;
 import com.backend.medconsult.dto.patientDto.PatientDto;
 import com.backend.medconsult.dto.patientDto.PatientRegisterDto;
+import com.backend.medconsult.entity.appointment.Appointment;
 import com.backend.medconsult.entity.auth.User;
 import com.backend.medconsult.entity.people.Doctor;
 import com.backend.medconsult.entity.people.Patient;
+import com.backend.medconsult.repository.AppointmentRepository;
 import com.backend.medconsult.repository.DoctorRepository;
 import com.backend.medconsult.repository.PatientRepository;
 import com.backend.medconsult.repository.UserRepository;
@@ -34,6 +38,9 @@ public class PatientServiceImpl implements PatientService {
 
     @Autowired
     FileStorageService fileStorageService;
+
+    @Autowired
+    AppointmentRepository appointmentRepository;
 
     @Override
     public PatientRegisterDto registerPatient(PatientRegisterDto dto, CustomUserPrincipal authUser) {
@@ -114,6 +121,16 @@ public class PatientServiceImpl implements PatientService {
         User savedUser = userRepository.save(user);
 
         return UserDto.fromEntity(savedUser);
+    }
+
+    @Override
+    public AppointmentDto getLatestAppointment(CustomUserPrincipal authUser) {
+        UUID patientId = authUser.getUser().getPatient().getPatientId();
+        Appointment appointment = appointmentRepository
+                .findTopByPatient_PatientIdOrderByScheduledAtDesc(patientId)
+                .orElseThrow(() -> new RuntimeException("No appointments"));
+        return AppointmentDto.fromEntity(appointment);
+
     }
 
 }
