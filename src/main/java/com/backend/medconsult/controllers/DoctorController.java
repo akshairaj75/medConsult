@@ -119,9 +119,9 @@ public class DoctorController {
     }
 
     @GetMapping("/appointments/today")
-    public ResponseEntity<List<AppointmentDto>> getDoctorAppointments(
+    public ResponseEntity<List<AppointmentDto>> getDoctorTodayAppointments(
             @AuthenticationPrincipal CustomUserPrincipal authUser) {
-        List<AppointmentDto> appointments = doctorService.getDoctorAppointments(authUser);
+        List<AppointmentDto> appointments = doctorService.getDoctorTodayAppointments(authUser);
         if (appointments == null) {
             return ResponseEntity.notFound().build();
         }

@@ -175,18 +175,23 @@ public class DoctorServiceImpl implements DoctorService {
         }
 
         @Override
-        public List<AppointmentDto> getDoctorAppointments(CustomUserPrincipal authUser) {
-                LocalDate today = LocalDate.now();
+        public List<AppointmentDto> getDoctorTodayAppointments(CustomUserPrincipal authUser) {
 
+                LocalDate today = LocalDate.now();
                 LocalDateTime start = today.atStartOfDay();
                 LocalDateTime end = today.atTime(LocalTime.MAX);
+
                 User authUserEntity = userRepository.findById(authUser.getUserId())
                                 .orElseThrow(() -> new RuntimeException("User not found"));
                 if (authUserEntity.getRole() == Role.DOCTOR) {
                         UUID doctorId = authUserEntity.getDoctor().getDoctorId();
                         List<Appointment> appointments = appointmentRepository
-                                        .findByDoctor_DoctorIdAndScheduledAtBetweenOrderByScheduledAtDesc(doctorId,
-                                                        start, end);
+                                        .findTodayDoctorAppointments(doctorId,
+                                                        start, end,
+                                                        List.of(
+                                                                        AppointmentStatus.CONFIRMED,
+                                                                        AppointmentStatus.COMPLETED,
+                                                                        AppointmentStatus.NO_SHOW));
                         return appointments.stream()
                                         .map(AppointmentDto::fromEntity)
                                         .toList();
@@ -211,9 +216,8 @@ public class DoctorServiceImpl implements DoctorService {
                         UUID doctorId = authUserEntity.getDoctor().getDoctorId();
                         List<Appointment> appointments = appointmentRepository
                                         .findActiveDoctorAppointments(doctorId, List.of(
-                                                AppointmentStatus.CANCELLED,
-                                                AppointmentStatus.SCHEDULED
-                                        ));
+                                                        AppointmentStatus.CANCELLED,
+                                                        AppointmentStatus.SCHEDULED));
                         return appointments.stream()
                                         .map(AppointmentDto::fromEntity)
                                         .toList();

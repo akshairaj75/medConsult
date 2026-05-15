@@ -28,14 +28,28 @@ public interface AppointmentRepository extends JpaRepository<Appointment, UUID> 
                         LocalDateTime end);
 
         @Query("""
-                    SELECT a
-                    FROM Appointment a
-                    WHERE a.doctor.doctorId = :doctorId
-                      AND a.status NOT IN :excludedStatuses
-                    ORDER BY a.scheduledAt DESC
-                """)
+                            SELECT a
+                            FROM Appointment a
+                            WHERE a.doctor.doctorId = :doctorId
+                              AND a.status NOT IN :excludedStatuses
+                            ORDER BY a.scheduledAt DESC
+                        """)
         List<Appointment> findActiveDoctorAppointments(
                         @Param("doctorId") UUID doctorId,
+                        @Param("excludedStatuses") List<AppointmentStatus> excludedStatuses);
+
+        @Query("""
+                            SELECT a
+                            FROM Appointment a
+                            WHERE a.doctor.doctorId = :doctorId
+                              AND a.scheduledAt BETWEEN :startOfDay AND :endOfDay
+                              AND a.status IN :excludedStatuses
+                            ORDER BY a.scheduledAt ASC
+                        """)
+        List<Appointment> findTodayDoctorAppointments(
+                        @Param("doctorId") UUID doctorId,
+                        @Param("startOfDay") LocalDateTime startOfDay,
+                        @Param("endOfDay") LocalDateTime endOfDay,
                         @Param("excludedStatuses") List<AppointmentStatus> excludedStatuses);
 
         List<Appointment> findByPatient_PatientIdOrderByScheduledAtDesc(UUID patientId);

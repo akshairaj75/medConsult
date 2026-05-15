@@ -27,7 +27,7 @@ public interface DoctorService {
 
     public BookAppointmentDto bookAppointment(UUID doctorId, CustomUserPrincipal authUser, BookAppointmentDto appointmentDto);
 
-    public List<AppointmentDto> getDoctorAppointments(CustomUserPrincipal authUser);
+    public List<AppointmentDto> getDoctorTodayAppointments(CustomUserPrincipal authUser);
 
     public AppointmentDto getDoctorAppointmentById(UUID doctorId, UUID appointmentId);
 
