@@ -21,7 +21,7 @@ public class WebSocketChannelInterceptor
 
         @Autowired
         private JwtService jwtUtil;
-
+        
         @Autowired
         private UserDetailsService userDetailsService;
 
