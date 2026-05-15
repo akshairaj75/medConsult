@@ -210,7 +210,10 @@ public class DoctorServiceImpl implements DoctorService {
                 if (authUserEntity.getRole() == Role.DOCTOR) {
                         UUID doctorId = authUserEntity.getDoctor().getDoctorId();
                         List<Appointment> appointments = appointmentRepository
-                                        .findActiveDoctorAppointments(doctorId, List.of());
+                                        .findActiveDoctorAppointments(doctorId, List.of(
+                                                AppointmentStatus.CANCELLED,
+                                                AppointmentStatus.SCHEDULED
+                                        ));
                         return appointments.stream()
                                         .map(AppointmentDto::fromEntity)
                                         .toList();

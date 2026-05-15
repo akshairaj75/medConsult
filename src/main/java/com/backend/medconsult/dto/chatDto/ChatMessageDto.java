@@ -1,82 +1,68 @@
 package com.backend.medconsult.dto.chatDto;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
+import com.backend.medconsult.entity.consultations.Message;
 import com.backend.medconsult.enums.MessageType;
 
+import lombok.*;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class ChatMessageDto {
 
+    private UUID messageId;
+
     private UUID consultationId;
+
     private UUID senderId;
-    private MessageType messageType;
+
+    private String senderName;
+
     private String content;
+
     private String fileUrl;
-    private String fileName;
-    private Long fileSizeBytes;
-    private String fileMimeType;
 
-    public UUID getConsultationId() {
-        return consultationId;
-    }
+    private boolean isRead;
 
-    public void setConsultationId(UUID consultationId) {
-        this.consultationId = consultationId;
-    }
+    private MessageType messageType;
 
-    public UUID getSenderId() {
-        return senderId;
-    }
+    private LocalDateTime createdAt;
 
-    public void setSenderId(UUID senderId) {
-        this.senderId = senderId;
-    }
+    public static ChatMessageDto fromEntity(
+            Message message) {
 
-    public MessageType getMessageType() {
-        return messageType;
-    }
+        return ChatMessageDto.builder()
 
-    public void setMessageType(MessageType messageType) {
-        this.messageType = messageType;
-    }
+                .messageId(message.getMessageId())
 
-    public String getContent() {
-        return content;
-    }
+                .consultationId(
+                        message.getConsultation()
+                                .getConsultationId())
 
-    public void setContent(String content) {
-        this.content = content;
-    }
+                .senderId(
+                        message.getSender().getUserId())
 
-    public String getFileUrl() {
-        return fileUrl;
-    }
+                .senderName(
+                        message.getSender().getFullName())
 
-    public void setFileUrl(String fileUrl) {
-        this.fileUrl = fileUrl;
-    }
+                .content(message.getContent())
 
-    public String getFileName() {
-        return fileName;
-    }
+                .fileUrl(message.getFileUrl())
 
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
-    }
+                .isRead(message.isRead())
 
-        public Long getFileSizeBytes() {
-        return fileSizeBytes;
-    }
+                .messageType(
+                        message.getMessageType())
 
-    public void setFileSizeBytes(Long fileSizeBytes) {
-        this.fileSizeBytes = fileSizeBytes;
-    }
+                .createdAt(
+                        message.getCreatedAt())
 
-    public String getFileMimeType() {
-        return fileMimeType;
-    }
-
-    public void setFileMimeType(String fileMimeType) {
-        this.fileMimeType = fileMimeType;
+                .build();
     }
 
 }

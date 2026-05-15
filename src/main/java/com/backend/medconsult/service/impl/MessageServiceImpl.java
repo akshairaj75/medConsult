@@ -1,14 +1,17 @@
 package com.backend.medconsult.service.impl;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import java.security.Principal;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
+
 import org.springframework.stereotype.Service;
 
 import com.backend.medconsult.dto.chatDto.ChatMessageDto;
-import com.backend.medconsult.dto.chatDto.MessageDto;
-import com.backend.medconsult.dto.chatDto.ReadReceiptDto;
 import com.backend.medconsult.entity.auth.User;
 import com.backend.medconsult.entity.consultations.Consultation;
 import com.backend.medconsult.entity.consultations.Message;
+import com.backend.medconsult.enums.MessageType;
 import com.backend.medconsult.repository.ConsultationRepository;
 import com.backend.medconsult.repository.MessageRepository;
 import com.backend.medconsult.repository.UserRepository;
@@ -17,40 +20,98 @@ import com.backend.medconsult.service.MessageService;
 @Service
 public class MessageServiceImpl implements MessageService {
 
-    @Autowired
-    private MessageRepository repository;
+    UserRepository userRepository;
+    MessageRepository messageRepository;
+    ConsultationRepository consultationRepository;
 
-    @Autowired
-    private ConsultationRepository consultationRepository;
+    // @Override
+    // public MessageDto saveMessage(ChatMessageDto dto) {
 
-    @Autowired
-    private UserRepository userRepository;
+    // Consultation consultation =
+    // consultationRepository.findById(dto.getConsultationId())
+    // .orElseThrow(() -> new RuntimeException("Consultation not found"));
+
+    // User sender = userRepository.findById(dto.getSenderId())
+    // .orElseThrow(() -> new RuntimeException("Sender not found"));
+
+    // Message message = new Message();
+    // message.setConsultation(consultation);
+    // message.setSender(sender);
+    // message.setContent(dto.getContent());
+    // message.setMessageType(dto.getMessageType());
+
+    // repository.save(message);
+
+    // return MessageDto.fromMessageDto(message);
+    // // return null;
+    // }
 
     @Override
-    public MessageDto saveMessage(ChatMessageDto dto) {
+    public ChatMessageDto process(
+            ChatMessageDto request,
+            Principal principal) {
 
-        Consultation consultation = consultationRepository.findById(dto.getConsultationId())
-                .orElseThrow(() -> new RuntimeException("Consultation not found"));
+        User sender = userRepository
+                .findByEmail(principal.getName())
+                .orElseThrow(
+                        () -> new RuntimeException(
+                                "Sender not found"));
 
-        User sender = userRepository.findById(dto.getSenderId())
-                .orElseThrow(() -> new RuntimeException("Sender not found"));
+        Consultation consultation = consultationRepository
+                .findById(request.getConsultationId())
+                .orElseThrow(
+                        () -> new RuntimeException(
+                                "Consultation not found"));
 
         Message message = new Message();
+
         message.setConsultation(consultation);
+
         message.setSender(sender);
-        message.setContent(dto.getContent());
-        message.setMessageType(dto.getMessageType());
 
-        repository.save(message);
+        message.setContent(request.getContent());
 
-        return MessageDto.fromMessageDto(message);
-        // return null;
+        message.setFileUrl(request.getFileUrl());
+
+        message.setMessageType(
+                request.getMessageType() != null
+                        ? request.getMessageType()
+                        : MessageType.TEXT);
+
+        Message saved = messageRepository.save(message);
+
+        return ChatMessageDto.fromEntity(saved);
     }
 
     @Override
-    public void markRead(ReadReceiptDto dto) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'markRead'");
+    public List<ChatMessageDto> loadMessages(
+            UUID consultationId) {
+
+        return messageRepository
+                .findMessagesByConsultation(consultationId)
+                .stream()
+                .map(ChatMessageDto::fromEntity)
+                .toList();
+    }
+
+    @Override
+    public void markAsRead(UUID messageId) {
+
+        Message message = messageRepository
+                .findById(messageId)
+                .orElseThrow();
+
+        message.setRead(true);
+
+        message.setReadAt(LocalDateTime.now());
+
+        messageRepository.save(message);
+    }
+
+    @Override
+    public Long unreadCount(UUID userId) {
+
+        return messageRepository.unreadCount(userId);
     }
 
 }

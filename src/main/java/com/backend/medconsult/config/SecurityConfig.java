@@ -25,82 +25,84 @@ import jakarta.servlet.http.HttpServletResponse;
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    // @Bean
-    // public SecurityFilterChain securityFilterChain(
-    // HttpSecurity http) throws Exception {
-    // http
-    // .csrf(csrf -> csrf.disable())
-    // .sessionManagement(session -> session
-    // .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
-    // .authorizeHttpRequests(auth -> auth
-    // // .requestMatchers("/api/auth/register", "/api/auth/login").permitAll()
-    // // .anyRequest().authenticated()
-    // .anyRequest().permitAll())
-    // .formLogin(Customizer.withDefaults());
+        // @Bean
+        // public SecurityFilterChain securityFilterChain(
+        // HttpSecurity http) throws Exception {
+        // http
+        // .csrf(csrf -> csrf.disable())
+        // .sessionManagement(session -> session
+        // .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+        // .authorizeHttpRequests(auth -> auth
+        // // .requestMatchers("/api/auth/register", "/api/auth/login").permitAll()
+        // // .anyRequest().authenticated()
+        // .anyRequest().permitAll())
+        // .formLogin(Customizer.withDefaults());
 
-    // return http.build();
-    // }
+        // return http.build();
+        // }
 
-    @Autowired
-    private CustomOAuth2UserService oauthService;
+        @Autowired
+        private CustomOAuth2UserService oauthService;
 
-    @Autowired
-    private JwtAuthenticationFilter jwtFilter;
+        @Autowired
+        private JwtAuthenticationFilter jwtFilter;
 
-    @Autowired
-    private OAuth2SuccessHandler oAuth2successHandler;
+        @Autowired
+        private OAuth2SuccessHandler oAuth2successHandler;
 
-    @Bean
-    public AuthenticationManager authenticationManager(
-            AuthenticationConfiguration authenticationConfiguration) throws Exception {
-        return authenticationConfiguration.getAuthenticationManager();
-    }
+        @Bean
+        public AuthenticationManager authenticationManager(
+                        AuthenticationConfiguration authenticationConfiguration) throws Exception {
+                return authenticationConfiguration.getAuthenticationManager();
+        }
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+        @Bean
+        public PasswordEncoder passwordEncoder() {
+                return new BCryptPasswordEncoder();
+        }
 
-    @Bean
-    public SecurityFilterChain filterChain(
-            HttpSecurity http) throws Exception {
+        @Bean
+        public SecurityFilterChain filterChain(
+                        HttpSecurity http) throws Exception {
 
-        http
-                .cors(Customizer.withDefaults())
-                .csrf(csrf -> csrf.disable())
-                .sessionManagement(session ->
-                        session.sessionCreationPolicy(
-                                SessionCreationPolicy.STATELESS))
+                http
+                                .cors(Customizer.withDefaults())
+                                .csrf(csrf -> csrf.disable())
+                                .sessionManagement(session -> session.sessionCreationPolicy(
+                                                SessionCreationPolicy.STATELESS))
 
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**", "/api/oauth2/**","/uploads/**").permitAll()
-                        .anyRequest().authenticated())
+                                .authorizeHttpRequests(auth -> auth
+                                                .requestMatchers("/api/auth/**", "/api/oauth2/**", "/uploads/**",
+                                                                "/ws/**")
+                                                .permitAll()
+                                                .requestMatchers("/api/chat/**")
+                                                .authenticated()
+                                                .anyRequest().authenticated())
 
-                .oauth2Login(oauth -> oauth
-                        .userInfoEndpoint(user -> 
-                                user.userService(oauthService))
-                        .successHandler(oAuth2successHandler))
+                                .oauth2Login(oauth -> oauth
+                                                .userInfoEndpoint(user -> user.userService(oauthService))
+                                                .successHandler(oAuth2successHandler))
 
-                .exceptionHandling(ex -> ex
-                        .authenticationEntryPoint((request, response, authException) -> {
-                                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                                response.setContentType("application/json");
-                                response.getWriter().write("""
-                                        {
-                                                "message": "Unauthorized"
-                                        }
-                                        """);
-                                }))
+                                .exceptionHandling(ex -> ex
+                                                .authenticationEntryPoint((request, response, authException) -> {
+                                                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                                                        response.setContentType("application/json");
+                                                        response.getWriter().write("""
+                                                                        {
+                                                                                "message": "Unauthorized"
+                                                                        }
+                                                                        """);
+                                                }))
 
-                .logout(logout -> logout
-                        .logoutUrl("/logout")
-                        .logoutSuccessUrl("/api/auth/logout")
-                        .invalidateHttpSession(true)
-                        .deleteCookies("JSESSIONID"));
-        http.addFilterBefore(
-                jwtFilter,
-                UsernamePasswordAuthenticationFilter.class);
-        return http.build();
-    }
+                                .logout(logout -> logout
+                                                .logoutUrl("/logout")
+                                                .logoutSuccessUrl("/api/auth/logout")
+                                                .invalidateHttpSession(true)
+                                                .deleteCookies("JSESSIONID"));
+                http.addFilterBefore(
+                                jwtFilter,
+                                UsernamePasswordAuthenticationFilter.class);
+                return http.build();
+        }
 
 }

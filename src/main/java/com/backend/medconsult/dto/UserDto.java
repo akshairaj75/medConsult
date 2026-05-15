@@ -2,7 +2,6 @@ package com.backend.medconsult.dto;
 
 import java.util.UUID;
 
-import com.backend.medconsult.dto.patientDto.PatientDto;
 import com.backend.medconsult.entity.auth.User;
 import com.backend.medconsult.enums.Role;
 
