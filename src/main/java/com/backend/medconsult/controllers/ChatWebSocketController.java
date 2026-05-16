@@ -8,7 +8,9 @@ import java.util.UUID;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,8 +21,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.backend.medconsult.dto.chatDto.ChatMessageDto;
-import com.backend.medconsult.entity.consultations.Consultation;
-import com.backend.medconsult.repository.ConsultationRepository;
 import com.backend.medconsult.security.CustomUserPrincipal;
 import com.backend.medconsult.service.MessageService;
 import com.backend.medconsult.service.impl.FileStorageService;
@@ -35,35 +35,49 @@ public class ChatWebSocketController {
 
         private final SimpMessagingTemplate messagingTemplate;
         private final FileStorageService fileStorageService;
-        private final ConsultationRepository consultationRepository;
         private final MessageService messageService;
 
+        // @MessageMapping("/chat.send")
+        // public void sendMessage(
+        // ChatMessageDto dto,
+        // Principal principal) {
+
+        // ChatMessageDto saved = messageService.process(dto, principal);
+
+        // Consultation consultation =
+        // consultationRepository.findById(dto.getConsultationId())
+        // .orElseThrow();
+        // String senderEmail = principal.getName();
+        // String receiverEmail;
+
+        // if (consultation.getDoctor().getUser().getEmail().equals(senderEmail)) {
+        // receiverEmail = consultation.getPatient().getUser().getEmail();
+        // } else {
+        // receiverEmail = consultation.getDoctor().getUser().getEmail();
+        // }
+
+        // messagingTemplate.convertAndSendToUser(receiverEmail, "/queue/messages",
+        // saved);
+        // }
+
         @MessageMapping("/chat.send")
-        public void sendMessage(
-                        ChatMessageDto request,
-                        Principal principal) {
+        public void sendMessage(ChatMessageDto dto, Principal principal) {
+                UsernamePasswordAuthenticationToken auth = (UsernamePasswordAuthenticationToken) principal;
 
-                ChatMessageDto saved = messageService.process(request, principal);
+                CustomUserPrincipal authUser = (CustomUserPrincipal) auth.getPrincipal();
 
-                Consultation consultation = consultationRepository.findById(request.getConsultationId())
-                                .orElseThrow();
-                String senderEmail = principal.getName();
-                String receiverEmail;
+                ChatMessageDto saved = messageService.saveMessage(dto, authUser);
 
-                if (consultation.getDoctor().getUser().getEmail().equals(senderEmail)) {
-                        receiverEmail = consultation.getPatient().getUser().getEmail();
-                } else {
-                        receiverEmail = consultation.getDoctor().getUser().getEmail();
-                }
-
-                messagingTemplate.convertAndSendToUser(receiverEmail, "/queue/messages", saved);
+                messagingTemplate.convertAndSend(
+                                "/topic/chat/" + dto.getConsultationId(),
+                                saved);
         }
 
-        @GetMapping("/{roomId}/messages")
-        public ResponseEntity<List<ChatMessageDto>> getMessages(@PathVariable UUID roomId) {
+        @GetMapping("/{consultationId}/messages")
+        public ResponseEntity<List<ChatMessageDto>> getMessages(@PathVariable UUID consultationId) {
 
                 return ResponseEntity.ok(
-                                messageService.loadMessages(roomId));
+                                messageService.loadMessages(consultationId));
         }
 
         @GetMapping("/unread-count")

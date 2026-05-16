@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.backend.medconsult.dto.chatDto.ChatMessageDto;
@@ -15,103 +16,148 @@ import com.backend.medconsult.enums.MessageType;
 import com.backend.medconsult.repository.ConsultationRepository;
 import com.backend.medconsult.repository.MessageRepository;
 import com.backend.medconsult.repository.UserRepository;
+import com.backend.medconsult.security.CustomUserPrincipal;
 import com.backend.medconsult.service.MessageService;
 
 @Service
 public class MessageServiceImpl implements MessageService {
 
-    UserRepository userRepository;
-    MessageRepository messageRepository;
-    ConsultationRepository consultationRepository;
+        @Autowired
+        UserRepository userRepository;
 
-    // @Override
-    // public MessageDto saveMessage(ChatMessageDto dto) {
+        @Autowired
+        MessageRepository messageRepository;
 
-    // Consultation consultation =
-    // consultationRepository.findById(dto.getConsultationId())
-    // .orElseThrow(() -> new RuntimeException("Consultation not found"));
+        @Autowired
+        ConsultationRepository consultationRepository;
 
-    // User sender = userRepository.findById(dto.getSenderId())
-    // .orElseThrow(() -> new RuntimeException("Sender not found"));
+        // @Override
+        // public MessageDto saveMessage(ChatMessageDto dto) {
 
-    // Message message = new Message();
-    // message.setConsultation(consultation);
-    // message.setSender(sender);
-    // message.setContent(dto.getContent());
-    // message.setMessageType(dto.getMessageType());
+        // Consultation consultation =
+        // consultationRepository.findById(dto.getConsultationId())
+        // .orElseThrow(() -> new RuntimeException("Consultation not found"));
 
-    // repository.save(message);
+        // User sender = userRepository.findById(dto.getSenderId())
+        // .orElseThrow(() -> new RuntimeException("Sender not found"));
 
-    // return MessageDto.fromMessageDto(message);
-    // // return null;
-    // }
+        // Message message = new Message();
+        // message.setConsultation(consultation);
+        // message.setSender(sender);
+        // message.setContent(dto.getContent());
+        // message.setMessageType(dto.getMessageType());
 
-    @Override
-    public ChatMessageDto process(
-            ChatMessageDto request,
-            Principal principal) {
+        // repository.save(message);
 
-        User sender = userRepository
-                .findByEmail(principal.getName())
-                .orElseThrow(
-                        () -> new RuntimeException(
-                                "Sender not found"));
+        // return MessageDto.fromMessageDto(message);
+        // // return null;
+        // }
 
-        Consultation consultation = consultationRepository
-                .findById(request.getConsultationId())
-                .orElseThrow(
-                        () -> new RuntimeException(
-                                "Consultation not found"));
+        @Override
+        public ChatMessageDto process(
+                        ChatMessageDto request,
+                        Principal principal) {
 
-        Message message = new Message();
+                ;
 
-        message.setConsultation(consultation);
+                User sender = userRepository
+                                .findByEmail(principal.getName())
+                                .orElseThrow(
+                                                () -> new RuntimeException(
+                                                                "Sender not found"));
 
-        message.setSender(sender);
+                Consultation consultation = consultationRepository
+                                .findById(request.getConsultationId())
+                                .orElseThrow(
+                                                () -> new RuntimeException(
+                                                                "Consultation not found"));
 
-        message.setContent(request.getContent());
+                Message message = new Message();
 
-        message.setFileUrl(request.getFileUrl());
+                message.setConsultation(consultation);
 
-        message.setMessageType(
-                request.getMessageType() != null
-                        ? request.getMessageType()
-                        : MessageType.TEXT);
+                message.setSender(sender);
 
-        Message saved = messageRepository.save(message);
+                message.setContent(request.getContent());
 
-        return ChatMessageDto.fromEntity(saved);
-    }
+                message.setFileUrl(request.getFileUrl());
 
-    @Override
-    public List<ChatMessageDto> loadMessages(
-            UUID consultationId) {
+                message.setMessageType(
+                                request.getMessageType() != null
+                                                ? request.getMessageType()
+                                                : MessageType.TEXT);
 
-        return messageRepository
-                .findMessagesByConsultation(consultationId)
-                .stream()
-                .map(ChatMessageDto::fromEntity)
-                .toList();
-    }
+                Message saved = messageRepository.save(message);
 
-    @Override
-    public void markAsRead(UUID messageId) {
+                return ChatMessageDto.fromEntity(saved);
+        }
 
-        Message message = messageRepository
-                .findById(messageId)
-                .orElseThrow();
+        @Override
+        public List<ChatMessageDto> loadMessages(
+                        UUID consultationId) {
 
-        message.setRead(true);
+                return messageRepository
+                                .findMessagesByConsultation(consultationId)
+                                .stream()
+                                .map(ChatMessageDto::fromEntity)
+                                .toList();
+        }
 
-        message.setReadAt(LocalDateTime.now());
+        @Override
+        public void markAsRead(UUID messageId) {
 
-        messageRepository.save(message);
-    }
+                Message message = messageRepository
+                                .findById(messageId)
+                                .orElseThrow();
 
-    @Override
-    public Long unreadCount(UUID userId) {
+                message.setRead(true);
 
-        return messageRepository.unreadCount(userId);
-    }
+                message.setReadAt(LocalDateTime.now());
+
+                messageRepository.save(message);
+        }
+
+        @Override
+        public Long unreadCount(UUID userId) {
+
+                return messageRepository.unreadCount(userId);
+        }
+
+        @Override
+        public ChatMessageDto saveMessage(ChatMessageDto dto, CustomUserPrincipal authUser) {
+
+                System.out.println("============================");
+                System.out.println(dto.getContent());
+                System.out.println(dto.getMessageType());
+                System.out.println(dto.getConsultationId());
+                System.out.println("============================");
+
+                
+
+                Consultation consultation = consultationRepository.findById(dto.getConsultationId())
+                                .orElseThrow();
+
+                User sender = userRepository.findById(authUser.getUserId())
+                                .orElseThrow();
+
+                Message message = new Message();
+                message.setConsultation(consultation);
+                message.setSender(sender);
+                message.setContent(dto.getContent());
+                message.setRead(false);
+                message.setMessageType(MessageType.TEXT);
+                Message saved = messageRepository.save(message);
+
+                return ChatMessageDto.fromEntity(saved);
+
+                // return ChatMessageDto.builder()
+                // .consultationId(consultation.getConsultationId())
+                // .senderId(sender.getUserId())
+                // .senderName(sender.getFullName())
+                // .content(saved.getContent())
+                // .messageType(saved.getMessageType())
+                // .createdAt(saved.getCreatedAt())
+                // .build();
+        }
 
 }

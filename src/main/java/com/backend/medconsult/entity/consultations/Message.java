@@ -67,7 +67,7 @@ public class Message {
     private String fileMimeType;
 
     @Column(name = "is_read", nullable = false)
-    private boolean isRead = false;
+    private Boolean isRead = false;
 
     @Column(name = "read_at")
     private LocalDateTime readAt;
@@ -148,11 +148,11 @@ public class Message {
         this.fileMimeType = fileMimeType;
     }
 
-    public boolean isRead() {
+    public Boolean isRead() {
         return isRead;
     }
 
-    public void setRead(boolean isRead) {
+    public void setRead(Boolean isRead) {
         this.isRead = isRead;
     }
 

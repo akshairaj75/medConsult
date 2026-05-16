@@ -16,29 +16,21 @@ import lombok.*;
 public class ChatMessageDto {
 
     private UUID messageId;
-
     private UUID consultationId;
-
     private UUID senderId;
-
     private String senderName;
-
     private String content;
-
     private String fileUrl;
-
-    private boolean isRead;
-
+    private Boolean isRead;
     private MessageType messageType;
-
     private LocalDateTime createdAt;
 
-    public static ChatMessageDto fromEntity(
-            Message message) {
+    public static ChatMessageDto fromEntity(Message message) {
 
         return ChatMessageDto.builder()
 
-                .messageId(message.getMessageId())
+                .messageId(
+                        message.getMessageId())
 
                 .consultationId(
                         message.getConsultation()
@@ -50,11 +42,14 @@ public class ChatMessageDto {
                 .senderName(
                         message.getSender().getFullName())
 
-                .content(message.getContent())
+                .content(
+                        message.getContent())
 
-                .fileUrl(message.getFileUrl())
+                .fileUrl(
+                        message.getFileUrl())
 
-                .isRead(message.isRead())
+                .isRead(
+                        message.isRead())
 
                 .messageType(
                         message.getMessageType())

@@ -6,12 +6,12 @@ import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.messaging.support.MessageHeaderAccessor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.Message;
 
 import com.backend.medconsult.security.CustomUserPrincipal;
+import com.backend.medconsult.service.impl.CustomUserDetailsService;
 import com.backend.medconsult.service.impl.JwtService;
 
 @Component
@@ -21,9 +21,9 @@ public class WebSocketChannelInterceptor
 
         @Autowired
         private JwtService jwtUtil;
-        
+
         @Autowired
-        private UserDetailsService userDetailsService;
+        private CustomUserDetailsService userDetailsService;
 
         @Override
         public Message<?> preSend(
