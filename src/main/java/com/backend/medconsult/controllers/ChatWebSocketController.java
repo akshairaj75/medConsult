@@ -37,29 +37,6 @@ public class ChatWebSocketController {
         private final FileStorageService fileStorageService;
         private final MessageService messageService;
 
-        // @MessageMapping("/chat.send")
-        // public void sendMessage(
-        // ChatMessageDto dto,
-        // Principal principal) {
-
-        // ChatMessageDto saved = messageService.process(dto, principal);
-
-        // Consultation consultation =
-        // consultationRepository.findById(dto.getConsultationId())
-        // .orElseThrow();
-        // String senderEmail = principal.getName();
-        // String receiverEmail;
-
-        // if (consultation.getDoctor().getUser().getEmail().equals(senderEmail)) {
-        // receiverEmail = consultation.getPatient().getUser().getEmail();
-        // } else {
-        // receiverEmail = consultation.getDoctor().getUser().getEmail();
-        // }
-
-        // messagingTemplate.convertAndSendToUser(receiverEmail, "/queue/messages",
-        // saved);
-        // }
-
         @MessageMapping("/chat.send")
         public void sendMessage(ChatMessageDto dto, Principal principal) {
                 UsernamePasswordAuthenticationToken auth = (UsernamePasswordAuthenticationToken) principal;
@@ -74,10 +51,10 @@ public class ChatWebSocketController {
         }
 
         @GetMapping("/{consultationId}/messages")
-        public ResponseEntity<List<ChatMessageDto>> getMessages(@PathVariable UUID consultationId) {
+        public ResponseEntity<List<ChatMessageDto>> getMessages(
+                        @PathVariable UUID consultationId) {
 
-                return ResponseEntity.ok(
-                                messageService.loadMessages(consultationId));
+                return ResponseEntity.ok(messageService.loadMessages(consultationId));
         }
 
         @GetMapping("/unread-count")

@@ -1,6 +1,9 @@
 package com.backend.medconsult.service.impl;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -127,7 +130,30 @@ public class PatientServiceImpl implements PatientService {
         UUID patientId = authUser.getUser().getPatient().getPatientId();
         Appointment appointment = appointmentRepository
                 .findTopByPatient_PatientIdOrderByScheduledAtDesc(patientId)
-                .orElseThrow(() -> new RuntimeException("No appointments"));
+                .orElse(null);
+        if (appointment == null) {
+            return null;
+        }
+        return AppointmentDto.fromEntity(appointment);
+
+    }
+
+    @Override
+    public AppointmentDto getLatestAppointmentToday(CustomUserPrincipal authUser) {
+        UUID patientId = authUser.getUser().getPatient().getPatientId();
+
+        LocalDate today = LocalDate.now();
+        LocalDateTime start = today.atStartOfDay();
+        LocalDateTime end = today.atTime(LocalTime.MAX);
+
+        Appointment appointment = appointmentRepository
+                .findTopByPatient_PatientIdAndScheduledAtBetweenOrderByScheduledAtDesc(patientId,
+                        start,
+                        end)
+                .orElse(null);
+        if (appointment == null) {
+            return null;
+        }
         return AppointmentDto.fromEntity(appointment);
 
     }

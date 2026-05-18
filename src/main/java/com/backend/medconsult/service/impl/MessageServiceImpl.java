@@ -57,9 +57,6 @@ public class MessageServiceImpl implements MessageService {
         public ChatMessageDto process(
                         ChatMessageDto request,
                         Principal principal) {
-
-                ;
-
                 User sender = userRepository
                                 .findByEmail(principal.getName())
                                 .orElseThrow(
@@ -68,20 +65,14 @@ public class MessageServiceImpl implements MessageService {
 
                 Consultation consultation = consultationRepository
                                 .findById(request.getConsultationId())
-                                .orElseThrow(
-                                                () -> new RuntimeException(
-                                                                "Consultation not found"));
+                                .orElseThrow(() -> new RuntimeException(
+                                                "Consultation not found"));
 
                 Message message = new Message();
-
                 message.setConsultation(consultation);
-
                 message.setSender(sender);
-
                 message.setContent(request.getContent());
-
                 message.setFileUrl(request.getFileUrl());
-
                 message.setMessageType(
                                 request.getMessageType() != null
                                                 ? request.getMessageType()
@@ -93,11 +84,10 @@ public class MessageServiceImpl implements MessageService {
         }
 
         @Override
-        public List<ChatMessageDto> loadMessages(
-                        UUID consultationId) {
+        public List<ChatMessageDto> loadMessages(UUID consultationId) {
 
                 return messageRepository
-                                .findMessagesByConsultation(consultationId)
+                                .findMessagesByConsultation_ConsultationIdOrderByCreatedAtAsc(consultationId)
                                 .stream()
                                 .map(ChatMessageDto::fromEntity)
                                 .toList();
@@ -106,14 +96,9 @@ public class MessageServiceImpl implements MessageService {
         @Override
         public void markAsRead(UUID messageId) {
 
-                Message message = messageRepository
-                                .findById(messageId)
-                                .orElseThrow();
-
+                Message message = messageRepository.findById(messageId).orElseThrow();
                 message.setRead(true);
-
                 message.setReadAt(LocalDateTime.now());
-
                 messageRepository.save(message);
         }
 
@@ -125,15 +110,6 @@ public class MessageServiceImpl implements MessageService {
 
         @Override
         public ChatMessageDto saveMessage(ChatMessageDto dto, CustomUserPrincipal authUser) {
-
-                System.out.println("============================");
-                System.out.println(dto.getContent());
-                System.out.println(dto.getMessageType());
-                System.out.println(dto.getConsultationId());
-                System.out.println("============================");
-
-                
-
                 Consultation consultation = consultationRepository.findById(dto.getConsultationId())
                                 .orElseThrow();
 
@@ -150,14 +126,6 @@ public class MessageServiceImpl implements MessageService {
 
                 return ChatMessageDto.fromEntity(saved);
 
-                // return ChatMessageDto.builder()
-                // .consultationId(consultation.getConsultationId())
-                // .senderId(sender.getUserId())
-                // .senderName(sender.getFullName())
-                // .content(saved.getContent())
-                // .messageType(saved.getMessageType())
-                // .createdAt(saved.getCreatedAt())
-                // .build();
         }
 
 }

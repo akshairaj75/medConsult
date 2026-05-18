@@ -64,7 +64,10 @@ public class PatientController {
     @GetMapping("/next-appointment")
     public ResponseEntity<AppointmentDto> getLatestAppointment(@AuthenticationPrincipal CustomUserPrincipal authUser){
 
-        AppointmentDto dto = patientService.getLatestAppointment(authUser);
+        AppointmentDto dto = patientService.getLatestAppointmentToday(authUser);
+        if (dto == null) {
+            dto = patientService.getLatestAppointment(authUser);
+        }
         return ResponseEntity.ok(dto);
     }
 }

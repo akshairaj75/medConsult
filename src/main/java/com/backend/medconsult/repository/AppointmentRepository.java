@@ -56,4 +56,8 @@ public interface AppointmentRepository extends JpaRepository<Appointment, UUID> 
 
         Optional<Appointment> findTopByPatient_PatientIdOrderByScheduledAtDesc(UUID patientId);
 
+        Optional<Appointment> findTopByPatient_PatientIdAndScheduledAtBetweenOrderByScheduledAtDesc(
+        UUID patientId,
+        LocalDateTime start,
+        LocalDateTime end);
 }

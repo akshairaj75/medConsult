@@ -23,5 +23,7 @@ public interface PatientService {
 
     AppointmentDto getLatestAppointment(CustomUserPrincipal authUser);
 
+    AppointmentDto getLatestAppointmentToday(CustomUserPrincipal authUser);
+
 
 }
