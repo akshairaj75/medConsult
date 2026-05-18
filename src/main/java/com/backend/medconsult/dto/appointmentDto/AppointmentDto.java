@@ -18,7 +18,7 @@ public class AppointmentDto {
     private DoctorDto doctor; 
 
 
-    private UUID consultaionId;
+    private UUID consultationId;
     private String appointmentType;
     private LocalDateTime scheduledAt;
     private int durationMinutes;
@@ -69,12 +69,12 @@ public class AppointmentDto {
     public void setDoctor(DoctorDto doctor) {
         this.doctor = doctor;
     }
-    public UUID getConsultaionId() {
-        return consultaionId;
+    public UUID getConsultationId() {
+        return consultationId;
     }
 
-    public void setConsultaionId(UUID consultaionId) {
-        this.consultaionId = consultaionId;
+    public void setConsultationId(UUID consultationId) {
+        this.consultationId = consultationId;
     }
 
     public String getAppointmentType() {
@@ -171,7 +171,7 @@ public class AppointmentDto {
                         ? PatientDto.fromEntity(appointment.getPatient())
                         : null);
         dto.setPatientId(appointment.getPatient().getPatientId());
-        dto.setConsultaionId(
+        dto.setConsultationId(
                 appointment.getConsultation() != null
                         ? appointment.getConsultation().getConsultationId()
                         : null);

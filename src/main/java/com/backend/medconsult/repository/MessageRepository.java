@@ -7,7 +7,6 @@ import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import com.backend.medconsult.entity.auth.User;
 import com.backend.medconsult.entity.consultations.Message;
 
 public interface MessageRepository extends JpaRepository<Message, UUID> {
