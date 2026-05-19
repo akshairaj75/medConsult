@@ -38,15 +38,19 @@ public class HealthController {
 
     @GetMapping("/prescription/{patientId}")
     public ResponseEntity<List<PrescriptionDto>> getPrescriptionsByPatientId(
-            @PathVariable UUID patientId,
+            @AuthenticationPrincipal CustomUserPrincipal authUser,
             @RequestParam(required = false) Boolean activeOnly) {
-        List<PrescriptionDto> prescriptions = healthService.getPrescriptionsByPatientId(patientId, activeOnly);
+        List<PrescriptionDto> prescriptions = healthService.getPrescriptionsByPatientId(authUser, activeOnly);
         return ResponseEntity.ok(prescriptions);
     }
 
-    @PostMapping("/medication-dherence")
-    public ResponseEntity<List<MedAdherenceRegisterDto>> addAdherence(){
-        return null;
+    @PostMapping("/med-adherence")
+    public ResponseEntity<MedAdherenceRegisterDto> addAdherence(
+        @RequestBody MedAdherenceRegisterDto dto,
+        @AuthenticationPrincipal CustomUserPrincipal authUser
+    ){
+        MedAdherenceRegisterDto adherence = healthService.addAdherence(dto, authUser);
+        return ResponseEntity.ok(adherence);
     }
 
 }

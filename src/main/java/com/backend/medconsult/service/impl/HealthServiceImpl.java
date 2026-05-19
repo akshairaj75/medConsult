@@ -7,15 +7,17 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.backend.medconsult.dto.HealthDto.MedAdherenceRegisterDto;
 import com.backend.medconsult.dto.HealthDto.PrescriptionDto;
 import com.backend.medconsult.dto.HealthDto.PrescriptionRegisterDto;
+import com.backend.medconsult.entity.clinicalData.MedicationAdherence;
 import com.backend.medconsult.entity.clinicalData.Prescription;
 import com.backend.medconsult.entity.consultations.Consultation;
-import com.backend.medconsult.entity.people.Doctor;
 import com.backend.medconsult.entity.people.Patient;
 import com.backend.medconsult.enums.Role;
 import com.backend.medconsult.repository.ConsultationRepository;
 import com.backend.medconsult.repository.DoctorRepository;
+import com.backend.medconsult.repository.MedicationAdherenceRepository;
 import com.backend.medconsult.repository.PatientRepository;
 import com.backend.medconsult.repository.PrescriptionRepository;
 import com.backend.medconsult.security.CustomUserPrincipal;
@@ -35,6 +37,9 @@ public class HealthServiceImpl implements HealthService {
 
         @Autowired
         PrescriptionRepository prescriptionRepository;
+
+        @Autowired
+        MedicationAdherenceRepository adherenceRepository;
 
         @Override
         public List<PrescriptionRegisterDto> addPrescription(
@@ -85,8 +90,9 @@ public class HealthServiceImpl implements HealthService {
         }
 
         @Override
-        public List<PrescriptionDto> getPrescriptionsByPatientId(UUID patientId, Boolean activeOnly) {
+        public List<PrescriptionDto> getPrescriptionsByPatientId(CustomUserPrincipal authUser, Boolean activeOnly) {
                 List<Prescription> prescriptions;
+                UUID patientId = authUser.getUser().getPatient().getPatientId();
                 if (activeOnly != null && activeOnly) {
                         prescriptions = prescriptionRepository.findActivePrescriptionsByPatient_patientId(patientId,
                                         LocalDate.now());
@@ -96,6 +102,26 @@ public class HealthServiceImpl implements HealthService {
                 return prescriptions.stream()
                                 .map(PrescriptionDto::fromEntity)
                                 .toList();
+        }
+
+        @Override
+        public MedAdherenceRegisterDto addAdherence(MedAdherenceRegisterDto dto, CustomUserPrincipal authUser) {
+                Patient patient = authUser.getUser().getPatient();
+                Prescription prescription = prescriptionRepository.findById(dto.getPrescriptionId())
+                                .orElseThrow(() -> new RuntimeException("Prescription not found"));
+
+                LocalDate today = LocalDate.now();
+                MedicationAdherence adherence = new MedicationAdherence();
+                adherence.setPatient(patient);
+                adherence.setPrescription(prescription);
+                adherence.setRecordedDate(today);
+                if (dto.getSkippedReason() != null) {
+                        adherence.setSkippedReason(dto.getSkippedReason());
+                } else {
+                        adherence.setTaken(dto.isTaken());
+                }
+                adherenceRepository.save(adherence);
+                return MedAdherenceRegisterDto.fromEntity(adherence);
         }
 
 }
