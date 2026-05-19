@@ -30,7 +30,7 @@ public class HealthController {
     @PostMapping("/prescription/{consultationId}/add")
     public ResponseEntity<List<PrescriptionRegisterDto>> addPrescription(
         @AuthenticationPrincipal CustomUserPrincipal authUser,
-            @RequestBody PrescriptionRegisterDto dto,
+            @RequestBody List<PrescriptionRegisterDto> dto,
             @PathVariable UUID consultationId) {
         List<PrescriptionRegisterDto> prescriptions = healthService.addPrescription(authUser, dto, consultationId);
         return ResponseEntity.ok(prescriptions);

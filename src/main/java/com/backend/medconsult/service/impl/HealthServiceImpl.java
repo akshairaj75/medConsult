@@ -39,16 +39,8 @@ public class HealthServiceImpl implements HealthService {
         @Override
         public List<PrescriptionRegisterDto> addPrescription(
                         CustomUserPrincipal authUser,
-                        PrescriptionRegisterDto dto,
+                        List<PrescriptionRegisterDto> dtos,
                         UUID consultationId) {
-                LocalDate startDate = dto.getStartedAt() == null
-                                ? LocalDate.now()
-                                : dto.getStartedAt();
-
-                // LocalDate expiryDate = startDate.plusDays(dto.getDurationDays());
-                LocalDate expiryDate = dto.getDurationDays() != null
-                                ? startDate.plusDays(dto.getDurationDays())
-                                : null;
 
                 Consultation consultation = consultationRepository.findById(consultationId)
                                 .orElseThrow(() -> new RuntimeException("Consultation not found"));
@@ -57,24 +49,38 @@ public class HealthServiceImpl implements HealthService {
                         throw new RuntimeException("Only doctors can prescribe medications");
                 }
 
-                Prescription prescription = new Prescription();
+                List<Prescription> prescriptions = dtos.stream().map(dto -> {
 
-                prescription.setDoctor(consultation.getDoctor());
-                prescription.setPatient(consultation.getPatient());
-                prescription.setConsultation(consultation);
-                prescription.setMedicationName(dto.getMedicationName());
-                prescription.setDosage(dto.getDosage());
-                prescription.setFrequency(dto.getFrequency());
-                prescription.setDurationDays(dto.getDurationDays());
-                prescription.setRefillsAllowed(dto.getRefillsAllowed());
-                prescription.setInstructions(dto.getInstructions());
-                prescription.setStartedAt(startDate);
-                prescription.setExpiresAt(expiryDate);
+                        LocalDate startDate = dto.getStartedAt() == null
+                                        ? LocalDate.now()
+                                        : dto.getStartedAt();
 
-                Prescription savedPrescription = prescriptionRepository.save(prescription);
+                        // LocalDate expiryDate = startDate.plusDays(dto.getDurationDays());
+                        LocalDate expiryDate = dto.getDurationDays() != null
+                                        ? startDate.plusDays(dto.getDurationDays())
+                                        : null;
+                        Prescription prescription = new Prescription();
+                        prescription.setDoctor(consultation.getDoctor());
+                        prescription.setPatient(consultation.getPatient());
+                        prescription.setConsultation(consultation);
+                        prescription.setMedicationName(dto.getMedicationName());
+                        prescription.setDosage(dto.getDosage());
+                        prescription.setFrequency(dto.getFrequency());
+                        prescription.setDurationDays(dto.getDurationDays());
+                        prescription.setRefillsAllowed(dto.getRefillsAllowed());
+                        prescription.setInstructions(dto.getInstructions());
+                        prescription.setStartedAt(startDate);
+                        prescription.setExpiresAt(expiryDate);
 
-                return List.of(
-                                PrescriptionRegisterDto.fromEntity(savedPrescription));
+                        return prescription;
+
+                }).toList();
+
+                List<Prescription> savedPrescriptions = prescriptionRepository.saveAll(prescriptions);
+
+                return savedPrescriptions.stream()
+                                .map(PrescriptionRegisterDto::fromEntity)
+                                .toList();
 
         }
 

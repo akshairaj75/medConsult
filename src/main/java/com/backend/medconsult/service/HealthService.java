@@ -9,7 +9,7 @@ import com.backend.medconsult.security.CustomUserPrincipal;
 
 public interface HealthService {
 
-    List<PrescriptionRegisterDto> addPrescription(CustomUserPrincipal authUser, PrescriptionRegisterDto dto, UUID consultationId);
+    List<PrescriptionRegisterDto> addPrescription(CustomUserPrincipal authUser, List<PrescriptionRegisterDto> dto, UUID consultationId);
 
     List<PrescriptionDto> getPrescriptionsByPatientId(UUID patientId, Boolean activeOnly);
 
