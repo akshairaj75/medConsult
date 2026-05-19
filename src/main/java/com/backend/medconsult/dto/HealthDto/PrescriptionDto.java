@@ -1,6 +1,7 @@
 package com.backend.medconsult.dto.HealthDto;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 import com.backend.medconsult.entity.clinicalData.Prescription;
@@ -23,6 +24,7 @@ public class PrescriptionDto {
     private LocalDate startedAt;
     private LocalDate expiresAt;
     private boolean active;
+    private List<MedAdherenceDto> adherenceLogs;
 
     public UUID getPrescriptionId() {
         return prescriptionId;
@@ -152,6 +154,14 @@ public class PrescriptionDto {
         this.active = active;
     }
 
+    public List<MedAdherenceDto> getAdherenceLogs() {
+        return adherenceLogs;
+    }
+
+    public void setAdherenceLogs(List<MedAdherenceDto> adherenceLogs) {
+        this.adherenceLogs = adherenceLogs;
+    }
+
     public static PrescriptionDto fromEntity(Prescription prescription) {
         PrescriptionDto dto = new PrescriptionDto();
         dto.setPrescriptionId(prescription.getPrescriptionId());
@@ -171,6 +181,17 @@ public class PrescriptionDto {
         dto.setStopReason(prescription.getStopReason());
         dto.setStartedAt(prescription.getStartedAt());
         dto.setExpiresAt(prescription.getExpiresAt());
+        if (prescription.getAdherenceLogs() != null) {
+
+            dto.setAdherenceLogs(
+
+                    prescription.getAdherenceLogs()
+                            .stream()
+                            .map(MedAdherenceDto::fromEntity)
+                            .toList()
+
+            );
+        }
 
         // Determine if the prescription is active
         boolean active = prescription.getStatus() == PrescriptionStatus.ACTIVE
