@@ -5,10 +5,11 @@ import java.util.UUID;
 
 import com.backend.medconsult.dto.HealthDto.PrescriptionDto;
 import com.backend.medconsult.dto.HealthDto.PrescriptionRegisterDto;
+import com.backend.medconsult.security.CustomUserPrincipal;
 
 public interface HealthService {
 
-    List<PrescriptionRegisterDto> addPrescription(PrescriptionRegisterDto dto, UUID patientId);
+    List<PrescriptionRegisterDto> addPrescription(CustomUserPrincipal authUser, PrescriptionRegisterDto dto, UUID consultationId);
 
     List<PrescriptionDto> getPrescriptionsByPatientId(UUID patientId, Boolean activeOnly);
 
