@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -226,6 +227,33 @@ public class DoctorServiceImpl implements DoctorService {
                 Patient patient = patientRepository.findById(authUser.getUser().getPatient().getPatientId())
                                 .orElseThrow(() -> new RuntimeException("Patient not found"));
 
+                // boolean alreadyBooked = appointmentRepository
+                // .existsByDoctor_DoctorIdAndScheduledAt(
+                // doctorId,
+                // appointmentDto.getScheduledAt());
+
+                Optional<Appointment> existingAppointment = appointmentRepository
+                                .findByDoctor_DoctorIdAndScheduledAt(
+                                                doctorId,
+                                                appointmentDto.getScheduledAt());
+
+                if (existingAppointment.isPresent()) {
+
+                        Appointment bookedAppointment = existingAppointment.get();
+
+                        boolean samePatient = bookedAppointment
+                                        .getPatient()
+                                        .getPatientId()
+                                        .equals(patient.getPatientId());
+
+                        if (samePatient) {
+                                throw new RuntimeException(
+                                                "You have already booked this slot");
+                        } else {
+                                throw new RuntimeException(
+                                                "This slot has already been booked");
+                        }
+                }
                 Appointment appointment = new Appointment();
                 appointment.setPatient(patient);
                 appointment.setDoctor(doctor);

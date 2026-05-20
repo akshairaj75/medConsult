@@ -10,4 +10,5 @@ import com.backend.medconsult.entity.people.Doctor;
 @Repository
 public interface DoctorRepository extends JpaRepository<Doctor, UUID> {
 
-} 
+
+}
