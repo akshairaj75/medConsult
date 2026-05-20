@@ -345,8 +345,8 @@ public class ClinicalServiceImpl implements ClinicalService {
                 return LabResultUpdateDto.fromEntity(labResult);
         }
 
-        // Helper method to calculate lab item status
-        // ============================================================================
+        // Method to calculate lab item status
+        // ==========================================
         private LabItemStatus calculateStatus(String value, String min, String max) {
                 try {
                         if (value == null || value.isBlank() ||
@@ -367,6 +367,5 @@ public class ClinicalServiceImpl implements ClinicalService {
                         return LabItemStatus.NORMAL;
                 }
         }
-        // ============================================================================
 
 }

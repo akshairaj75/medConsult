@@ -19,6 +19,9 @@ public class DoctorScheduleDto {
     private LocalDate effectiveFrom;
     private LocalDate effectiveUntil;
 
+    private Integer slotDuration;
+    private Integer gapMinutes;
+
     public UUID getDoctorId() {
         return doctorId;
     }
@@ -27,7 +30,7 @@ public class DoctorScheduleDto {
         this.doctorId = doctorId;
     }
 
-        public UUID getScheduleId() {
+    public UUID getScheduleId() {
         return scheduleId;
     }
 
@@ -89,6 +92,22 @@ public class DoctorScheduleDto {
 
     public void setEffectiveUntil(LocalDate effectiveUntil) {
         this.effectiveUntil = effectiveUntil;
+    }
+
+    public Integer getSlotDuration() {
+        return slotDuration;
+    }
+
+    public void setSlotDuration(Integer slotDuration) {
+        this.slotDuration = slotDuration;
+    }
+
+    public Integer getGapMinutes() {
+        return gapMinutes;
+    }
+
+    public void setGapMinutes(Integer gapMinutes) {
+        this.gapMinutes = gapMinutes;
     }
 
     public static DoctorScheduleDto fromEntity(DoctorSchedule schedule) {

@@ -3,6 +3,7 @@ package com.backend.medconsult.service.impl;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -107,7 +108,7 @@ public class DoctorServiceImpl implements DoctorService {
         @Override
         public List<DoctorScheduleDto> getDoctorSchedules(UUID doctorId) {
                 List<DoctorSchedule> schedules = doctorScheduleRepository
-                                .findByDoctor_DoctorIdOrderByDayOfWeekAsc(doctorId);
+                                .findByDoctor_DoctorIdOrderByDayOfWeekAscStartTimeAsc(doctorId);
                 return schedules.stream()
                                 .map(DoctorScheduleDto::fromEntity)
                                 .toList();
@@ -121,7 +122,7 @@ public class DoctorServiceImpl implements DoctorService {
                 if (userEntity.getRole() == Role.DOCTOR) {
                         UUID doctorId = userEntity.getDoctor().getDoctorId();
                         List<DoctorSchedule> schedules = doctorScheduleRepository
-                                        .findByDoctor_DoctorIdOrderByDayOfWeekAsc(doctorId);
+                                        .findByDoctor_DoctorIdOrderByDayOfWeekAscStartTimeAsc(doctorId);
                         return schedules.stream()
                                         .map(DoctorScheduleDto::fromEntity)
                                         .toList();
@@ -130,30 +131,91 @@ public class DoctorServiceImpl implements DoctorService {
         }
 
         @Override
-        public DoctorScheduleDto addDoctorSchedule(CustomUserPrincipal authUser, DoctorScheduleDto scheduleDto) {
+        public List<DoctorScheduleDto> addDoctorSchedule(
+                        CustomUserPrincipal authUser,
+                        DoctorScheduleDto scheduleDto) {
 
-                if (authUser.getUser().getRole() == Role.DOCTOR || authUser.getUser().getRole() == Role.ADMIN) {
-                        Doctor doctor = doctorRepository.findById(
-                                        authUser.getUser().getDoctor().getDoctorId())
-                                        .orElseThrow(() -> new RuntimeException("Doctor not found"));
-                        // Doctor doctor = doctorRepository.findById(scheduleDto.getDoctorId())
-                        // .orElseThrow(() -> new RuntimeException("Doctor not found"));
+                if (authUser.getUser().getRole() != Role.DOCTOR &&
+                                authUser.getUser().getRole() != Role.ADMIN) {
+
+                        throw new RuntimeException("Not authorised");
+                }
+
+                Doctor doctor = doctorRepository.findById(
+                                authUser.getUser().getDoctor().getDoctorId())
+                                .orElseThrow(() -> new RuntimeException("Doctor not found"));
+
+                LocalTime overallStart = scheduleDto.getStartTime();
+                LocalTime overallEnd = scheduleDto.getEndTime();
+
+                int duration = scheduleDto.getSlotDuration();
+                int gap = scheduleDto.getGapMinutes() == null
+                                ? 0
+                                : scheduleDto.getGapMinutes();
+
+                List<DoctorSchedule> savedSchedules = new ArrayList<>();
+
+                LocalTime currentStart = overallStart;
+
+                while (true) {
+
+                        LocalTime currentEnd = currentStart.plusMinutes(duration);
+
+                        if (currentEnd.isAfter(overallEnd)) {
+                                break;
+                        }
 
                         DoctorSchedule schedule = new DoctorSchedule();
+
                         schedule.setDoctor(doctor);
                         schedule.setDayOfWeek(scheduleDto.getDayOfWeek());
-                        schedule.setStartTime(scheduleDto.getStartTime());
-                        schedule.setEndTime(scheduleDto.getEndTime());
+
+                        schedule.setStartTime(currentStart);
+                        schedule.setEndTime(currentEnd);
+
                         schedule.setScheduleType(scheduleDto.getScheduleType());
+
                         schedule.setEffectiveFrom(scheduleDto.getEffectiveFrom());
                         schedule.setEffectiveUntil(scheduleDto.getEffectiveUntil());
 
-                        DoctorSchedule savedSchedule = doctorScheduleRepository.save(schedule);
-                        return DoctorScheduleDto.fromEntity(savedSchedule);
+                        savedSchedules.add(schedule);
 
+                        currentStart = currentEnd.plusMinutes(gap);
                 }
-                throw new RuntimeException("Not authorised to modify");
+
+                List<DoctorSchedule> result = doctorScheduleRepository.saveAll(savedSchedules);
+
+                return result.stream()
+                                .map(DoctorScheduleDto::fromEntity)
+                                .toList();
         }
+        // @Override
+        // public DoctorScheduleDto addDoctorSchedule(CustomUserPrincipal authUser,
+        // DoctorScheduleDto scheduleDto) {
+
+        // if (authUser.getUser().getRole() == Role.DOCTOR ||
+        // authUser.getUser().getRole() == Role.ADMIN) {
+        // Doctor doctor = doctorRepository.findById(
+        // authUser.getUser().getDoctor().getDoctorId())
+        // .orElseThrow(() -> new RuntimeException("Doctor not found"));
+        // // Doctor doctor = doctorRepository.findById(scheduleDto.getDoctorId())
+        // // .orElseThrow(() -> new RuntimeException("Doctor not found"));
+
+        // DoctorSchedule schedule = new DoctorSchedule();
+        // schedule.setDoctor(doctor);
+        // schedule.setDayOfWeek(scheduleDto.getDayOfWeek());
+        // schedule.setStartTime(scheduleDto.getStartTime());
+        // schedule.setEndTime(scheduleDto.getEndTime());
+        // schedule.setScheduleType(scheduleDto.getScheduleType());
+        // schedule.setEffectiveFrom(scheduleDto.getEffectiveFrom());
+        // schedule.setEffectiveUntil(scheduleDto.getEffectiveUntil());
+
+        // DoctorSchedule savedSchedule = doctorScheduleRepository.save(schedule);
+        // return DoctorScheduleDto.fromEntity(savedSchedule);
+
+        // }
+        // throw new RuntimeException("Not authorised to modify");
+        // }
 
         @Override
         public BookAppointmentDto bookAppointment(UUID doctorId, CustomUserPrincipal authUser,
@@ -189,9 +251,9 @@ public class DoctorServiceImpl implements DoctorService {
                                         .findTodayDoctorAppointments(doctorId,
                                                         start, end,
                                                         List.of(
-                                                                AppointmentStatus.CONFIRMED,
-                                                                AppointmentStatus.COMPLETED,
-                                                                AppointmentStatus.NO_SHOW));
+                                                                        AppointmentStatus.CONFIRMED,
+                                                                        AppointmentStatus.COMPLETED,
+                                                                        AppointmentStatus.NO_SHOW));
                         return appointments.stream()
                                         .map(AppointmentDto::fromEntity)
                                         .toList();
@@ -215,8 +277,7 @@ public class DoctorServiceImpl implements DoctorService {
                 if (authUserEntity.getRole() == Role.DOCTOR) {
                         UUID doctorId = authUserEntity.getDoctor().getDoctorId();
                         List<Appointment> appointments = appointmentRepository
-                                        .findActiveDoctorAppointments(doctorId, List.of(
-                                                        ));
+                                        .findActiveDoctorAppointments(doctorId, List.of());
                         return appointments.stream()
                                         .map(AppointmentDto::fromEntity)
                                         .toList();

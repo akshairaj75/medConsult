@@ -9,5 +9,6 @@ import com.backend.medconsult.entity.people.DoctorSchedule;
 
 public interface DoctorScheduleRepository extends JpaRepository<DoctorSchedule, UUID> {
 
-    List<DoctorSchedule> findByDoctor_DoctorIdOrderByDayOfWeekAsc(UUID doctorId);
+    // List<DoctorSchedule> findByDoctor_DoctorIdOrderByDayOfWeekAsc(UUID doctorId);
+    List<DoctorSchedule> findByDoctor_DoctorIdOrderByDayOfWeekAscStartTimeAsc(UUID doctorId);
 }

@@ -77,34 +77,50 @@ public class DoctorController {
 
     @DeleteMapping("/schedule/delete/{scheduleId}")
     public ResponseEntity<String> deleteSchedule(
-        @AuthenticationPrincipal CustomUserPrincipal authUser,
-        @PathVariable UUID scheduleId){
+            @AuthenticationPrincipal CustomUserPrincipal authUser,
+            @PathVariable UUID scheduleId) {
         return doctorService.deleteSchedule(authUser, scheduleId);
         // return ResponseEntity.ok(response);
     }
 
     @GetMapping("/my-patients")
-    public ResponseEntity<List<PatientDto>> myPatients(@AuthenticationPrincipal CustomUserPrincipal authUser){
+    public ResponseEntity<List<PatientDto>> myPatients(@AuthenticationPrincipal CustomUserPrincipal authUser) {
         List<PatientDto> dto = doctorService.myPatients(authUser);
         return ResponseEntity.ok(dto);
     }
 
     @GetMapping("/lab-patient")
-    public ResponseEntity<List<PatientDto>> labResultPatients(@AuthenticationPrincipal CustomUserPrincipal authUser){
+    public ResponseEntity<List<PatientDto>> labResultPatients(@AuthenticationPrincipal CustomUserPrincipal authUser) {
         List<PatientDto> dto = doctorService.labResultPatients(authUser);
         return ResponseEntity.ok(dto);
     }
 
-
     @PostMapping("/add-schedules")
-    public ResponseEntity<DoctorScheduleDto> addDoctorSchedule(@AuthenticationPrincipal CustomUserPrincipal authUser,
+    public ResponseEntity<List<DoctorScheduleDto>> addDoctorSchedule(
+            @AuthenticationPrincipal CustomUserPrincipal authUser,
             @RequestBody DoctorScheduleDto scheduleDto) {
-        DoctorScheduleDto createdSchedule = doctorService.addDoctorSchedule(authUser, scheduleDto);
-        if (createdSchedule == null) {
+
+        List<DoctorScheduleDto> createdSchedules = doctorService.addDoctorSchedule(authUser, scheduleDto);
+
+        if (createdSchedules == null || createdSchedules.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdSchedule);
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(createdSchedules);
     }
+    // @PostMapping("/add-schedules")
+    // public ResponseEntity<DoctorScheduleDto>
+    // addDoctorSchedule(@AuthenticationPrincipal CustomUserPrincipal authUser,
+    // @RequestBody DoctorScheduleDto scheduleDto) {
+    // DoctorScheduleDto createdSchedule = doctorService.addDoctorSchedule(authUser,
+    // scheduleDto);
+    // if (createdSchedule == null) {
+    // return ResponseEntity.notFound().build();
+    // }
+    // return ResponseEntity.status(HttpStatus.CREATED).body(createdSchedule);
+    // }
 
     @PostMapping("/{doctorId}/book_appointment")
     public ResponseEntity<BookAppointmentDto> bookAppointment(
@@ -150,8 +166,7 @@ public class DoctorController {
     public ResponseEntity<AppointmentDto> updateAppointmentById(
             @AuthenticationPrincipal CustomUserPrincipal authUser,
             @PathVariable UUID appointmentId,
-            @RequestBody AppointmentDto dto
-        ) {
+            @RequestBody AppointmentDto dto) {
         AppointmentDto appointment = doctorService.updateAppointmentById(authUser, appointmentId, dto);
         return ResponseEntity.ok(appointment);
     }
@@ -161,7 +176,7 @@ public class DoctorController {
             @PathVariable UUID appointmentId,
             @RequestBody AppointmentDto appointmentDto,
             @AuthenticationPrincipal CustomUserPrincipal authUser) {
-        AppointmentDto updatedAppointment = doctorService.scheduleAppointment(appointmentId, appointmentDto,authUser);
+        AppointmentDto updatedAppointment = doctorService.scheduleAppointment(appointmentId, appointmentDto, authUser);
         if (updatedAppointment == null) {
             return ResponseEntity.notFound().build();
         }
