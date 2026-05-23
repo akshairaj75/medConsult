@@ -7,6 +7,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.backend.medconsult.dto.UserDto;
 import com.backend.medconsult.dto.appointmentDto.AppointmentDto;
+import com.backend.medconsult.dto.clinicalDataDto.VitalsDto;
 import com.backend.medconsult.dto.patientDto.PatientDto;
 import com.backend.medconsult.dto.patientDto.PatientRegisterDto;
 import com.backend.medconsult.security.CustomUserPrincipal;
@@ -24,6 +25,8 @@ public interface PatientService {
     AppointmentDto getLatestAppointment(CustomUserPrincipal authUser);
 
     AppointmentDto getLatestAppointmentToday(CustomUserPrincipal authUser);
+
+    VitalsDto getPatientVital(UUID patientId);
 
 
 }

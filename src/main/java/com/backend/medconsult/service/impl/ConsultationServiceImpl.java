@@ -1,10 +1,51 @@
 package com.backend.medconsult.service.impl;
 
+import java.util.UUID;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.backend.medconsult.dto.appointmentDto.AppointmentDto;
+import com.backend.medconsult.dto.chatDto.ChatConsultationDto;
+import com.backend.medconsult.dto.clinicalDataDto.VitalsDto;
+import com.backend.medconsult.entity.appointment.Appointment;
+import com.backend.medconsult.entity.clinicalData.Vital;
+import com.backend.medconsult.entity.consultations.Consultation;
+import com.backend.medconsult.repository.AppointmentRepository;
+import com.backend.medconsult.repository.ConsultationRepository;
+import com.backend.medconsult.repository.VitalRepository;
 import com.backend.medconsult.service.ConsultationService;
 
 @Service
-public class ConsultationServiceImpl implements ConsultationService{
+public class ConsultationServiceImpl implements ConsultationService {
+
+    @Autowired
+    ConsultationRepository consultationRepository;
+
+    @Autowired
+    AppointmentRepository appointmentRepository;
+
+    @Autowired
+    VitalRepository vitalRepository;
+
+    @Override
+    public ChatConsultationDto getConsultDetails(UUID consultationId) {
+
+        Appointment appointment = appointmentRepository.findByConsultation_ConsultationId(consultationId)
+                .orElseThrow(() -> new RuntimeException("No consultation Details Found"));
+
+        AppointmentDto appointmentDto = AppointmentDto.fromEntity(appointment);
+
+        Vital vital = vitalRepository.findTopByPatient_PatientIdOrderByRecordedAtDesc(appointmentDto.getPatientId())
+                .orElseThrow(() -> new RuntimeException("Vitals not found"));
+
+        VitalsDto vitalsDto = VitalsDto.fromEntity(vital);
+
+        ChatConsultationDto dto = new ChatConsultationDto();
+        dto.setAppointment(appointmentDto);
+        dto.setVitals(vitalsDto);
+
+        return dto;
+    }
 
 }

@@ -317,6 +317,9 @@ public class ClinicalServiceImpl implements ClinicalService {
                 Doctor reviewedBy = doctorRepository.findById(authUser.getUser().getDoctor().getDoctorId())
                         .orElseThrow(() -> new RuntimeException("Patient not found"));
 
+                
+
+
                 LabResult labResult = labResultRepository.findById(labResultId)
                                 .orElseThrow(() -> new RuntimeException("Lab result not found"));
                 if (dto.getDoctorNotes() != null) {

@@ -13,16 +13,19 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.backend.medconsult.dto.UserDto;
 import com.backend.medconsult.dto.appointmentDto.AppointmentDto;
+import com.backend.medconsult.dto.clinicalDataDto.VitalsDto;
 import com.backend.medconsult.dto.patientDto.PatientDto;
 import com.backend.medconsult.dto.patientDto.PatientRegisterDto;
 import com.backend.medconsult.entity.appointment.Appointment;
 import com.backend.medconsult.entity.auth.User;
+import com.backend.medconsult.entity.clinicalData.Vital;
 import com.backend.medconsult.entity.people.Doctor;
 import com.backend.medconsult.entity.people.Patient;
 import com.backend.medconsult.repository.AppointmentRepository;
 import com.backend.medconsult.repository.DoctorRepository;
 import com.backend.medconsult.repository.PatientRepository;
 import com.backend.medconsult.repository.UserRepository;
+import com.backend.medconsult.repository.VitalRepository;
 import com.backend.medconsult.security.CustomUserPrincipal;
 import com.backend.medconsult.service.PatientService;
 
@@ -40,6 +43,8 @@ public class PatientServiceImpl implements PatientService {
 
     @Autowired
     FileStorageService fileStorageService;
+    @Autowired
+    VitalRepository vitalRepository;
 
     @Autowired
     AppointmentRepository appointmentRepository;
@@ -156,6 +161,14 @@ public class PatientServiceImpl implements PatientService {
         }
         return AppointmentDto.fromEntity(appointment);
 
+    }
+
+    @Override
+    public VitalsDto getPatientVital(UUID patientId) {
+        Vital vital = vitalRepository.findTopByPatient_PatientIdOrderByRecordedAtDesc(patientId)
+        .orElseThrow(()-> new RuntimeException("Vitals not found"));
+
+        return VitalsDto.fromEntity(vital);
     }
 
 }

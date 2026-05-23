@@ -15,7 +15,7 @@ public class AppointmentDto {
     private UUID doctorId;
     private UUID patientId;
     private PatientDto patient; 
-    private DoctorDto doctor; 
+    private DoctorDto doctor;
 
 
     private UUID consultationId;

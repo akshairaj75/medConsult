@@ -1,27 +1,30 @@
 package com.backend.medconsult.controllers;
 
+import java.util.UUID;
 
+import org.apache.catalina.connector.Response;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import org.springframework.stereotype.Controller;
+import com.backend.medconsult.dto.chatDto.ChatConsultationDto;
+import com.backend.medconsult.service.ConsultationService;
 
-
-@Controller
+@RestController
+@RequestMapping("/api/consultation")
 public class ConsultationChatController {
 
+   @Autowired
+   ConsultationService consultationService;
 
-   // @MessageMapping("/consultation.send")
-   // public void sendMessage(ChatMessageDto dto) {
-   //    MessageDto saved = messageService.saveMessage(dto);
-   //    messagingTemplate.convertAndSend("/topic/consultation/"
-   //          + dto.getConsultationId(), saved);
-   // }
+   @GetMapping("/{consultationId}")
+   public ResponseEntity<ChatConsultationDto> getConsultDetails(@PathVariable UUID consultationId){
+      ChatConsultationDto dto =  consultationService.getConsultDetails(consultationId);
+      return ResponseEntity.ok(dto);
 
-   // @MessageMapping("/consultation/read")
-   // public void markAsRead(ReadReceiptDto dto) {
-   //    messageService.markRead(dto);
-
-   //    messagingTemplate.convertAndSend("/topic/consultation/"
-   //          + dto.getConsultationId(), dto);
-   // }
+   }
 
 }

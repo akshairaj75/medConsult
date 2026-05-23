@@ -18,9 +18,18 @@ public class DoctorScheduleDto {
     private ScheduleType scheduleType;
     private LocalDate effectiveFrom;
     private LocalDate effectiveUntil;
-
+    
+    private String bookingStatus;
     private Integer slotDuration;
     private Integer gapMinutes;
+
+    public String getBookingStatus() {
+        return bookingStatus;
+    }
+
+    public void setBookingStatus(String bookingStatus) {
+        this.bookingStatus = bookingStatus;
+    }
 
     public UUID getDoctorId() {
         return doctorId;

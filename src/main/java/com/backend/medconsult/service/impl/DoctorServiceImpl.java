@@ -21,6 +21,7 @@ import com.backend.medconsult.dto.doctorDto.DoctorScheduleDto;
 import com.backend.medconsult.dto.patientDto.PatientDto;
 import com.backend.medconsult.entity.appointment.Appointment;
 import com.backend.medconsult.entity.auth.User;
+import com.backend.medconsult.entity.clinicalData.BookedSlotDto;
 import com.backend.medconsult.entity.consultations.Consultation;
 import com.backend.medconsult.entity.people.Doctor;
 import com.backend.medconsult.entity.people.DoctorSchedule;
@@ -113,6 +114,41 @@ public class DoctorServiceImpl implements DoctorService {
                 return schedules.stream()
                                 .map(DoctorScheduleDto::fromEntity)
                                 .toList();
+
+                // return schedules.stream().map(schedule -> {
+
+                // DoctorScheduleDto dto = DoctorScheduleDto.fromEntity(schedule);
+
+                // LocalTime slotDateTime = schedule.getStartTime();
+
+                // Optional<Appointment> bookedAppointment = appointmentRepository
+                // .findByDoctor_DoctorIdAndScheduledAt(
+                // doctorId,
+                // slotDateTime);
+
+                // // slot free
+                // if (bookedAppointment.isEmpty()) {
+                // dto.setBookingStatus("AVAILABLE");
+                // } else {
+                // Appointment appointment = bookedAppointment.get();
+
+                // boolean bookedByYou =
+
+                // appointment.getPatient()
+                // .getPatientId()
+                // .equals(patientId);
+                // if (bookedByYou) {
+                // dto.setBookingStatus(
+                // "BOOKED_BY_YOU");
+                // } else {
+                // dto.setBookingStatus(
+                // "BOOKED");
+                // }
+                // }
+                // return dto;
+                // })
+
+                // .toList();
         }
 
         @Override
@@ -500,6 +536,46 @@ public class DoctorServiceImpl implements DoctorService {
                                 .status(HttpStatus.OK)
                                 .body("Schedule deleted successfully");
 
+        }
+
+        @Override
+        public List<BookedSlotDto> getBookedSlots(UUID doctorId, LocalDate date, CustomUserPrincipal authUser) {
+                // 🔥 Start and end of selected day
+                LocalDateTime startOfDay = date.atStartOfDay();
+
+                LocalDateTime endOfDay = date.atTime(LocalTime.MAX);
+
+                // 🔥 Current logged patient
+                UUID currentPatientId = authUser.getUser()
+                                .getPatient()
+                                .getPatientId();
+
+                // 🔥 Fetch all appointments of doctor for selected date
+                List<Appointment> appointments = appointmentRepository
+                                .findByDoctor_DoctorIdAndScheduledAtBetween(
+                                                doctorId,
+                                                startOfDay,
+                                                endOfDay);
+                // 🔥 Convert to DTO
+                return appointments.stream()
+                                .map(appointment -> {
+                                        BookedSlotDto dto = new BookedSlotDto();
+                                        dto.setScheduledAt(
+                                                        appointment.getScheduledAt());
+                                        // 🔥 Check ownership
+                                        boolean bookedByYou = appointment.getPatient()
+                                                        .getPatientId()
+                                                        .equals(currentPatientId);
+                                        if (bookedByYou) {
+                                                dto.setStatus(
+                                                                "BOOKED_BY_YOU");
+                                        } else {
+                                                dto.setStatus(
+                                                                "BOOKED");
+                                        }
+                                        return dto;
+                                })
+                                .toList();
         }
 
 }
