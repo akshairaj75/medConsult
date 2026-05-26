@@ -10,7 +10,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.backend.medconsult.entity.appointment.Appointment;
-import com.backend.medconsult.entity.consultations.Consultation;
 import com.backend.medconsult.enums.AppointmentStatus;
 
 public interface AppointmentRepository extends JpaRepository<Appointment, UUID> {

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.backend.medconsult.dto.HealthDto.MedAdherenceDto;
 import com.backend.medconsult.dto.HealthDto.MedAdherenceRegisterDto;
 import com.backend.medconsult.dto.HealthDto.PrescriptionDto;
 import com.backend.medconsult.dto.HealthDto.PrescriptionRegisterDto;
@@ -29,7 +30,7 @@ public class HealthController {
 
     @PostMapping("/prescription/{consultationId}/add")
     public ResponseEntity<List<PrescriptionRegisterDto>> addPrescription(
-        @AuthenticationPrincipal CustomUserPrincipal authUser,
+            @AuthenticationPrincipal CustomUserPrincipal authUser,
             @RequestBody List<PrescriptionRegisterDto> dto,
             @PathVariable UUID consultationId) {
         List<PrescriptionRegisterDto> prescriptions = healthService.addPrescription(authUser, dto, consultationId);
@@ -46,11 +47,11 @@ public class HealthController {
 
     @PostMapping("/med-adherence")
     public ResponseEntity<MedAdherenceRegisterDto> addAdherence(
-        @RequestBody MedAdherenceRegisterDto dto,
-        @AuthenticationPrincipal CustomUserPrincipal authUser
-    ){
+            @RequestBody MedAdherenceRegisterDto dto,
+            @AuthenticationPrincipal CustomUserPrincipal authUser) {
         MedAdherenceRegisterDto adherence = healthService.addAdherence(dto, authUser);
         return ResponseEntity.ok(adherence);
     }
+
 
 }

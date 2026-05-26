@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import com.backend.medconsult.dto.doctorDto.DoctorDto;
+import com.backend.medconsult.dto.doctorDto.DoctorScheduleDto;
 import com.backend.medconsult.dto.patientDto.PatientDto;
 import com.backend.medconsult.entity.appointment.Appointment;
 import com.backend.medconsult.enums.AppointmentStatus;
@@ -14,9 +15,9 @@ public class AppointmentDto {
     private UUID appointmentId;
     private UUID doctorId;
     private UUID patientId;
-    private PatientDto patient; 
+    private PatientDto patient;
     private DoctorDto doctor;
-
+    private DoctorScheduleDto schedule;
 
     private UUID consultationId;
     private String appointmentType;
@@ -54,7 +55,7 @@ public class AppointmentDto {
         this.patientId = patientId;
     }
 
-        public PatientDto getPatient() {
+    public PatientDto getPatient() {
         return patient;
     }
 
@@ -69,6 +70,15 @@ public class AppointmentDto {
     public void setDoctor(DoctorDto doctor) {
         this.doctor = doctor;
     }
+
+    public DoctorScheduleDto getSchedule() {
+        return schedule;
+    }
+
+    public void setSchedule(DoctorScheduleDto schedule) {
+        this.schedule = schedule;
+    }
+
     public UUID getConsultationId() {
         return consultationId;
     }
@@ -176,9 +186,12 @@ public class AppointmentDto {
                         ? appointment.getConsultation().getConsultationId()
                         : null);
         dto.setPriority(appointment.getConsultation() != null
-                        ? appointment.getConsultation().getPriority()
-                        : null);
+                ? appointment.getConsultation().getPriority()
+                : null);
         dto.setAppointmentType(appointment.getAppointmentType());
+        dto.setSchedule(appointment.getSchedule() != null
+                ? DoctorScheduleDto.fromEntity(appointment.getSchedule())
+                : null);
         dto.setScheduledAt(appointment.getScheduledAt());
         dto.setDurationMinutes(appointment.getDurationMinutes());
         dto.setStatus(appointment.getStatus());

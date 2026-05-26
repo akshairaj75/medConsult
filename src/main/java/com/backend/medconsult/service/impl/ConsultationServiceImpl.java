@@ -10,7 +10,6 @@ import com.backend.medconsult.dto.chatDto.ChatConsultationDto;
 import com.backend.medconsult.dto.clinicalDataDto.VitalsDto;
 import com.backend.medconsult.entity.appointment.Appointment;
 import com.backend.medconsult.entity.clinicalData.Vital;
-import com.backend.medconsult.entity.consultations.Consultation;
 import com.backend.medconsult.repository.AppointmentRepository;
 import com.backend.medconsult.repository.ConsultationRepository;
 import com.backend.medconsult.repository.VitalRepository;

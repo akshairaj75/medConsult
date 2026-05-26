@@ -5,17 +5,23 @@ import java.util.UUID;
 
 import com.backend.medconsult.entity.appointment.Appointment;
 
-
 public class BookAppointmentDto {
     private UUID appointmentId;
     private UUID doctorId;
     private UUID patientId;
     private String consultaionId;
     private LocalDateTime scheduledAt;
-    private String appointmentType; 
+    private String appointmentType;
     private String notes;
+    private UUID scheduleId;
 
+    public UUID getScheduleId() {
+        return scheduleId;
+    }
 
+    public void setScheduleId(UUID scheduleId) {
+        this.scheduleId = scheduleId;
+    }
 
     public UUID getAppointmentId() {
         return appointmentId;
@@ -73,7 +79,6 @@ public class BookAppointmentDto {
         this.notes = notes;
     }
 
-
     public static BookAppointmentDto fromEntity(Appointment appointment) {
         BookAppointmentDto dto = new BookAppointmentDto();
         dto.setAppointmentId(appointment.getAppointmentId());
@@ -82,6 +87,7 @@ public class BookAppointmentDto {
         dto.setAppointmentType(appointment.getAppointmentType());
         dto.setScheduledAt(appointment.getScheduledAt());
         dto.setNotes(appointment.getNotes());
+        dto.setScheduleId(appointment.getSchedule().getScheduleId());
         return dto;
     }
 

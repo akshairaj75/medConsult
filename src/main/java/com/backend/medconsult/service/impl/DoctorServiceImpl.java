@@ -5,7 +5,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +20,6 @@ import com.backend.medconsult.dto.doctorDto.DoctorScheduleDto;
 import com.backend.medconsult.dto.patientDto.PatientDto;
 import com.backend.medconsult.entity.appointment.Appointment;
 import com.backend.medconsult.entity.auth.User;
-import com.backend.medconsult.entity.clinicalData.BookedSlotDto;
 import com.backend.medconsult.entity.consultations.Consultation;
 import com.backend.medconsult.entity.people.Doctor;
 import com.backend.medconsult.entity.people.DoctorSchedule;
@@ -114,41 +112,6 @@ public class DoctorServiceImpl implements DoctorService {
                 return schedules.stream()
                                 .map(DoctorScheduleDto::fromEntity)
                                 .toList();
-
-                // return schedules.stream().map(schedule -> {
-
-                // DoctorScheduleDto dto = DoctorScheduleDto.fromEntity(schedule);
-
-                // LocalTime slotDateTime = schedule.getStartTime();
-
-                // Optional<Appointment> bookedAppointment = appointmentRepository
-                // .findByDoctor_DoctorIdAndScheduledAt(
-                // doctorId,
-                // slotDateTime);
-
-                // // slot free
-                // if (bookedAppointment.isEmpty()) {
-                // dto.setBookingStatus("AVAILABLE");
-                // } else {
-                // Appointment appointment = bookedAppointment.get();
-
-                // boolean bookedByYou =
-
-                // appointment.getPatient()
-                // .getPatientId()
-                // .equals(patientId);
-                // if (bookedByYou) {
-                // dto.setBookingStatus(
-                // "BOOKED_BY_YOU");
-                // } else {
-                // dto.setBookingStatus(
-                // "BOOKED");
-                // }
-                // }
-                // return dto;
-                // })
-
-                // .toList();
         }
 
         @Override
@@ -226,33 +189,6 @@ public class DoctorServiceImpl implements DoctorService {
                                 .map(DoctorScheduleDto::fromEntity)
                                 .toList();
         }
-        // @Override
-        // public DoctorScheduleDto addDoctorSchedule(CustomUserPrincipal authUser,
-        // DoctorScheduleDto scheduleDto) {
-
-        // if (authUser.getUser().getRole() == Role.DOCTOR ||
-        // authUser.getUser().getRole() == Role.ADMIN) {
-        // Doctor doctor = doctorRepository.findById(
-        // authUser.getUser().getDoctor().getDoctorId())
-        // .orElseThrow(() -> new RuntimeException("Doctor not found"));
-        // // Doctor doctor = doctorRepository.findById(scheduleDto.getDoctorId())
-        // // .orElseThrow(() -> new RuntimeException("Doctor not found"));
-
-        // DoctorSchedule schedule = new DoctorSchedule();
-        // schedule.setDoctor(doctor);
-        // schedule.setDayOfWeek(scheduleDto.getDayOfWeek());
-        // schedule.setStartTime(scheduleDto.getStartTime());
-        // schedule.setEndTime(scheduleDto.getEndTime());
-        // schedule.setScheduleType(scheduleDto.getScheduleType());
-        // schedule.setEffectiveFrom(scheduleDto.getEffectiveFrom());
-        // schedule.setEffectiveUntil(scheduleDto.getEffectiveUntil());
-
-        // DoctorSchedule savedSchedule = doctorScheduleRepository.save(schedule);
-        // return DoctorScheduleDto.fromEntity(savedSchedule);
-
-        // }
-        // throw new RuntimeException("Not authorised to modify");
-        // }
 
         @Override
         public BookAppointmentDto bookAppointment(UUID doctorId, CustomUserPrincipal authUser,
@@ -263,41 +199,24 @@ public class DoctorServiceImpl implements DoctorService {
                 Patient patient = patientRepository.findById(authUser.getUser().getPatient().getPatientId())
                                 .orElseThrow(() -> new RuntimeException("Patient not found"));
 
-                // boolean alreadyBooked = appointmentRepository
-                // .existsByDoctor_DoctorIdAndScheduledAt(
-                // doctorId,
-                // appointmentDto.getScheduledAt());
+                DoctorSchedule schedule = doctorScheduleRepository.findById(appointmentDto.getScheduleId())
+                                .orElseThrow(() -> new RuntimeException("Schedule not found"));
 
-                Optional<Appointment> existingAppointment = appointmentRepository
-                                .findByDoctor_DoctorIdAndScheduledAt(
-                                                doctorId,
-                                                appointmentDto.getScheduledAt());
+                if (schedule.isBooked() == false) {
 
-                if (existingAppointment.isPresent()) {
+                        Appointment appointment = new Appointment();
+                        appointment.setPatient(patient);
+                        appointment.setDoctor(doctor);
+                        appointment.setSchedule(schedule);
+                        appointment.setScheduledAt(appointmentDto.getScheduledAt());
+                        appointment.setAppointmentType(appointmentDto.getAppointmentType());
+                        appointment.setNotes(appointmentDto.getNotes());
 
-                        Appointment bookedAppointment = existingAppointment.get();
+                        appointmentRepository.save(appointment);
+                        return BookAppointmentDto.fromEntity(appointment);
 
-                        boolean samePatient = bookedAppointment
-                                        .getPatient()
-                                        .getPatientId()
-                                        .equals(patient.getPatientId());
-
-                        if (samePatient) {
-                                throw new RuntimeException(
-                                                "You have already booked this slot");
-                        } else {
-                                throw new RuntimeException(
-                                                "This slot has already been booked");
-                        }
                 }
-                Appointment appointment = new Appointment();
-                appointment.setPatient(patient);
-                appointment.setDoctor(doctor);
-                appointment.setScheduledAt(appointmentDto.getScheduledAt());
-                appointment.setAppointmentType(appointmentDto.getAppointmentType());
-                appointment.setNotes(appointmentDto.getNotes());
-                appointmentRepository.save(appointment);
-                return BookAppointmentDto.fromEntity(appointment);
+                throw new RuntimeException("This slot have been already booked");
         }
 
         @Override
@@ -373,6 +292,9 @@ public class DoctorServiceImpl implements DoctorService {
                 Appointment appointment = appointmentRepository.findById(appointmentId)
                                 .orElseThrow(() -> new RuntimeException("Appointment not found"));
 
+                // DoctorSchedule schedule =
+                // doctorScheduleRepository.findById(appointmentDto.scheduleId())
+
                 User cancellingUser = appointmentDto.getCancelledBy() != null
                                 ? userRepository.findById(appointmentDto.getCancelledBy())
                                                 .orElseThrow(() -> new RuntimeException("Cancelling user not found"))
@@ -382,10 +304,12 @@ public class DoctorServiceImpl implements DoctorService {
                 // throw new RuntimeException("Appointment does not belong to the specified
                 // doctor");
                 // }
+
                 appointment.setScheduledAt(appointmentDto.getScheduledAt());
                 appointment.setDurationMinutes(appointmentDto.getDurationMinutes());
                 appointment.setReminderSent(appointmentDto.isReminderSent());
                 appointment.setCancelledBy(cancellingUser);
+                // appointment.setSchedule(null);
                 appointment.setCancelReason(appointmentDto.getCancelReason());
                 appointmentRepository.save(appointment);
                 return AppointmentDto.fromEntity(appointment);
@@ -402,6 +326,8 @@ public class DoctorServiceImpl implements DoctorService {
                                 .orElseThrow(() -> new RuntimeException("User not found"));
                 AppointmentStatus status = dto.getStatus();
                 Patient patient = appointment.getPatient();
+
+                DoctorSchedule schedule = appointment.getSchedule();
 
                 if (status == null) {
                         return AppointmentDto.fromEntity(appointment);
@@ -420,6 +346,7 @@ public class DoctorServiceImpl implements DoctorService {
                                         appointment.setCancelReason(null);
                                         appointment.setCancelledBy(null);
                                         patient.setAssignedDoctor(doctor);
+                                        schedule.setBooked(true);
 
                                         // Avoid duplicate consultation creation
                                         if (appointment.getConsultation() == null) {
@@ -537,45 +464,4 @@ public class DoctorServiceImpl implements DoctorService {
                                 .body("Schedule deleted successfully");
 
         }
-
-        @Override
-        public List<BookedSlotDto> getBookedSlots(UUID doctorId, LocalDate date, CustomUserPrincipal authUser) {
-                // 🔥 Start and end of selected day
-                LocalDateTime startOfDay = date.atStartOfDay();
-
-                LocalDateTime endOfDay = date.atTime(LocalTime.MAX);
-
-                // 🔥 Current logged patient
-                UUID currentPatientId = authUser.getUser()
-                                .getPatient()
-                                .getPatientId();
-
-                // 🔥 Fetch all appointments of doctor for selected date
-                List<Appointment> appointments = appointmentRepository
-                                .findByDoctor_DoctorIdAndScheduledAtBetween(
-                                                doctorId,
-                                                startOfDay,
-                                                endOfDay);
-                // 🔥 Convert to DTO
-                return appointments.stream()
-                                .map(appointment -> {
-                                        BookedSlotDto dto = new BookedSlotDto();
-                                        dto.setScheduledAt(
-                                                        appointment.getScheduledAt());
-                                        // 🔥 Check ownership
-                                        boolean bookedByYou = appointment.getPatient()
-                                                        .getPatientId()
-                                                        .equals(currentPatientId);
-                                        if (bookedByYou) {
-                                                dto.setStatus(
-                                                                "BOOKED_BY_YOU");
-                                        } else {
-                                                dto.setStatus(
-                                                                "BOOKED");
-                                        }
-                                        return dto;
-                                })
-                                .toList();
-        }
-
 }

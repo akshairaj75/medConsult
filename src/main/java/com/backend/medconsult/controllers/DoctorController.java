@@ -1,6 +1,5 @@
 package com.backend.medconsult.controllers;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -15,7 +14,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.backend.medconsult.dto.appointmentDto.AppointmentDto;
@@ -24,7 +22,6 @@ import com.backend.medconsult.dto.doctorDto.DoctorDto;
 import com.backend.medconsult.dto.doctorDto.DoctorRegisterDto;
 import com.backend.medconsult.dto.doctorDto.DoctorScheduleDto;
 import com.backend.medconsult.dto.patientDto.PatientDto;
-import com.backend.medconsult.entity.clinicalData.BookedSlotDto;
 import com.backend.medconsult.security.CustomUserPrincipal;
 import com.backend.medconsult.service.DoctorService;
 
@@ -185,18 +182,4 @@ public class DoctorController {
         }
         return ResponseEntity.ok(updatedAppointment);
     }
-
-    @GetMapping("/{doctorId}/booked-slots")
-    public ResponseEntity<List<BookedSlotDto>> getBookedSlots(
-            @PathVariable UUID doctorId,
-            @RequestParam LocalDate date,
-            @AuthenticationPrincipal CustomUserPrincipal authUser) {
-
-        return ResponseEntity.ok(
-                doctorService.getBookedSlots(
-                        doctorId,
-                        date,
-                        authUser));
-    }
-
 }

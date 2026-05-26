@@ -8,6 +8,7 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UuidGenerator;
 import org.hibernate.type.SqlTypes;
 
+import com.backend.medconsult.entity.appointment.Appointment;
 import com.backend.medconsult.enums.ScheduleType;
 import com.backend.medconsult.enums.Weekday;
 
@@ -21,6 +22,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -60,6 +62,16 @@ public class DoctorSchedule {
 
     @Column(name = "effective_until")
     private LocalDate effectiveUntil;
+
+    @Column(name = "is_booked", nullable = false)
+    private boolean isBooked = false;
+
+    @OneToOne(mappedBy = "schedule")
+    private Appointment appointment;
+
+    public void setAppointment(Appointment appointment) {
+        this.appointment = appointment;
+    }
 
     public UUID getScheduleId() {
         return scheduleId;
@@ -123,6 +135,14 @@ public class DoctorSchedule {
 
     public void setEffectiveUntil(LocalDate effectiveUntil) {
         this.effectiveUntil = effectiveUntil;
+    }
+
+    public boolean isBooked() {
+        return isBooked;
+    }
+
+    public void setBooked(boolean isBooked) {
+        this.isBooked = isBooked;
     }
 
 }

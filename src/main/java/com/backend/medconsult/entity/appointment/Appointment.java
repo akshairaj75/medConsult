@@ -12,6 +12,7 @@ import org.hibernate.type.SqlTypes;
 import com.backend.medconsult.entity.auth.User;
 import com.backend.medconsult.entity.consultations.Consultation;
 import com.backend.medconsult.entity.people.Doctor;
+import com.backend.medconsult.entity.people.DoctorSchedule;
 import com.backend.medconsult.entity.people.Patient;
 import com.backend.medconsult.enums.AppointmentStatus;
 
@@ -82,6 +83,10 @@ public class Appointment {
     @Column(name = "reminder_sent", nullable = false)
     private boolean reminderSent = false;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "schedule_id")
+    private DoctorSchedule schedule;
+
     // FK → users (who cancelled)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cancelled_by")
@@ -131,11 +136,11 @@ public class Appointment {
     }
 
     // public List<Consultation> getConsultations() {
-    //     return consultations;
+    // return consultations;
     // }
 
     // public void setConsultations(List<Consultation> consultations) {
-    //     this.consultations = consultations;
+    // this.consultations = consultations;
     // }
 
     public String getAppointmentType() {
@@ -192,6 +197,14 @@ public class Appointment {
 
     public void setReminderSent(boolean reminderSent) {
         this.reminderSent = reminderSent;
+    }
+
+    public DoctorSchedule getSchedule() {
+        return schedule;
+    }
+
+    public void setSchedule(DoctorSchedule schedule) {
+        this.schedule = schedule;
     }
 
     public User getCancelledBy() {

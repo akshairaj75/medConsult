@@ -2,11 +2,13 @@ package com.backend.medconsult.service.impl;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.backend.medconsult.dto.HealthDto.MedAdherenceDto;
 import com.backend.medconsult.dto.HealthDto.MedAdherenceRegisterDto;
 import com.backend.medconsult.dto.HealthDto.PrescriptionDto;
 import com.backend.medconsult.dto.HealthDto.PrescriptionRegisterDto;
@@ -60,6 +62,7 @@ public class HealthServiceImpl implements HealthService {
                                         ? LocalDate.now()
                                         : dto.getStartedAt();
 
+                                        
                         // LocalDate expiryDate = startDate.plusDays(dto.getDurationDays());
                         LocalDate expiryDate = dto.getDurationDays() != null
                                         ? startDate.plusDays(dto.getDurationDays())
@@ -110,18 +113,45 @@ public class HealthServiceImpl implements HealthService {
                 Prescription prescription = prescriptionRepository.findById(dto.getPrescriptionId())
                                 .orElseThrow(() -> new RuntimeException("Prescription not found"));
 
-                LocalDate today = LocalDate.now();
-                MedicationAdherence adherence = new MedicationAdherence();
-                adherence.setPatient(patient);
-                adherence.setPrescription(prescription);
-                adherence.setRecordedDate(today);
-                if (dto.getSkippedReason() != null) {
-                        adherence.setSkippedReason(dto.getSkippedReason());
+                LocalDate today = LocalDate.of(2026, 5, 28);
+                // LocalDate today = LocalDate.now();
+                Optional<MedicationAdherence> existing = adherenceRepository
+                                .findByPrescriptionAndRecordedDate(
+                                                prescription,
+                                                today);
+
+                MedicationAdherence adherence;
+
+                if (existing.isPresent()) {
+
+                        adherence = existing.get();
+
                 } else {
-                        adherence.setTaken(dto.isTaken());
+                        adherence = new MedicationAdherence();
+                        adherence.setPatient(patient);
+                        adherence.setPrescription(prescription);
+                        adherence.setRecordedDate(today);
                 }
+                adherence.setTaken(dto.isTaken());
+
+                adherence.setSkippedReason(
+                                dto.getSkippedReason());
                 adherenceRepository.save(adherence);
                 return MedAdherenceRegisterDto.fromEntity(adherence);
         }
 
+        // @Override
+        // public List<MedAdherenceDto> getAdherence(CustomUserPrincipal authUser, UUID consultationId) {
+        //         UUID patientId = authUser.getUser().getPatient().getPatientId();
+        //         List<MedicationAdherence> adherance;
+        //         adherance = adherenceRepository.findByPatient_PatientId(patientId)
+        //                         .orElseThrow(() -> new RuntimeException("No adherance for the prescription"));
+                
+        //         // adherance = adherenceRepository.findByPrescription_Consultation_ConsultationId(patientId)
+        //         //                 .orElseThrow(() -> new RuntimeException("No adherance for the prescription"));
+
+        //         return adherance.stream()
+        //                         .map(MedAdherenceDto::fromEntity)
+        //                         .toList();
+        // }
 }

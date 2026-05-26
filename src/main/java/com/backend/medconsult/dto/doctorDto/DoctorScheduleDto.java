@@ -18,18 +18,10 @@ public class DoctorScheduleDto {
     private ScheduleType scheduleType;
     private LocalDate effectiveFrom;
     private LocalDate effectiveUntil;
-    
-    private String bookingStatus;
+    private boolean isBooked;
+
     private Integer slotDuration;
     private Integer gapMinutes;
-
-    public String getBookingStatus() {
-        return bookingStatus;
-    }
-
-    public void setBookingStatus(String bookingStatus) {
-        this.bookingStatus = bookingStatus;
-    }
 
     public UUID getDoctorId() {
         return doctorId;
@@ -103,6 +95,15 @@ public class DoctorScheduleDto {
         this.effectiveUntil = effectiveUntil;
     }
 
+
+    public boolean isBooked() {
+        return isBooked;
+    }
+
+    public void setBooked(boolean isBooked) {
+        this.isBooked = isBooked;
+    }
+
     public Integer getSlotDuration() {
         return slotDuration;
     }
@@ -130,6 +131,7 @@ public class DoctorScheduleDto {
         dto.setScheduleType(schedule.getScheduleType());
         dto.setEffectiveFrom(schedule.getEffectiveFrom());
         dto.setEffectiveUntil(schedule.getEffectiveUntil());
+        dto.setBooked(schedule.isBooked());
         return dto;
     }
 
