@@ -19,8 +19,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.backend.medconsult.dto.caseRoomDto.CaseDiscussionMessageDto;
+import com.backend.medconsult.dto.caseRoomDto.CaseDiscussionResponseDto;
 import com.backend.medconsult.dto.chatDto.ChatMessageDto;
 import com.backend.medconsult.security.CustomUserPrincipal;
+import com.backend.medconsult.service.CaseDiscussionService;
 import com.backend.medconsult.service.MessageService;
 import com.backend.medconsult.service.impl.FileStorageService;
 
@@ -35,6 +38,7 @@ public class ChatWebSocketController {
         private final SimpMessagingTemplate messagingTemplate;
         private final FileStorageService fileStorageService;
         private final MessageService messageService;
+        private final CaseDiscussionService caseDiscussionService;
 
         @MessageMapping("/chat.send")
         public void sendMessage(ChatMessageDto dto, Principal principal) {
@@ -83,6 +87,19 @@ public class ChatWebSocketController {
                 String url = fileStorageService.storeFile(file);
 
                 return ResponseEntity.ok(url);
+        }
+
+        // ---------------------------
+
+        @MessageMapping("/case-chat.send")
+        public void sendMessage(CaseDiscussionMessageDto dto, Principal principal) {
+
+                CustomUserPrincipal authUser = (CustomUserPrincipal) ((Authentication) principal)
+                                .getPrincipal();
+
+                CaseDiscussionResponseDto response = caseDiscussionService.sendMessage(dto, authUser);
+
+                messagingTemplate.convertAndSend("/topic/case-room/" + dto.getCaseId(), response);
         }
 
 }

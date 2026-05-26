@@ -1,5 +1,6 @@
 package com.backend.medconsult.controllers;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,7 +10,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.backend.medconsult.dto.caseRoomDto.CaseDiscussionResponseDto;
 import com.backend.medconsult.dto.chatDto.ChatConsultationDto;
+import com.backend.medconsult.service.CaseDiscussionService;
 import com.backend.medconsult.service.ConsultationService;
 
 @RestController
@@ -19,11 +22,23 @@ public class ConsultationChatController {
    @Autowired
    ConsultationService consultationService;
 
+   @Autowired
+   CaseDiscussionService caseDiscussionService;
+
    @GetMapping("/{consultationId}")
-   public ResponseEntity<ChatConsultationDto> getConsultDetails(@PathVariable UUID consultationId){
-      ChatConsultationDto dto =  consultationService.getConsultDetails(consultationId);
+   public ResponseEntity<ChatConsultationDto> getConsultDetails(@PathVariable UUID consultationId) {
+      ChatConsultationDto dto = consultationService.getConsultDetails(consultationId);
       return ResponseEntity.ok(dto);
 
+   }
+
+   @GetMapping("/{caseId}/messages")
+   public ResponseEntity<List<CaseDiscussionResponseDto>> getMessages(
+         @PathVariable UUID caseId) {
+
+      return ResponseEntity.ok(
+            caseDiscussionService
+                  .loadMessages(caseId));
    }
 
 }
