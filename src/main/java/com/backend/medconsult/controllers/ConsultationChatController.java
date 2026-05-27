@@ -5,13 +5,18 @@ import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.backend.medconsult.dto.caseRoomDto.CaseDiscussionResponseDto;
+import com.backend.medconsult.dto.caseRoomDto.CreateCaseRoomDto;
 import com.backend.medconsult.dto.chatDto.ChatConsultationDto;
+import com.backend.medconsult.security.CustomUserPrincipal;
 import com.backend.medconsult.service.CaseDiscussionService;
 import com.backend.medconsult.service.ConsultationService;
 
@@ -39,6 +44,15 @@ public class ConsultationChatController {
       return ResponseEntity.ok(
             caseDiscussionService
                   .loadMessages(caseId));
+   }
+
+   @PostMapping("/create")
+   public ResponseEntity<?> createRoom(
+         @RequestBody CreateCaseRoomDto dto,
+         @AuthenticationPrincipal CustomUserPrincipal authUser) {
+
+      return ResponseEntity.ok(
+            caseDiscussionService.createRoom(dto, authUser));
    }
 
 }
