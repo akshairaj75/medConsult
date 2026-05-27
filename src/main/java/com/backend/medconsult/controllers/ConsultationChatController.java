@@ -38,22 +38,18 @@ public class ConsultationChatController {
 
    }
 
-   @GetMapping("/{caseId}/messages")
+   @GetMapping("/case/{caseId}/load-messages")
    public ResponseEntity<List<CaseDiscussionResponseDto>> getMessages(
          @PathVariable UUID caseId) {
 
-      return ResponseEntity.ok(
-            caseDiscussionService
-                  .loadMessages(caseId));
+      return ResponseEntity.ok(caseDiscussionService.loadCaseRoomMessages(caseId));
    }
 
    @PostMapping("/create")
-   public ResponseEntity<CaseRoomDto> createRoom(
-         @RequestBody CreateCaseRoomDto dto,
+   public ResponseEntity<CaseRoomDto> createRoom(@RequestBody CreateCaseRoomDto dto,
          @AuthenticationPrincipal CustomUserPrincipal authUser) {
 
-      return ResponseEntity.ok(
-            caseDiscussionService.createRoom(dto, authUser));
+      return ResponseEntity.ok(caseDiscussionService.createRoom(dto, authUser));
    }
 
 }

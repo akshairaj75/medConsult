@@ -41,12 +41,10 @@ public class ChatWebSocketController {
         private final CaseDiscussionService caseDiscussionService;
 
         @MessageMapping("/chat.send")
-        public void sendMessage(ChatMessageDto dto, Principal principal) {
+        public void sendConsultMessage(ChatMessageDto dto, Principal principal) {
                 UsernamePasswordAuthenticationToken auth = (UsernamePasswordAuthenticationToken) principal;
-
                 CustomUserPrincipal authUser = (CustomUserPrincipal) auth.getPrincipal();
-
-                ChatMessageDto saved = messageService.saveMessage(dto, authUser);
+                ChatMessageDto saved = messageService.saveConsultMessage(dto, authUser);
 
                 messagingTemplate.convertAndSend(
                                 "/topic/chat/" + dto.getConsultationId(),
@@ -54,10 +52,10 @@ public class ChatWebSocketController {
         }
 
         @GetMapping("/{consultationId}/messages")
-        public ResponseEntity<List<ChatMessageDto>> getMessages(
+        public ResponseEntity<List<ChatMessageDto>> getConsultMessages(
                         @PathVariable UUID consultationId) {
 
-                return ResponseEntity.ok(messageService.loadMessages(consultationId));
+                return ResponseEntity.ok(messageService.loadConsultMessages(consultationId));
         }
 
         @GetMapping("/unread-count")
@@ -89,15 +87,14 @@ public class ChatWebSocketController {
                 return ResponseEntity.ok(url);
         }
 
-        // ---------------------------
 
         @MessageMapping("/case-chat.send")
-        public void sendMessage(CaseDiscussionMessageDto dto, Principal principal) {
+        public void sendCaseRoomMessage(CaseDiscussionMessageDto dto, Principal principal) {
 
                 CustomUserPrincipal authUser = (CustomUserPrincipal) ((Authentication) principal)
                                 .getPrincipal();
 
-                CaseDiscussionResponseDto response = caseDiscussionService.sendMessage(dto, authUser);
+                CaseDiscussionResponseDto response = caseDiscussionService.sendCaseRoomMessage(dto, authUser);
 
                 messagingTemplate.convertAndSend("/topic/case-room/" + dto.getCaseId(), response);
         }

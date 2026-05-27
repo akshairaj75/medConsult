@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.backend.medconsult.dto.HealthDto.MedAdherenceDto;
 import com.backend.medconsult.dto.HealthDto.MedAdherenceRegisterDto;
 import com.backend.medconsult.dto.HealthDto.PrescriptionDto;
 import com.backend.medconsult.dto.HealthDto.PrescriptionRegisterDto;

@@ -11,7 +11,7 @@ import com.backend.medconsult.enums.Priority;
 
 public class CaseRoomDto {
 
-    private UUID caseRoomId;
+    private UUID caseId;
     private String caseCode;
     private UUID patientId;
     private DoctorDto createdBy;
@@ -24,12 +24,12 @@ public class CaseRoomDto {
     private LocalDateTime closedAt;
     private LocalDateTime createdAt;
 
-    public UUID getCaseRoomId() {
-        return caseRoomId;
+    public UUID getCaseId() {
+        return caseId;
     }
 
-    public void setCaseRoomId(UUID caseRoomId) {
-        this.caseRoomId = caseRoomId;
+    public void setCaseId(UUID caseId) {
+        this.caseId = caseId;
     }
 
     public String getCaseCode() {
@@ -122,7 +122,7 @@ public class CaseRoomDto {
 
     public static CaseRoomDto fromEntity(CaseRoom cs) {
         CaseRoomDto dto = new CaseRoomDto();
-        dto.setCaseRoomId(cs.getCaseId());
+        dto.setCaseId(cs.getCaseId());
         dto.setCaseCode(cs.getCaseCode());
         dto.setPatientId(cs.getPatient().getPatientId());
         dto.setCreatedBy(DoctorDto.fromEntity(cs.getCreatedBy()));
@@ -134,6 +134,6 @@ public class CaseRoomDto {
         dto.setPendingActions(cs.getPendingActions());
         dto.setClosedAt(cs.getClosedAt());
         dto.setCreatedAt(cs.getCreatedAt());
-        return null;
+        return dto;
     }
 }

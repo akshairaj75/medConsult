@@ -1,4 +1,5 @@
 package com.backend.medconsult.service;
+
 import java.security.Principal;
 import java.util.List;
 import java.util.UUID;
@@ -15,10 +16,9 @@ public interface MessageService {
 
     ChatMessageDto process(ChatMessageDto request, Principal principal);
 
-    List<ChatMessageDto> loadMessages(UUID consultationId);
+    List<ChatMessageDto> loadConsultMessages(UUID consultationId);
 
-    ChatMessageDto saveMessage(ChatMessageDto dto, CustomUserPrincipal authUser);
-
+    ChatMessageDto saveConsultMessage(ChatMessageDto dto, CustomUserPrincipal authUser);
 
     @Nullable
     Long unreadCount(UUID userId);

@@ -84,7 +84,7 @@ public class MessageServiceImpl implements MessageService {
         }
 
         @Override
-        public List<ChatMessageDto> loadMessages(UUID consultationId) {
+        public List<ChatMessageDto> loadConsultMessages(UUID consultationId) {
 
                 return messageRepository
                                 .findMessagesByConsultation_ConsultationIdOrderByCreatedAtAsc(consultationId)
@@ -109,7 +109,7 @@ public class MessageServiceImpl implements MessageService {
         }
 
         @Override
-        public ChatMessageDto saveMessage(ChatMessageDto dto, CustomUserPrincipal authUser) {
+        public ChatMessageDto saveConsultMessage(ChatMessageDto dto, CustomUserPrincipal authUser) {
                 Consultation consultation = consultationRepository.findById(dto.getConsultationId())
                                 .orElseThrow();
 
