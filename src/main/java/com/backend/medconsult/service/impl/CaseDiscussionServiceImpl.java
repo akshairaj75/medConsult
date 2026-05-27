@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.backend.medconsult.dto.caseRoomDto.CaseDiscussionMessageDto;
 import com.backend.medconsult.dto.caseRoomDto.CaseDiscussionResponseDto;
+import com.backend.medconsult.dto.caseRoomDto.CaseRoomDto;
 import com.backend.medconsult.dto.caseRoomDto.CreateCaseRoomDto;
 import com.backend.medconsult.entity.caseDiscussion.CaseDiscussion;
 import com.backend.medconsult.entity.caseDiscussion.CaseRoom;
@@ -77,7 +78,7 @@ public class CaseDiscussionServiceImpl implements CaseDiscussionService {
     }
 
     @Override
-    public CaseRoom createRoom(
+    public CaseRoomDto createRoom(
             CreateCaseRoomDto dto,
             CustomUserPrincipal authUser) {
 
@@ -126,7 +127,7 @@ public class CaseDiscussionServiceImpl implements CaseDiscussionService {
             caseRoomMemberRepository.save(member);
         }
 
-        return room;
+        return CaseRoomDto.fromEntity(room);
     }
 
 }

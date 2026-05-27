@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.UUID;
 
 public class CreateCaseRoomDto {
+    
     private UUID patientId;
     private String specialty;
     private String title;

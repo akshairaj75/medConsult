@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.backend.medconsult.dto.caseRoomDto.CaseDiscussionResponseDto;
+import com.backend.medconsult.dto.caseRoomDto.CaseRoomDto;
 import com.backend.medconsult.dto.caseRoomDto.CreateCaseRoomDto;
 import com.backend.medconsult.dto.chatDto.ChatConsultationDto;
 import com.backend.medconsult.security.CustomUserPrincipal;
@@ -47,7 +48,7 @@ public class ConsultationChatController {
    }
 
    @PostMapping("/create")
-   public ResponseEntity<?> createRoom(
+   public ResponseEntity<CaseRoomDto> createRoom(
          @RequestBody CreateCaseRoomDto dto,
          @AuthenticationPrincipal CustomUserPrincipal authUser) {
 

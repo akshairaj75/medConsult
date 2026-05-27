@@ -98,7 +98,7 @@ public class MessageDto {
         this.createdAt = createdAt;
     }
 
-        public static MessageDto fromMessageDto(Message message) {
+    public static MessageDto fromMessageDto(Message message) {
         MessageDto dto = new MessageDto();
         dto.setMessageId(message.getMessageId());
         dto.setConsultationId(message.getConsultation().getConsultationId());
@@ -111,6 +111,5 @@ public class MessageDto {
         // dto.setFileMimeType(messageDto.getFileMimeType());
         return dto;
     }
-
 
 }

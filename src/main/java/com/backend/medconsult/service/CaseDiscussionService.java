@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import com.backend.medconsult.dto.caseRoomDto.CaseDiscussionMessageDto;
 import com.backend.medconsult.dto.caseRoomDto.CaseDiscussionResponseDto;
+import com.backend.medconsult.dto.caseRoomDto.CaseRoomDto;
 import com.backend.medconsult.dto.caseRoomDto.CreateCaseRoomDto;
 import com.backend.medconsult.entity.caseDiscussion.CaseRoom;
 import com.backend.medconsult.security.CustomUserPrincipal;
@@ -14,6 +15,6 @@ public interface CaseDiscussionService {
 
     CaseDiscussionResponseDto sendMessage(CaseDiscussionMessageDto dto, CustomUserPrincipal authUser);
 
-    CaseRoom createRoom(CreateCaseRoomDto dto, CustomUserPrincipal authUser);
+    CaseRoomDto createRoom(CreateCaseRoomDto dto, CustomUserPrincipal authUser);
 
 }
