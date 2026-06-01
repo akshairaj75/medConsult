@@ -29,15 +29,12 @@ public class WebSocketChannelInterceptor
         public Message<?> preSend(
                         Message<?> message,
                         MessageChannel channel) {
-
                 StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(
                                 message,
                                 StompHeaderAccessor.class);
 
                 if (StompCommand.CONNECT.equals(accessor.getCommand())) {
-
                         String authHeader = accessor.getFirstNativeHeader("Authorization");
-
                         if (authHeader == null ||
                                         !authHeader.startsWith("Bearer ")) {
 
@@ -46,9 +43,7 @@ public class WebSocketChannelInterceptor
                         }
 
                         String token = authHeader.substring(7);
-
                         String userEmail = jwtUtil.extractEmail(token);
-
                         CustomUserPrincipal principal = (CustomUserPrincipal) userDetailsService
                                         .loadUserByUsername(userEmail);
 
