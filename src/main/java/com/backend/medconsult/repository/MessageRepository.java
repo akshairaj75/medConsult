@@ -5,31 +5,44 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.backend.medconsult.entity.consultations.Message;
 
 public interface MessageRepository extends JpaRepository<Message, UUID> {
 
-    @Query("""
-            SELECT COUNT(m)
-            FROM Message m
-            WHERE m.isRead = false
-            AND m.sender.id <> :userId
-            """)
-    long unreadCount(UUID userId);
+        @Query("""
+                        SELECT COUNT(m)
+                        FROM Message m
+                        WHERE m.isRead = false
+                        AND m.sender.id <> :userId
+                        """)
+        long unreadCount(UUID userId);
 
-    @Query("""
-                SELECT m
-                FROM Message m
-                WHERE m.consultation.consultationId =
-                        :consultationId
-                ORDER BY m.createdAt ASC
-            """)
-    List<Message> findMessagesByConsultation(UUID consultationId);
+        @Modifying
+        @Transactional
+        @Query("""
+                                 UPDATE Message m
+                                 SET m.isRead = true,
+                                 m.readAt = CURRENT_TIMESTAMP
+                                 WHERE m.consultation.consultationId = :consultationId
+                                 AND m.sender.userId <> :userId
+                                 AND m.isRead = false
+                        """)
+        int markConsultationMessagesAsRead(UUID consultationId, UUID userId);
 
+        @Query("""
+                            SELECT m
+                            FROM Message m
+                            WHERE m.consultation.consultationId =
+                                    :consultationId
+                            ORDER BY m.createdAt ASC
+                        """)
+        List<Message> findMessagesByConsultation(UUID consultationId);
 
-    Optional<List<Message>> findByConsultation_ConsultationIdOrderByCreatedAtAsc(UUID consultationId);
+        Optional<List<Message>> findByConsultation_ConsultationIdOrderByCreatedAtAsc(UUID consultationId);
 
-    List<Message> findMessagesByConsultation_ConsultationIdOrderByCreatedAtAsc(UUID consultationId);
+        List<Message> findMessagesByConsultation_ConsultationIdOrderByCreatedAtAsc(UUID consultationId);
 }

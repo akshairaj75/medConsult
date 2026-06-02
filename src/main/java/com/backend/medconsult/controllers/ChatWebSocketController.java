@@ -10,6 +10,7 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -69,8 +70,19 @@ public class ChatWebSocketController {
                 return ResponseEntity.ok(unreadCount);
         }
 
-        @PostMapping("/read/{messageId}")
-        public ResponseEntity<Void> read(
+        @PostMapping("/{consultationId}/read")
+        public ResponseEntity<Void> markRead(
+                        @PathVariable UUID consultationId,
+                        @AuthenticationPrincipal CustomUserPrincipal authUser) {
+
+                messageService.markConsultationRead(consultationId, authUser);
+                
+
+                return ResponseEntity.ok().build();
+        }
+
+        @PostMapping("/message/{messageId}/read")
+        public ResponseEntity<Void> markMessageRead(
                         @PathVariable UUID messageId) {
 
                 messageService.markAsRead(messageId);
@@ -87,7 +99,7 @@ public class ChatWebSocketController {
                 return ResponseEntity.ok(url);
         }
 
-
+        // CASE ROOM DISCUSSIONS
         @MessageMapping("/case-chat.send")
         public void sendCaseRoomMessage(CaseDiscussionMessageDto dto, Principal principal) {
 

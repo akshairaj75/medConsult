@@ -12,7 +12,7 @@ import com.backend.medconsult.security.CustomUserPrincipal;
 public interface MessageService {
 
     // MessageDto saveMessage(ChatMessageDto dto);
-    void markAsRead(UUID messageId);
+    void markConsultationRead(UUID consultationId, CustomUserPrincipal authUser);
 
     ChatMessageDto process(ChatMessageDto request, Principal principal);
 
@@ -22,5 +22,7 @@ public interface MessageService {
 
     @Nullable
     Long unreadCount(UUID userId);
+
+    void markAsRead(UUID messageId);
 
 }

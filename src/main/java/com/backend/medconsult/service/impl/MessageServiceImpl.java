@@ -18,6 +18,7 @@ import com.backend.medconsult.repository.MessageRepository;
 import com.backend.medconsult.repository.UserRepository;
 import com.backend.medconsult.security.CustomUserPrincipal;
 import com.backend.medconsult.service.MessageService;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class MessageServiceImpl implements MessageService {
@@ -94,6 +95,15 @@ public class MessageServiceImpl implements MessageService {
         }
 
         @Override
+        @Transactional
+        public void markConsultationRead(UUID consultationId, CustomUserPrincipal authUser) {
+
+                messageRepository.markConsultationMessagesAsRead(
+                                consultationId,
+                                authUser.getUserId());
+                // messageRepository.save(message);
+        }
+
         public void markAsRead(UUID messageId) {
 
                 Message message = messageRepository.findById(messageId).orElseThrow();
