@@ -9,7 +9,6 @@ import com.backend.medconsult.enums.CaseMemberRole;
 
 public class CaseRoomMemberDto {
     private UUID roomMemberId;
-    private UUID caseId;
     private DoctorDto doctor;
     private CaseMemberRole role;
     private LocalDateTime joinedAt;
@@ -21,15 +20,7 @@ public class CaseRoomMemberDto {
     public void setRoomMemberId(UUID roomMemberId) {
         this.roomMemberId = roomMemberId;
     }
-
-    public UUID getCaseId() {
-        return caseId;
-    }
-
-    public void setCaseId(UUID caseId) {
-        this.caseId = caseId;
-    }
-
+    
     public DoctorDto getDoctor() {
         return doctor;
     }
@@ -57,7 +48,6 @@ public class CaseRoomMemberDto {
     public static CaseRoomMemberDto fromEntity(CaseRoomMember member) {
         CaseRoomMemberDto dto = new CaseRoomMemberDto();
         dto.setRoomMemberId(member.getMemberId());
-        dto.setCaseId(member.getCaseRoom().getCaseId());
         dto.setDoctor(DoctorDto.fromEntity(member.getDoctor()));
         dto.setRole(member.getRole());
         dto.setJoinedAt(member.getJoinedAt());
