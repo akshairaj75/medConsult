@@ -1,6 +1,7 @@
 package com.backend.medconsult.service.impl;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,105 +28,121 @@ import com.backend.medconsult.service.CaseDiscussionService;
 @Service
 public class CaseDiscussionServiceImpl implements CaseDiscussionService {
 
-        @Autowired
-        CaseDiscussionRepository caseDiscussionRepository;
+    @Autowired
+    CaseDiscussionRepository caseDiscussionRepository;
 
-        @Autowired
-        CaseRoomRepository caseRoomRepository;
+    @Autowired
+    CaseRoomRepository caseRoomRepository;
 
-        @Autowired
-        CaseRoomMemberRepository caseRoomMemberRepository;
+    @Autowired
+    CaseRoomMemberRepository caseRoomMemberRepository;
 
-        @Autowired
-        PatientRepository patientRepository;
+    @Autowired
+    PatientRepository patientRepository;
 
-        @Autowired
-        DoctorRepository doctorRepository;
+    @Autowired
+    DoctorRepository doctorRepository;
 
-        @Override
-        public CaseDiscussionResponseDto sendCaseRoomMessage(
-                        CaseDiscussionMessageDto dto,
-                        CustomUserPrincipal authUser) {
+    @Override
+    public CaseDiscussionResponseDto sendCaseRoomMessage(CaseDiscussionMessageDto dto, CustomUserPrincipal authUser) {
 
-                Doctor doctor = authUser.getUser().getDoctor();
+        Doctor doctor = authUser.getUser().getDoctor();
 
-                CaseRoom caseRoom = caseRoomRepository
-                                .findById(dto.getCaseId())
-                                .orElseThrow(
-                                                () -> new RuntimeException("Case room not found"));
+        CaseRoom caseRoom = caseRoomRepository.findById(dto.getCaseId())
+                .orElseThrow(() -> new RuntimeException("Case room not found"));
 
-                CaseDiscussion discussion = new CaseDiscussion();
+        CaseDiscussion discussion = new CaseDiscussion();
 
-                discussion.setCaseRoom(caseRoom);
-                discussion.setAuthor(doctor);
-                discussion.setContent(dto.getContent());
-                discussion.setTags(dto.getTags());
-                discussion.setFileUrl(dto.getFileUrl());
-                caseDiscussionRepository.save(discussion);
+        discussion.setCaseRoom(caseRoom);
+        discussion.setAuthor(doctor);
+        discussion.setContent(dto.getContent());
+        discussion.setTags(dto.getTags());
+        discussion.setFileUrl(dto.getFileUrl());
+        caseDiscussionRepository.save(discussion);
 
-                return CaseDiscussionResponseDto.fromEntity(discussion);
+        return CaseDiscussionResponseDto.fromEntity(discussion);
 
+    }
+
+    @Override
+    public List<CaseDiscussionResponseDto> loadCaseRoomMessages(UUID caseId) {
+
+        return caseDiscussionRepository.findByCaseRoom_CaseIdOrderByCreatedAtAsc(caseId).stream()
+                .map(CaseDiscussionResponseDto::fromEntity).toList();
+    }
+
+    @Override
+    public CaseRoomDto createRoom(CreateCaseRoomDto dto, CustomUserPrincipal authUser) {
+
+        Doctor creator = authUser.getUser().getDoctor();
+
+        Patient patient = patientRepository.findById(dto.getPatientId())
+                .orElseThrow(() -> new RuntimeException("Patient not found"));
+
+        CaseRoom room = new CaseRoom();
+
+        room.setPatient(patient);
+        room.setCreatedBy(creator);
+        room.setTitle(dto.getTitle());
+        room.setDescription(dto.getDescription());
+        room.setSpecialty(dto.getSpecialty());
+        room.setCaseCode("CASE-" + System.currentTimeMillis());
+        caseRoomRepository.save(room);
+
+        // creator member
+        CaseRoomMember creatorMember = new CaseRoomMember();
+
+        creatorMember.setCaseRoom(room);
+        creatorMember.setDoctor(creator);
+        creatorMember.setRole(CaseMemberRole.LEAD);
+
+        // room.getMembers().add(creatorMember);
+
+        caseRoomMemberRepository.save(creatorMember);
+
+        System.out.println("Creator: " + creator.getDoctorId());
+
+        for (UUID doctorId : dto.getDoctorIds()) {
+            System.out.println("Invited: " + doctorId);
         }
 
-        @Override
-        public List<CaseDiscussionResponseDto> loadCaseRoomMessages(UUID caseId) {
+        // invited doctors
+        for (UUID doctorId : dto.getDoctorIds()) {
 
-                return caseDiscussionRepository
-                                .findByCaseRoom_CaseIdOrderByCreatedAtAsc(caseId)
-                                .stream()
-                                .map(CaseDiscussionResponseDto::fromEntity)
-                                .toList();
+            if (doctorId.equals(creator.getDoctorId())) {
+                continue;
+            }
+
+            Doctor doctor = doctorRepository.findById(doctorId)
+                    .orElseThrow(() -> new RuntimeException("Doctor not found"));
+
+            CaseRoomMember member = new CaseRoomMember();
+
+            member.setCaseRoom(room);
+            member.setDoctor(doctor);
+            member.setRole(CaseMemberRole.COLLABORATOR);
+
+            caseRoomMemberRepository.save(member);
         }
+        // room = caseRoomRepository.findById(room.getCaseId())
+        // .orElseThrow(() -> new RuntimeException("Case room not found"));
 
-        @Override
-        public CaseRoomDto createRoom(
-                        CreateCaseRoomDto dto,
-                        CustomUserPrincipal authUser) {
+        CaseRoomDto res = CaseRoomDto.fromEntity(room);
 
-                Doctor creator = authUser.getUser().getDoctor();
+        return res;
+    }
 
-                Patient patient = patientRepository
-                                .findById(dto.getPatientId())
-                                .orElseThrow(() -> new RuntimeException("Patient not found"));
+    @Override
+    public List<CaseRoomDto> getCases(CustomUserPrincipal authUser) {
+        UUID doctorId = authUser.getUser().getDoctor().getDoctorId();
+        Doctor doc = doctorRepository.findById(doctorId)
+                .orElseThrow();
 
-                CaseRoom room = new CaseRoom();
+        return caseRoomRepository.findByCreatedBy(doc)
+                .stream()
+                .map(CaseRoomDto::fromEntity)
+                .toList();
 
-                room.setPatient(patient);
-                room.setCreatedBy(creator);
-                room.setTitle(dto.getTitle());
-                room.setDescription(dto.getDescription());
-                room.setSpecialty(dto.getSpecialty());
-                room.setCaseCode("CASE-" + System.currentTimeMillis());
-                caseRoomRepository.save(room);
-
-                // creator member
-                CaseRoomMember creatorMember = new CaseRoomMember();
-
-                creatorMember.setCaseRoom(room);
-                creatorMember.setDoctor(creator);
-                creatorMember.setRole(CaseMemberRole.LEAD);
-
-                caseRoomMemberRepository.save(creatorMember);
-
-                // invited doctors
-                for (UUID doctorId : dto.getDoctorIds()) {
-
-                        Doctor doctor = doctorRepository
-                                        .findById(doctorId)
-                                        .orElseThrow(() -> new RuntimeException("Doctor not found"));
-
-                        CaseRoomMember member = new CaseRoomMember();
-
-                        member.setCaseRoom(room);
-                        member.setDoctor(doctor);
-                        member.setRole(CaseMemberRole.COLLABORATOR);
-
-                        caseRoomMemberRepository.save(member);
-                }
-
-                CaseRoomDto res = CaseRoomDto.fromEntity(room);
-
-                return res;
-        }
+    }
 
 }

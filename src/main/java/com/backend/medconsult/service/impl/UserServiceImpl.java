@@ -6,9 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.backend.medconsult.dto.AuthResponseDto;
-import com.backend.medconsult.dto.UserLoginDto;
-import com.backend.medconsult.dto.UserRegisterDto;
+import com.backend.medconsult.dto.authDto.AuthResponseDto;
+import com.backend.medconsult.dto.authDto.UserLoginDto;
+import com.backend.medconsult.dto.authDto.UserRegisterDto;
 import com.backend.medconsult.entity.auth.User;
 import com.backend.medconsult.enums.AuthProvider;
 import com.backend.medconsult.repository.UserRepository;
@@ -25,64 +25,9 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private JwtService jwtService;
 
-    // public UserRegisterDto register(UserRegisterDto dto) {
-    // if (userRepository.findByEmail(dto.email).isPresent()) {
-    // throw new ResponseStatusException(
-    // HttpStatus.BAD_REQUEST,
-    // "Email already exists");
-    // }
-    // User user = new User();
-    // String fullName;
-    // user.setEmail(dto.getEmail());
-    // user.setPasswordHash(passwordEncoder.encode(dto.getPassword())); // encode
-    // here
-
-    // if (dto.getLastName() != null && !dto.getLastName().trim().isEmpty()) {
-    // fullName = dto.getFirstName() + " " + dto.getLastName();
-    // } else {
-    // fullName = dto.getFirstName();
-    // }
-    // user.setFullName(fullName);
-    // userRepository.save(user);
-    // return dto;
-
-    // }
-
-    // @Service
-    // public class CustomUserDetailsService implements UserDetailsService {
-    // @Override
-    // public UserDetails loadUserByUsername(String username) {
-    // // fetch from DB
-    // }
-    // }
-
-    // public AuthResponseDto verify(UserLoginDto request) {
-    // try {
-    // Authentication auth = authManager.authenticate(
-
-    // new UsernamePasswordAuthenticationToken(
-    // request.getEmail(),
-    // request.getPassword()));
-
-    // SecurityContext context = SecurityContextHolder.getContext();
-    // context.setAuthentication(auth);
-
-    // return new AuthResponseDto(request.getEmail());
-
-    // } catch (BadCredentialsException e) {
-    // throw new ResponseStatusException(
-    // HttpStatus.UNAUTHORIZED,
-    // "Invalid username or password");
-    // }
-    // }
-
     public List<User> getUsers() {
-    return userRepository.findAll();
+        return userRepository.findAll();
     }
-
-    // public List<User> getPatients() {
-    // return userRepository.findByRole(Role.PATIENT);
-    // }
 
     @Override
     public AuthResponseDto register(UserRegisterDto dto) {

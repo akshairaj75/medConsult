@@ -27,130 +27,130 @@ import com.backend.medconsult.service.HealthService;
 @Service
 public class HealthServiceImpl implements HealthService {
 
-        @Autowired
-        PatientRepository patientRepository;
+    @Autowired
+    PatientRepository patientRepository;
 
-        @Autowired
-        DoctorRepository doctorRepository;
+    @Autowired
+    DoctorRepository doctorRepository;
 
-        @Autowired
-        ConsultationRepository consultationRepository;
+    @Autowired
+    ConsultationRepository consultationRepository;
 
-        @Autowired
-        PrescriptionRepository prescriptionRepository;
+    @Autowired
+    PrescriptionRepository prescriptionRepository;
 
-        @Autowired
-        MedicationAdherenceRepository adherenceRepository;
+    @Autowired
+    MedicationAdherenceRepository adherenceRepository;
 
-        @Override
-        public List<PrescriptionRegisterDto> addPrescription(
-                        CustomUserPrincipal authUser,
-                        List<PrescriptionRegisterDto> dtos,
-                        UUID consultationId) {
+    @Override
+    public List<PrescriptionRegisterDto> addPrescription(
+            CustomUserPrincipal authUser,
+            List<PrescriptionRegisterDto> dtos,
+            UUID consultationId) {
 
-                Consultation consultation = consultationRepository.findById(consultationId)
-                                .orElseThrow(() -> new RuntimeException("Consultation not found"));
+        Consultation consultation = consultationRepository.findById(consultationId)
+                .orElseThrow(() -> new RuntimeException("Consultation not found"));
 
-                if (authUser.getUser().getRole() != Role.DOCTOR) {
-                        throw new RuntimeException("Only doctors can prescribe medications");
-                }
-
-                List<Prescription> prescriptions = dtos.stream().map(dto -> {
-
-                        LocalDate startDate = dto.getStartedAt() == null
-                                        ? LocalDate.now()
-                                        : dto.getStartedAt();
-
-                                        
-                        // LocalDate expiryDate = startDate.plusDays(dto.getDurationDays());
-                        LocalDate expiryDate = dto.getDurationDays() != null
-                                        ? startDate.plusDays(dto.getDurationDays())
-                                        : null;
-                        Prescription prescription = new Prescription();
-                        prescription.setDoctor(consultation.getDoctor());
-                        prescription.setPatient(consultation.getPatient());
-                        prescription.setConsultation(consultation);
-                        prescription.setMedicationName(dto.getMedicationName());
-                        prescription.setDosage(dto.getDosage());
-                        prescription.setFrequency(dto.getFrequency());
-                        prescription.setDurationDays(dto.getDurationDays());
-                        prescription.setRefillsAllowed(dto.getRefillsAllowed());
-                        prescription.setInstructions(dto.getInstructions());
-                        prescription.setStartedAt(startDate);
-                        prescription.setExpiresAt(expiryDate);
-
-                        return prescription;
-
-                }).toList();
-
-                List<Prescription> savedPrescriptions = prescriptionRepository.saveAll(prescriptions);
-
-                return savedPrescriptions.stream()
-                                .map(PrescriptionRegisterDto::fromEntity)
-                                .toList();
-
+        if (authUser.getUser().getRole() != Role.DOCTOR) {
+            throw new RuntimeException("Only doctors can prescribe medications");
         }
 
-        @Override
-        public List<PrescriptionDto> getPrescriptionsByPatientId(CustomUserPrincipal authUser, Boolean activeOnly) {
-                List<Prescription> prescriptions;
-                UUID patientId = authUser.getUser().getPatient().getPatientId();
-                if (activeOnly != null && activeOnly) {
-                        prescriptions = prescriptionRepository.findActivePrescriptionsByPatient_patientId(patientId,
-                                        LocalDate.now());
-                } else {
-                        prescriptions = prescriptionRepository.findByPatient_PatientId(patientId);
-                }
-                return prescriptions.stream()
-                                .map(PrescriptionDto::fromEntity)
-                                .toList();
+        List<Prescription> prescriptions = dtos.stream().map(dto -> {
+
+            LocalDate startDate = dto.getStartedAt() == null
+                    ? LocalDate.now()
+                    : dto.getStartedAt();
+
+
+            // LocalDate expiryDate = startDate.plusDays(dto.getDurationDays());
+            LocalDate expiryDate = dto.getDurationDays() != null
+                    ? startDate.plusDays(dto.getDurationDays())
+                    : null;
+            Prescription prescription = new Prescription();
+            prescription.setDoctor(consultation.getDoctor());
+            prescription.setPatient(consultation.getPatient());
+            prescription.setConsultation(consultation);
+            prescription.setMedicationName(dto.getMedicationName());
+            prescription.setDosage(dto.getDosage());
+            prescription.setFrequency(dto.getFrequency());
+            prescription.setDurationDays(dto.getDurationDays());
+            prescription.setRefillsAllowed(dto.getRefillsAllowed());
+            prescription.setInstructions(dto.getInstructions());
+            prescription.setStartedAt(startDate);
+            prescription.setExpiresAt(expiryDate);
+
+            return prescription;
+
+        }).toList();
+
+        List<Prescription> savedPrescriptions = prescriptionRepository.saveAll(prescriptions);
+
+        return savedPrescriptions.stream()
+                .map(PrescriptionRegisterDto::fromEntity)
+                .toList();
+
+    }
+
+    @Override
+    public List<PrescriptionDto> getPrescriptionsByPatientId(CustomUserPrincipal authUser, Boolean activeOnly) {
+        List<Prescription> prescriptions;
+        UUID patientId = authUser.getUser().getPatient().getPatientId();
+        if (activeOnly != null && activeOnly) {
+            prescriptions = prescriptionRepository.findActivePrescriptionsByPatient_patientId(patientId,
+                    LocalDate.now());
+        } else {
+            prescriptions = prescriptionRepository.findByPatient_PatientId(patientId);
         }
+        return prescriptions.stream()
+                .map(PrescriptionDto::fromEntity)
+                .toList();
+    }
 
-        @Override
-        public MedAdherenceRegisterDto addAdherence(MedAdherenceRegisterDto dto, CustomUserPrincipal authUser) {
-                Patient patient = authUser.getUser().getPatient();
-                Prescription prescription = prescriptionRepository.findById(dto.getPrescriptionId())
-                                .orElseThrow(() -> new RuntimeException("Prescription not found"));
+    @Override
+    public MedAdherenceRegisterDto addAdherence(MedAdherenceRegisterDto dto, CustomUserPrincipal authUser) {
+        Patient patient = authUser.getUser().getPatient();
+        Prescription prescription = prescriptionRepository.findById(dto.getPrescriptionId())
+                .orElseThrow(() -> new RuntimeException("Prescription not found"));
 
-                LocalDate today = LocalDate.of(2026, 5, 28);
-                // LocalDate today = LocalDate.now();
-                Optional<MedicationAdherence> existing = adherenceRepository
-                                .findByPrescriptionAndRecordedDate(
-                                                prescription,
-                                                today);
+        LocalDate today = LocalDate.of(2026, 5, 28);
+        // LocalDate today = LocalDate.now();
+        Optional<MedicationAdherence> existing = adherenceRepository
+                .findByPrescriptionAndRecordedDate(
+                        prescription,
+                        today);
 
-                MedicationAdherence adherence;
+        MedicationAdherence adherence;
 
-                if (existing.isPresent()) {
+        if (existing.isPresent()) {
 
-                        adherence = existing.get();
+            adherence = existing.get();
 
-                } else {
-                        adherence = new MedicationAdherence();
-                        adherence.setPatient(patient);
-                        adherence.setPrescription(prescription);
-                        adherence.setRecordedDate(today);
-                }
-                adherence.setTaken(dto.isTaken());
-
-                adherence.setSkippedReason(
-                                dto.getSkippedReason());
-                adherenceRepository.save(adherence);
-                return MedAdherenceRegisterDto.fromEntity(adherence);
+        } else {
+            adherence = new MedicationAdherence();
+            adherence.setPatient(patient);
+            adherence.setPrescription(prescription);
+            adherence.setRecordedDate(today);
         }
+        adherence.setTaken(dto.isTaken());
 
-        // @Override
-        // public List<MedAdherenceDto> getAdherence(CustomUserPrincipal authUser, UUID consultationId) {
-        //         UUID patientId = authUser.getUser().getPatient().getPatientId();
-        //         List<MedicationAdherence> adherance;
-        //         adherance = adherenceRepository.findByPatient_PatientId(patientId)
-        //                         .orElseThrow(() -> new RuntimeException("No adherance for the prescription"));
-                
-        //         // adherance = adherenceRepository.findByPrescription_Consultation_ConsultationId(patientId)
-        //         //                 .orElseThrow(() -> new RuntimeException("No adherance for the prescription"));
+        adherence.setSkippedReason(
+                dto.getSkippedReason());
+        adherenceRepository.save(adherence);
+        return MedAdherenceRegisterDto.fromEntity(adherence);
+    }
 
-        //         return adherance.stream()
-        //                         .map(MedAdherenceDto::fromEntity)
-        //                         .toList();
-        // }
+    // @Override
+    // public List<MedAdherenceDto> getAdherence(CustomUserPrincipal authUser, UUID consultationId) {
+    //         UUID patientId = authUser.getUser().getPatient().getPatientId();
+    //         List<MedicationAdherence> adherance;
+    //         adherance = adherenceRepository.findByPatient_PatientId(patientId)
+    //                         .orElseThrow(() -> new RuntimeException("No adherance for the prescription"));
+
+    //         // adherance = adherenceRepository.findByPrescription_Consultation_ConsultationId(patientId)
+    //         //                 .orElseThrow(() -> new RuntimeException("No adherance for the prescription"));
+
+    //         return adherance.stream()
+    //                         .map(MedAdherenceDto::fromEntity)
+    //                         .toList();
+    // }
 }

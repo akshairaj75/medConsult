@@ -9,10 +9,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.backend.medconsult.dto.AuthResponseDto;
-import com.backend.medconsult.dto.UserDto;
-import com.backend.medconsult.dto.UserLoginDto;
-import com.backend.medconsult.dto.UserRegisterDto;
+import com.backend.medconsult.dto.authDto.AuthResponseDto;
+import com.backend.medconsult.dto.authDto.UserDto;
+import com.backend.medconsult.dto.authDto.UserLoginDto;
+import com.backend.medconsult.dto.authDto.UserRegisterDto;
 import com.backend.medconsult.entity.auth.User;
 import com.backend.medconsult.repository.UserRepository;
 import com.backend.medconsult.security.CustomUserPrincipal;
@@ -43,17 +43,14 @@ public class AuthController {
 
     @PostMapping("/logout")
     public ResponseEntity<?> logout() {
-        return ResponseEntity.ok(
-                "Logged out");
+        return ResponseEntity.ok("Logged out");
     }
 
     @GetMapping("/me")
-    public ResponseEntity<UserDto> currentUser(
-            @AuthenticationPrincipal CustomUserPrincipal principal) {
+    public ResponseEntity<UserDto> currentUser(@AuthenticationPrincipal CustomUserPrincipal principal) {
 
-        User user = userRepository.findById(principal.getUserId())
-                .orElseThrow(() -> new RuntimeException("user not found"));
-                
+        User user = userRepository.findById(principal.getUserId()).orElseThrow(() -> new RuntimeException("user not found"));
+
         return ResponseEntity.ok(UserDto.fromEntity(user));
 
     }

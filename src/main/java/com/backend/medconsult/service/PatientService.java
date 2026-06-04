@@ -5,7 +5,7 @@ import java.util.UUID;
 
 import org.springframework.web.multipart.MultipartFile;
 
-import com.backend.medconsult.dto.UserDto;
+import com.backend.medconsult.dto.authDto.UserDto;
 import com.backend.medconsult.dto.appointmentDto.AppointmentDto;
 import com.backend.medconsult.dto.clinicalDataDto.VitalsDto;
 import com.backend.medconsult.dto.patientDto.PatientDto;

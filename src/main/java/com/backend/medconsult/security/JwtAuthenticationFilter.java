@@ -20,43 +20,43 @@ import jakarta.servlet.http.HttpServletResponse;
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-        @Autowired
-        private JwtService jwtService;
+    @Autowired
+    private JwtService jwtService;
 
-        @Autowired
-        private CustomUserDetailsService userDetailsService;
+    @Autowired
+    private CustomUserDetailsService userDetailsService;
 
-        @Override
-        protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
-                        FilterChain filterChain)
-                        throws ServletException, IOException {
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
+                                    FilterChain filterChain)
+            throws ServletException, IOException {
 
-                String authHeader = request.getHeader("Authorization");
-                String token = null;
-                String email = null;
+        String authHeader = request.getHeader("Authorization");
+        String token = null;
+        String email = null;
 
-                if (authHeader != null && authHeader.startsWith("Bearer ")) {
-                        token = authHeader.substring(7);
-                        email = jwtService.extractEmail(token);
-                }
-                if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-
-                        CustomUserPrincipal principal = (CustomUserPrincipal) userDetailsService
-                                        .loadUserByUsername(email);
-
-                        if (jwtService.validateToken(token, principal)) {
-                                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                                                principal,
-                                                null,
-                                                principal.getAuthorities());
-
-                                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-                                SecurityContextHolder.getContext().setAuthentication(authToken);
-                        }
-                }
-
-                filterChain.doFilter(request, response);
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            token = authHeader.substring(7);
+            email = jwtService.extractEmail(token);
         }
+        if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+
+            CustomUserPrincipal principal = (CustomUserPrincipal) userDetailsService
+                    .loadUserByUsername(email);
+
+            if (jwtService.validateToken(token, principal)) {
+                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                        principal,
+                        null,
+                        principal.getAuthorities());
+
+                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+                SecurityContextHolder.getContext().setAuthentication(authToken);
+            }
+        }
+
+        filterChain.doFilter(request, response);
+    }
 
 }

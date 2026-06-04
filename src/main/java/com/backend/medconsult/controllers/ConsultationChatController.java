@@ -17,6 +17,7 @@ import com.backend.medconsult.dto.caseRoomDto.CaseDiscussionResponseDto;
 import com.backend.medconsult.dto.caseRoomDto.CaseRoomDto;
 import com.backend.medconsult.dto.caseRoomDto.CreateCaseRoomDto;
 import com.backend.medconsult.dto.chatDto.ChatConsultationDto;
+import com.backend.medconsult.entity.caseDiscussion.CaseRoom;
 import com.backend.medconsult.security.CustomUserPrincipal;
 import com.backend.medconsult.service.CaseDiscussionService;
 import com.backend.medconsult.service.ConsultationService;
@@ -25,31 +26,40 @@ import com.backend.medconsult.service.ConsultationService;
 @RequestMapping("/api/consultation")
 public class ConsultationChatController {
 
-   @Autowired
-   ConsultationService consultationService;
+    @Autowired
+    ConsultationService consultationService;
 
-   @Autowired
-   CaseDiscussionService caseDiscussionService;
+    @Autowired
+    CaseDiscussionService caseDiscussionService;
 
-   @GetMapping("/{consultationId}")
-   public ResponseEntity<ChatConsultationDto> getConsultDetails(@PathVariable UUID consultationId) {
-      ChatConsultationDto dto = consultationService.getConsultDetails(consultationId);
-      return ResponseEntity.ok(dto);
+    @GetMapping("/{consultationId}")
+    public ResponseEntity<ChatConsultationDto> getConsultDetails(@PathVariable UUID consultationId) {
+        ChatConsultationDto dto = consultationService.getConsultDetails(consultationId);
+        return ResponseEntity.ok(dto);
 
-   }
+    }
 
-   @GetMapping("/case/{caseId}/load-messages")
-   public ResponseEntity<List<CaseDiscussionResponseDto>> getMessages(
-         @PathVariable UUID caseId) {
+    @GetMapping("/case/{caseId}/load-messages")
+    public ResponseEntity<List<CaseDiscussionResponseDto>> getMessages(
+            @PathVariable UUID caseId) {
 
-      return ResponseEntity.ok(caseDiscussionService.loadCaseRoomMessages(caseId));
-   }
+        return ResponseEntity.ok(caseDiscussionService.loadCaseRoomMessages(caseId));
+    }
 
-   @PostMapping("/create")
-   public ResponseEntity<CaseRoomDto> createRoom(@RequestBody CreateCaseRoomDto dto,
-         @AuthenticationPrincipal CustomUserPrincipal authUser) {
+    @PostMapping("/create")
+    public ResponseEntity<CaseRoomDto> createRoom(@RequestBody CreateCaseRoomDto dto,
+                                                  @AuthenticationPrincipal CustomUserPrincipal authUser) {
 
-      return ResponseEntity.ok(caseDiscussionService.createRoom(dto, authUser));
-   }
+        return ResponseEntity.ok(caseDiscussionService.createRoom(dto, authUser));
+    }
+
+    @GetMapping("/caserooms")
+    public ResponseEntity<List<CaseRoomDto>> getCases(
+        @AuthenticationPrincipal CustomUserPrincipal authUser
+    ){
+        List<CaseRoomDto> dto = caseDiscussionService.getCases(authUser);
+        return ResponseEntity.ok(dto);
+
+    }
 
 }

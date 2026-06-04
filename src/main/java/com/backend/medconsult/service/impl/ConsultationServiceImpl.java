@@ -30,19 +30,18 @@ public class ConsultationServiceImpl implements ConsultationService {
     @Override
     public ChatConsultationDto getConsultDetails(UUID consultationId) {
 
-        Appointment appointment = appointmentRepository.findByConsultation_ConsultationId(consultationId)
-                .orElseThrow(() -> new RuntimeException("No consultation Details Found"));
+        Appointment appointment = appointmentRepository.findByConsultation_ConsultationId(consultationId).orElseThrow(() -> new RuntimeException("No consultation Details Found"));
 
         AppointmentDto appointmentDto = AppointmentDto.fromEntity(appointment);
 
-        Vital vital = vitalRepository.findTopByPatient_PatientIdOrderByRecordedAtDesc(appointmentDto.getPatientId())
-                .orElseThrow(() -> new RuntimeException("Vitals not found"));
+        Vital vital = vitalRepository.findTopByPatient_PatientIdOrderByRecordedAtDesc(appointmentDto.getPatientId()).orElseThrow(() -> new RuntimeException("Vitals not found"));
 
         VitalsDto vitalsDto = VitalsDto.fromEntity(vital);
 
         ChatConsultationDto dto = new ChatConsultationDto();
         dto.setAppointment(appointmentDto);
         dto.setVitals(vitalsDto);
+
 
         return dto;
     }

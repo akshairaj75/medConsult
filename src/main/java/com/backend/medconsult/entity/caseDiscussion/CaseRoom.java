@@ -1,6 +1,7 @@
 package com.backend.medconsult.entity.caseDiscussion;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -93,7 +94,7 @@ public class CaseRoom {
         private LocalDateTime updatedAt;
 
         @OneToMany(mappedBy = "caseRoom", cascade = CascadeType.ALL, orphanRemoval = true)
-        private List<CaseRoomMember> members;
+        private List<CaseRoomMember> members = new ArrayList<>();;
 
         @OneToMany(mappedBy = "caseRoom")
         private List<CaseDiscussion> discussions;

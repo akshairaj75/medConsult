@@ -4,13 +4,12 @@ import java.util.List;
 import java.util.UUID;
 
 public class CreateCaseRoomDto {
-    
+
     private UUID patientId;
     private String specialty;
     private String title;
     private String description;
-
-    // doctors to invite
+    private List<CaseRoomMemberDto> roomMembers;
     private List<UUID> doctorIds;
 
     public UUID getPatientId() {
@@ -51,6 +50,14 @@ public class CreateCaseRoomDto {
 
     public void setDoctorIds(List<UUID> doctorIds) {
         this.doctorIds = doctorIds;
+    }
+
+    public List<CaseRoomMemberDto> getRoomMembers() {
+        return roomMembers;
+    }
+
+    public void setRoomMembers(List<CaseRoomMemberDto> roomMembers) {
+        this.roomMembers = roomMembers;
     }
 
 }

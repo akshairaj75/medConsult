@@ -4,7 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
-import com.backend.medconsult.dto.UserDto;
+import com.backend.medconsult.dto.authDto.UserDto;
 import com.backend.medconsult.dto.doctorDto.DoctorDto;
 import com.backend.medconsult.entity.people.Patient;
 import com.backend.medconsult.enums.BloodType;

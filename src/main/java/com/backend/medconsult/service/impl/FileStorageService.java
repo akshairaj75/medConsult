@@ -27,7 +27,7 @@ public class FileStorageService {
         if (!Files.exists(uploadPath)) {
             Files.createDirectories(uploadPath);
         }
-        
+
         String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
         Files.copy(file.getInputStream(),
                 uploadPath.resolve(fileName),

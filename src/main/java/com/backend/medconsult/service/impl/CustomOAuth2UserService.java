@@ -34,8 +34,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
             System.out.println("EMAIL: " + email);
 
-            User user = userRepository.findByEmail(email)
-                    .orElse(new User());
+            User user = userRepository.findByEmail(email).orElse(new User());
 
             user.setEmail(email);
             user.setFullName(name);

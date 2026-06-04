@@ -59,16 +59,16 @@ public class JwtService {
 
 
     public boolean validateToken(String token, UserDetails userDetails) {
-                return extractEmail(token)
+        return extractEmail(token)
                 .equals(userDetails
                         .getUsername())
                 && !isTokenExpired(token);
-        
+
     }
 
 
     private boolean isTokenExpired(String token) {
-       Date expiration = Jwts.parserBuilder()
+        Date expiration = Jwts.parserBuilder()
                 .setSigningKey(getSigningKey())
                 .build()
                 .parseClaimsJws(token)

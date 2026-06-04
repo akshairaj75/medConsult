@@ -34,7 +34,7 @@ public class DoctorController {
 
     @PostMapping("/register") // add userId as path variable after implementing auth
     public ResponseEntity<DoctorRegisterDto> registerDoctor(@RequestBody DoctorRegisterDto dto,
-            @AuthenticationPrincipal CustomUserPrincipal authUser) {
+                                                            @AuthenticationPrincipal CustomUserPrincipal authUser) {
         DoctorRegisterDto registered = doctorService.registerDoctor(dto, authUser);
         return ResponseEntity.status(HttpStatus.CREATED).body(registered);
     }

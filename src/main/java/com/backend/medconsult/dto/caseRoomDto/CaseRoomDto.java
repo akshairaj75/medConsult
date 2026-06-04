@@ -23,6 +23,7 @@ public class CaseRoomDto {
     private List<String> pendingActions;
     private LocalDateTime closedAt;
     private LocalDateTime createdAt;
+    private List<CaseRoomMemberDto> roomMembers;
 
     public UUID getCaseId() {
         return caseId;
@@ -120,6 +121,22 @@ public class CaseRoomDto {
         this.createdAt = createdAt;
     }
 
+    // public List<DoctorDto> getRoomMembers() {
+    // return roomMembers;
+    // }
+
+    // public void setRoomMembers(List<DoctorDto> roomMembers) {
+    // this.roomMembers = roomMembers;
+    // }
+
+    public List<CaseRoomMemberDto> getRoomMembers() {
+        return roomMembers;
+    }
+
+    public void setRoomMembers(List<CaseRoomMemberDto> roomMembers) {
+        this.roomMembers = roomMembers;
+    }
+
     public static CaseRoomDto fromEntity(CaseRoom cs) {
         CaseRoomDto dto = new CaseRoomDto();
         dto.setCaseId(cs.getCaseId());
@@ -134,6 +151,13 @@ public class CaseRoomDto {
         dto.setPendingActions(cs.getPendingActions());
         dto.setClosedAt(cs.getClosedAt());
         dto.setCreatedAt(cs.getCreatedAt());
+        if (cs.getMembers() != null) {
+            dto.setRoomMembers(
+                    cs.getMembers()
+                            .stream()
+                            .map(CaseRoomMemberDto::fromEntity)
+                            .toList());
+        }
         return dto;
     }
 }

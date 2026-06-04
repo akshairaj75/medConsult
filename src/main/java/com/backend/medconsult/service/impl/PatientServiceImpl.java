@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.backend.medconsult.dto.UserDto;
+import com.backend.medconsult.dto.authDto.UserDto;
 import com.backend.medconsult.dto.appointmentDto.AppointmentDto;
 import com.backend.medconsult.dto.clinicalDataDto.VitalsDto;
 import com.backend.medconsult.dto.patientDto.PatientDto;
@@ -166,7 +166,7 @@ public class PatientServiceImpl implements PatientService {
     @Override
     public VitalsDto getPatientVital(UUID patientId) {
         Vital vital = vitalRepository.findTopByPatient_PatientIdOrderByRecordedAtDesc(patientId)
-        .orElseThrow(()-> new RuntimeException("Vitals not found"));
+                .orElseThrow(() -> new RuntimeException("Vitals not found"));
 
         return VitalsDto.fromEntity(vital);
     }

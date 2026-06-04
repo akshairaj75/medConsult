@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.backend.medconsult.dto.UserDto;
+import com.backend.medconsult.dto.authDto.UserDto;
 import com.backend.medconsult.dto.appointmentDto.AppointmentDto;
 import com.backend.medconsult.dto.clinicalDataDto.VitalsDto;
 import com.backend.medconsult.dto.patientDto.PatientDto;
@@ -33,9 +33,7 @@ public class PatientController {
     PatientService patientService;
 
     @PostMapping("/register") // add userId as path variable after implementing auth
-    public ResponseEntity<PatientRegisterDto> registerPatient(
-            @RequestBody PatientRegisterDto dto,
-            @AuthenticationPrincipal CustomUserPrincipal authUser) {
+    public ResponseEntity<PatientRegisterDto> registerPatient(@RequestBody PatientRegisterDto dto, @AuthenticationPrincipal CustomUserPrincipal authUser) {
         PatientRegisterDto registered = patientService.registerPatient(dto, authUser);
         return ResponseEntity.status(HttpStatus.CREATED).body(registered);
     }
@@ -47,10 +45,7 @@ public class PatientController {
     }
 
     @PutMapping("/update-profile")
-    public ResponseEntity<UserDto> updateUserProfile(
-            @AuthenticationPrincipal CustomUserPrincipal authUser,
-            @RequestPart("data") UserDto dto,
-            @RequestPart(value = "profilePhoto", required = false) MultipartFile profilePhoto) {
+    public ResponseEntity<UserDto> updateUserProfile(@AuthenticationPrincipal CustomUserPrincipal authUser, @RequestPart("data") UserDto dto, @RequestPart(value = "profilePhoto", required = false) MultipartFile profilePhoto) {
         UserDto response = patientService.updateUserProfile(authUser, dto, profilePhoto);
         return ResponseEntity.ok(response);
 
@@ -63,7 +58,7 @@ public class PatientController {
     }
 
     @GetMapping("/next-appointment")
-    public ResponseEntity<AppointmentDto> getLatestAppointment(@AuthenticationPrincipal CustomUserPrincipal authUser){
+    public ResponseEntity<AppointmentDto> getLatestAppointment(@AuthenticationPrincipal CustomUserPrincipal authUser) {
 
         AppointmentDto dto = patientService.getLatestAppointmentToday(authUser);
         if (dto == null) {
@@ -73,7 +68,7 @@ public class PatientController {
     }
 
     @GetMapping("/get-vitals/{patientId}")
-    public ResponseEntity<VitalsDto> getPatientVital(@PathVariable UUID patientId){
+    public ResponseEntity<VitalsDto> getPatientVital(@PathVariable UUID patientId) {
         VitalsDto dto = patientService.getPatientVital(patientId);
         return ResponseEntity.ok(dto);
 

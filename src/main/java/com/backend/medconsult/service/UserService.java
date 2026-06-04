@@ -1,8 +1,8 @@
 package com.backend.medconsult.service;
 
-import com.backend.medconsult.dto.AuthResponseDto;
-import com.backend.medconsult.dto.UserLoginDto;
-import com.backend.medconsult.dto.UserRegisterDto;
+import com.backend.medconsult.dto.authDto.AuthResponseDto;
+import com.backend.medconsult.dto.authDto.UserLoginDto;
+import com.backend.medconsult.dto.authDto.UserRegisterDto;
 
 public interface UserService {
 

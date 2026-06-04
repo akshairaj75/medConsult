@@ -36,79 +36,70 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/chat")
 public class ChatWebSocketController {
 
-        private final SimpMessagingTemplate messagingTemplate;
-        private final FileStorageService fileStorageService;
-        private final MessageService messageService;
-        private final CaseDiscussionService caseDiscussionService;
+    private final SimpMessagingTemplate messagingTemplate;
+    private final FileStorageService fileStorageService;
+    private final MessageService messageService;
+    private final CaseDiscussionService caseDiscussionService;
 
-        @MessageMapping("/chat.send")
-        public void sendConsultMessage(ChatMessageDto dto, Principal principal) {
-                UsernamePasswordAuthenticationToken auth = (UsernamePasswordAuthenticationToken) principal;
-                CustomUserPrincipal authUser = (CustomUserPrincipal) auth.getPrincipal();
-                ChatMessageDto saved = messageService.saveConsultMessage(dto, authUser);
+    @MessageMapping("/chat.send")
+    public void sendConsultMessage(ChatMessageDto dto, Principal principal) {
+        UsernamePasswordAuthenticationToken auth = (UsernamePasswordAuthenticationToken) principal;
+        CustomUserPrincipal authUser = (CustomUserPrincipal) auth.getPrincipal();
+        ChatMessageDto saved = messageService.saveConsultMessage(dto, authUser);
 
-                messagingTemplate.convertAndSend(
-                                "/topic/chat/" + dto.getConsultationId(),
-                                saved);
-        }
+        messagingTemplate.convertAndSend("/topic/chat/" + dto.getConsultationId(), saved);
+    }
 
-        @GetMapping("/{consultationId}/messages")
-        public ResponseEntity<List<ChatMessageDto>> getConsultMessages(
-                        @PathVariable UUID consultationId) {
+    @GetMapping("/{consultationId}/messages")
+    public ResponseEntity<List<ChatMessageDto>> getConsultMessages(@PathVariable UUID consultationId) {
 
-                return ResponseEntity.ok(messageService.loadConsultMessages(consultationId));
-        }
+        return ResponseEntity.ok(messageService.loadConsultMessages(consultationId));
+    }
 
-        @GetMapping("/unread-count")
-        public ResponseEntity<Long> unread(
-                        Authentication authentication) {
+    @GetMapping("/unread-count")
+    public ResponseEntity<Long> unread(Authentication authentication) {
 
-                CustomUserPrincipal user = (CustomUserPrincipal) authentication.getPrincipal();
+        CustomUserPrincipal user = (CustomUserPrincipal) authentication.getPrincipal();
 
-                Long unreadCount = messageService.unreadCount(user.getUserId());
+        Long unreadCount = messageService.unreadCount(user.getUserId());
 
-                return ResponseEntity.ok(unreadCount);
-        }
+        return ResponseEntity.ok(unreadCount);
+    }
 
-        @PostMapping("/{consultationId}/read")
-        public ResponseEntity<Void> markRead(
-                        @PathVariable UUID consultationId,
-                        @AuthenticationPrincipal CustomUserPrincipal authUser) {
+    @PostMapping("/{consultationId}/read")
+    public ResponseEntity<Void> markRead(@PathVariable UUID consultationId, @AuthenticationPrincipal CustomUserPrincipal authUser) {
 
-                messageService.markConsultationRead(consultationId, authUser);
-                
+        messageService.markConsultationRead(consultationId, authUser);
 
-                return ResponseEntity.ok().build();
-        }
 
-        @PostMapping("/message/{messageId}/read")
-        public ResponseEntity<Void> markMessageRead(
-                        @PathVariable UUID messageId) {
+        return ResponseEntity.ok().build();
+    }
 
-                messageService.markAsRead(messageId);
+    @PostMapping("/message/{messageId}/read")
+    public ResponseEntity<Void> markMessageRead(@PathVariable UUID messageId) {
 
-                return ResponseEntity.ok().build();
-        }
+        messageService.markAsRead(messageId);
 
-        @PostMapping("/upload")
-        public ResponseEntity<String> upload(
-                        @RequestParam MultipartFile file) throws IOException {
+        return ResponseEntity.ok().build();
+    }
 
-                String url = fileStorageService.storeFile(file);
+    @PostMapping("/upload")
+    public ResponseEntity<String> upload(@RequestParam MultipartFile file) throws IOException {
 
-                return ResponseEntity.ok(url);
-        }
+        String url = fileStorageService.storeFile(file);
 
-        // CASE ROOM DISCUSSIONS
-        @MessageMapping("/case-chat.send")
-        public void sendCaseRoomMessage(CaseDiscussionMessageDto dto, Principal principal) {
+        return ResponseEntity.ok(url);
+    }
 
-                CustomUserPrincipal authUser = (CustomUserPrincipal) ((Authentication) principal)
-                                .getPrincipal();
+    // CASE ROOM DISCUSSIONS
+    @MessageMapping("/case-chat.send")
+    public void sendCaseRoomMessage(CaseDiscussionMessageDto dto, Principal principal) {
 
-                CaseDiscussionResponseDto response = caseDiscussionService.sendCaseRoomMessage(dto, authUser);
+        CustomUserPrincipal authUser = (CustomUserPrincipal) ((Authentication) principal).getPrincipal();
 
-                messagingTemplate.convertAndSend("/topic/case-room/" + dto.getCaseId(), response);
-        }
+        CaseDiscussionResponseDto response = caseDiscussionService.sendCaseRoomMessage(dto, authUser);
+
+        messagingTemplate.convertAndSend("/topic/case-room/" + dto.getCaseId(), response);
+    }
 
 }

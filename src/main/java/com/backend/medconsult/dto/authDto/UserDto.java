@@ -1,4 +1,4 @@
-package com.backend.medconsult.dto;
+package com.backend.medconsult.dto.authDto;
 
 import java.util.UUID;
 

@@ -28,26 +28,19 @@ public class HealthController {
     HealthService healthService;
 
     @PostMapping("/prescription/{consultationId}/add")
-    public ResponseEntity<List<PrescriptionRegisterDto>> addPrescription(
-            @AuthenticationPrincipal CustomUserPrincipal authUser,
-            @RequestBody List<PrescriptionRegisterDto> dto,
-            @PathVariable UUID consultationId) {
+    public ResponseEntity<List<PrescriptionRegisterDto>> addPrescription(@AuthenticationPrincipal CustomUserPrincipal authUser, @RequestBody List<PrescriptionRegisterDto> dto, @PathVariable UUID consultationId) {
         List<PrescriptionRegisterDto> prescriptions = healthService.addPrescription(authUser, dto, consultationId);
         return ResponseEntity.ok(prescriptions);
     }
 
     @GetMapping("/prescription/{patientId}")
-    public ResponseEntity<List<PrescriptionDto>> getPrescriptionsByPatientId(
-            @AuthenticationPrincipal CustomUserPrincipal authUser,
-            @RequestParam(required = false) Boolean activeOnly) {
+    public ResponseEntity<List<PrescriptionDto>> getPrescriptionsByPatientId(@AuthenticationPrincipal CustomUserPrincipal authUser, @RequestParam(required = false) Boolean activeOnly) {
         List<PrescriptionDto> prescriptions = healthService.getPrescriptionsByPatientId(authUser, activeOnly);
         return ResponseEntity.ok(prescriptions);
     }
 
     @PostMapping("/med-adherence")
-    public ResponseEntity<MedAdherenceRegisterDto> addAdherence(
-            @RequestBody MedAdherenceRegisterDto dto,
-            @AuthenticationPrincipal CustomUserPrincipal authUser) {
+    public ResponseEntity<MedAdherenceRegisterDto> addAdherence(@RequestBody MedAdherenceRegisterDto dto, @AuthenticationPrincipal CustomUserPrincipal authUser) {
         MedAdherenceRegisterDto adherence = healthService.addAdherence(dto, authUser);
         return ResponseEntity.ok(adherence);
     }
