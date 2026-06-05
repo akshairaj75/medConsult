@@ -2,6 +2,7 @@ package com.backend.medconsult.repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -24,5 +25,8 @@ public interface PrescriptionRepository extends JpaRepository<Prescription, UUID
     )
 """)
     List<Prescription> findActivePrescriptionsByPatient_patientId(UUID patientId, LocalDate now);
+
+
+    Optional <List<Prescription>> findByConsultation_ConsultationId(UUID consultationId);
 
 }

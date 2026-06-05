@@ -135,14 +135,14 @@ public class CaseDiscussionServiceImpl implements CaseDiscussionService {
     @Override
     public List<CaseRoomDto> getCases(CustomUserPrincipal authUser) {
         UUID doctorId = authUser.getUser().getDoctor().getDoctorId();
+
         Doctor doc = doctorRepository.findById(doctorId)
                 .orElseThrow();
 
-        return caseRoomRepository.findByCreatedBy(doc)
-                .stream()
-                .map(CaseRoomDto::fromEntity)
+        List<CaseRoomDto> response = caseRoomRepository.findByMembers_Doctor(doc)
+                .stream().map(CaseRoomDto::fromEntity)
                 .toList();
-
+        return response;
     }
 
 }

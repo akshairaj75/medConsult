@@ -14,12 +14,7 @@ public class CaseRoomDto {
 
     private UUID caseId;
     private String caseCode;
-    private UUID patientId;
-
     private PatientDto patient;
-
-
-
     private DoctorDto createdBy;
     private String specialty;
     private String title;
@@ -46,15 +41,6 @@ public class CaseRoomDto {
     public void setCaseCode(String caseCode) {
         this.caseCode = caseCode;
     }
-
-    public UUID getPatientId() {
-        return patientId;
-    }
-
-    public void setPatientId(UUID patientId) {
-        this.patientId = patientId;
-    }
-
 
         public PatientDto getPatient() {
         return patient;
@@ -158,7 +144,6 @@ public class CaseRoomDto {
         CaseRoomDto dto = new CaseRoomDto();
         dto.setCaseId(cs.getCaseId());
         dto.setCaseCode(cs.getCaseCode());
-        dto.setPatientId(cs.getPatient().getPatientId());
         dto.setPatient(PatientDto.fromEntity(cs.getPatient()));
         dto.setCreatedBy(DoctorDto.fromEntity(cs.getCreatedBy()));
         dto.setSpecialty(cs.getSpecialty());

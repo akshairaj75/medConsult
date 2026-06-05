@@ -25,4 +25,6 @@ public interface CaseRoomRepository extends JpaRepository<CaseRoom, UUID> {
 
     List<CaseRoom> findByCreatedBy(Doctor doc);
 
+     List<CaseRoom> findByMembers_Doctor(Doctor doc);
+
 }
