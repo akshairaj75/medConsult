@@ -23,6 +23,8 @@ import org.springframework.web.multipart.MultipartFile;
 import com.backend.medconsult.dto.caseRoomDto.CaseDiscussionMessageDto;
 import com.backend.medconsult.dto.caseRoomDto.CaseDiscussionResponseDto;
 import com.backend.medconsult.dto.chatDto.ChatMessageDto;
+import com.backend.medconsult.dto.clinicalDataDto.FileUploadRequestDto;
+import com.backend.medconsult.dto.clinicalDataDto.FileUploadResponseDto;
 import com.backend.medconsult.security.CustomUserPrincipal;
 import com.backend.medconsult.service.CaseDiscussionService;
 import com.backend.medconsult.service.MessageService;
@@ -37,14 +39,16 @@ import lombok.RequiredArgsConstructor;
 public class ChatWebSocketController {
 
     private final SimpMessagingTemplate messagingTemplate;
-    private final FileStorageService fileStorageService;
     private final MessageService messageService;
     private final CaseDiscussionService caseDiscussionService;
 
     @MessageMapping("/chat.send")
     public void sendConsultMessage(ChatMessageDto dto, Principal principal) {
+        
         UsernamePasswordAuthenticationToken auth = (UsernamePasswordAuthenticationToken) principal;
+        
         CustomUserPrincipal authUser = (CustomUserPrincipal) auth.getPrincipal();
+        
         ChatMessageDto saved = messageService.saveConsultMessage(dto, authUser);
 
         messagingTemplate.convertAndSend("/topic/chat/" + dto.getConsultationId(), saved);
@@ -67,10 +71,10 @@ public class ChatWebSocketController {
     }
 
     @PostMapping("/{consultationId}/read")
-    public ResponseEntity<Void> markRead(@PathVariable UUID consultationId, @AuthenticationPrincipal CustomUserPrincipal authUser) {
+    public ResponseEntity<Void> markRead(@PathVariable UUID consultationId,
+            @AuthenticationPrincipal CustomUserPrincipal authUser) {
 
         messageService.markConsultationRead(consultationId, authUser);
-
 
         return ResponseEntity.ok().build();
     }
@@ -84,11 +88,16 @@ public class ChatWebSocketController {
     }
 
     @PostMapping("/upload")
-    public ResponseEntity<String> upload(@RequestParam MultipartFile file) throws IOException {
+    public ResponseEntity<FileUploadResponseDto> upload(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam UUID consultationId,
+            @AuthenticationPrincipal CustomUserPrincipal authUser) 
+            throws IOException{
 
-        String url = fileStorageService.storeFile(file);
+        FileUploadResponseDto dto = messageService.storeFile(file, consultationId, authUser);
+        // String url = fileStorageService.storeFile(file);
 
-        return ResponseEntity.ok(url);
+        return ResponseEntity.ok(dto);
     }
 
     // CASE ROOM DISCUSSIONS

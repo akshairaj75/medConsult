@@ -15,49 +15,37 @@ import lombok.*;
 @Builder
 public class ChatMessageDto {
 
-    private UUID messageId;
-    private UUID consultationId;
-    private UUID senderId;
-    private String senderName;
-    private String content;
-    private String fileUrl;
-    private Boolean isRead;
-    private MessageType messageType;
-    private LocalDateTime createdAt;
+        private UUID messageId;
+        private UUID consultationId;
+        private UUID senderId;
+        private String senderName;
+        private String content;
+        private String fileUrl;
+        private String fileName;
 
-    public static ChatMessageDto fromEntity(Message message) {
+        private Long fileSizeBytes;
 
-        return ChatMessageDto.builder()
+        private String fileMimeType;
+        private Boolean isRead;
+        private MessageType messageType;
+        private LocalDateTime createdAt;
 
-                .messageId(
-                        message.getMessageId())
+        public static ChatMessageDto fromEntity(Message message) {
 
-                .consultationId(
-                        message.getConsultation()
-                                .getConsultationId())
-
-                .senderId(
-                        message.getSender().getUserId())
-
-                .senderName(
-                        message.getSender().getFullName())
-
-                .content(
-                        message.getContent())
-
-                .fileUrl(
-                        message.getFileUrl())
-
-                .isRead(
-                        message.isRead())
-
-                .messageType(
-                        message.getMessageType())
-
-                .createdAt(
-                        message.getCreatedAt())
-
-                .build();
-    }
-
+                return ChatMessageDto.builder()
+                        .messageId(message.getMessageId())
+                        .consultationId(message.getConsultation()
+                                        .getConsultationId())
+                        .senderId(message.getSender().getUserId())
+                        .senderName(message.getSender().getFullName())
+                        .content(message.getContent())
+                        .isRead(message.isRead())
+                        .messageType(message.getMessageType())
+                        .createdAt(message.getCreatedAt())
+                        .fileUrl(message.getFileUrl())
+                        .fileMimeType(message.getFileMimeType())
+                        .fileName(message.getFileName())
+                        .fileSizeBytes(message.getFileSizeBytes())
+                        .build();
+        }
 }

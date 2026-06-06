@@ -1,5 +1,6 @@
 package com.backend.medconsult.service.impl;
 
+import java.io.IOException;
 import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -9,133 +10,190 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.backend.medconsult.dto.chatDto.ChatMessageDto;
+import com.backend.medconsult.dto.clinicalDataDto.FileUploadResponseDto;
 import com.backend.medconsult.entity.auth.User;
+import com.backend.medconsult.entity.clinicalData.File;
 import com.backend.medconsult.entity.consultations.Consultation;
 import com.backend.medconsult.entity.consultations.Message;
+import com.backend.medconsult.entity.people.Patient;
 import com.backend.medconsult.enums.MessageType;
 import com.backend.medconsult.repository.ConsultationRepository;
+import com.backend.medconsult.repository.FileRepository;
 import com.backend.medconsult.repository.MessageRepository;
 import com.backend.medconsult.repository.UserRepository;
 import com.backend.medconsult.security.CustomUserPrincipal;
 import com.backend.medconsult.service.MessageService;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class MessageServiceImpl implements MessageService {
 
-    @Autowired
-    UserRepository userRepository;
+        @Autowired
+        UserRepository userRepository;
 
-    @Autowired
-    MessageRepository messageRepository;
+        @Autowired
+        MessageRepository messageRepository;
 
-    @Autowired
-    ConsultationRepository consultationRepository;
+        @Autowired
+        FileStorageService fileStorageService;
 
-    // @Override
-    // public MessageDto saveMessage(ChatMessageDto dto) {
+        @Autowired
+        FileRepository fileRepository;
 
-    // Consultation consultation =
-    // consultationRepository.findById(dto.getConsultationId())
-    // .orElseThrow(() -> new RuntimeException("Consultation not found"));
+        @Autowired
+        ConsultationRepository consultationRepository;
 
-    // User sender = userRepository.findById(dto.getSenderId())
-    // .orElseThrow(() -> new RuntimeException("Sender not found"));
+        // @Override
+        // public MessageDto saveMessage(ChatMessageDto dto) {
 
-    // Message message = new Message();
-    // message.setConsultation(consultation);
-    // message.setSender(sender);
-    // message.setContent(dto.getContent());
-    // message.setMessageType(dto.getMessageType());
+        // Consultation consultation =
+        // consultationRepository.findById(dto.getConsultationId())
+        // .orElseThrow(() -> new RuntimeException("Consultation not found"));
 
-    // repository.save(message);
+        // User sender = userRepository.findById(dto.getSenderId())
+        // .orElseThrow(() -> new RuntimeException("Sender not found"));
 
-    // return MessageDto.fromMessageDto(message);
-    // // return null;
-    // }
+        // Message message = new Message();
+        // message.setConsultation(consultation);
+        // message.setSender(sender);
+        // message.setContent(dto.getContent());
+        // message.setMessageType(dto.getMessageType());
 
-    @Override
-    public ChatMessageDto process(
-            ChatMessageDto request,
-            Principal principal) {
-        User sender = userRepository
-                .findByEmail(principal.getName())
-                .orElseThrow(
-                        () -> new RuntimeException(
-                                "Sender not found"));
+        // repository.save(message);
 
-        Consultation consultation = consultationRepository
-                .findById(request.getConsultationId())
-                .orElseThrow(() -> new RuntimeException(
-                        "Consultation not found"));
+        // return MessageDto.fromMessageDto(message);
+        // // return null;
+        // }
 
-        Message message = new Message();
-        message.setConsultation(consultation);
-        message.setSender(sender);
-        message.setContent(request.getContent());
-        message.setFileUrl(request.getFileUrl());
-        message.setMessageType(
-                request.getMessageType() != null
-                        ? request.getMessageType()
-                        : MessageType.TEXT);
+        // @Override
+        // public ChatMessageDto process(
+        // ChatMessageDto request,
+        // Principal principal) {
+        // User sender = userRepository
+        // .findByEmail(principal.getName())
+        // .orElseThrow(
+        // () -> new RuntimeException(
+        // "Sender not found"));
 
-        Message saved = messageRepository.save(message);
+        // Consultation consultation = consultationRepository
+        // .findById(request.getConsultationId())
+        // .orElseThrow(() -> new RuntimeException(
+        // "Consultation not found"));
 
-        return ChatMessageDto.fromEntity(saved);
-    }
+        // Message message = new Message();
+        // message.setConsultation(consultation);
+        // message.setSender(sender);
+        // message.setContent(request.getContent());
+        // message.setFileUrl(request.getFileUrl());
+        // message.setMessageType(
+        // request.getMessageType() != null
+        // ? request.getMessageType()
+        // : MessageType.TEXT);
 
-    @Override
-    public List<ChatMessageDto> loadConsultMessages(UUID consultationId) {
+        // Message saved = messageRepository.save(message);
 
-        return messageRepository
-                .findMessagesByConsultation_ConsultationIdOrderByCreatedAtAsc(consultationId)
-                .stream()
-                .map(ChatMessageDto::fromEntity)
-                .toList();
-    }
+        // return ChatMessageDto.fromEntity(saved);
+        // }
 
-    @Override
-    @Transactional
-    public void markConsultationRead(UUID consultationId, CustomUserPrincipal authUser) {
+        @Override
+        public List<ChatMessageDto> loadConsultMessages(UUID consultationId) {
 
-        messageRepository.markConsultationMessagesAsRead(
-                consultationId,
-                authUser.getUserId());
-        // messageRepository.save(message);
-    }
+                return messageRepository
+                                .findMessagesByConsultation_ConsultationIdOrderByCreatedAtAsc(consultationId)
+                                .stream()
+                                .map(ChatMessageDto::fromEntity)
+                                .toList();
+        }
 
-    public void markAsRead(UUID messageId) {
+        @Override
+        @Transactional
+        public void markConsultationRead(UUID consultationId, CustomUserPrincipal authUser) {
 
-        Message message = messageRepository.findById(messageId).orElseThrow();
-        message.setRead(true);
-        message.setReadAt(LocalDateTime.now());
-        messageRepository.save(message);
-    }
+                messageRepository.markConsultationMessagesAsRead(
+                                consultationId,
+                                authUser.getUserId());
+                // messageRepository.save(message);
+        }
 
-    @Override
-    public Long unreadCount(UUID userId) {
+        public void markAsRead(UUID messageId) {
 
-        return messageRepository.unreadCount(userId);
-    }
+                Message message = messageRepository.findById(messageId).orElseThrow();
+                message.setRead(true);
+                message.setReadAt(LocalDateTime.now());
+                messageRepository.save(message);
+        }
 
-    @Override
-    public ChatMessageDto saveConsultMessage(ChatMessageDto dto, CustomUserPrincipal authUser) {
-        Consultation consultation = consultationRepository.findById(dto.getConsultationId())
-                .orElseThrow();
+        @Override
+        public Long unreadCount(UUID userId) {
 
-        User sender = userRepository.findById(authUser.getUserId())
-                .orElseThrow();
+                return messageRepository.unreadCount(userId);
+        }
 
-        Message message = new Message();
-        message.setConsultation(consultation);
-        message.setSender(sender);
-        message.setContent(dto.getContent());
-        message.setRead(false);
-        message.setMessageType(MessageType.TEXT);
-        Message saved = messageRepository.save(message);
+        @Override
+        public ChatMessageDto saveConsultMessage(ChatMessageDto dto, CustomUserPrincipal authUser) {
+                Consultation consultation = consultationRepository.findById(dto.getConsultationId())
+                                .orElseThrow();
 
-        return ChatMessageDto.fromEntity(saved);
+                User sender = userRepository.findById(authUser.getUserId())
+                                .orElseThrow();
 
-    }
+                Message message = new Message();
+
+                message.setConsultation(consultation);
+                message.setSender(sender);
+
+                message.setContent(dto.getContent());
+
+                message.setRead(false);
+                message.setMessageType(
+                                dto.getMessageType() != null
+                                                ? dto.getMessageType()
+                                                : MessageType.TEXT);
+
+                message.setFileUrl(dto.getFileUrl());
+                message.setFileName(dto.getFileName());
+                message.setFileSizeBytes(dto.getFileSizeBytes());
+                message.setFileMimeType(dto.getFileMimeType());
+
+                Message saved = messageRepository.save(message);
+
+                return ChatMessageDto.fromEntity(saved);
+
+        }
+
+        @Override
+        public FileUploadResponseDto storeFile(
+                        MultipartFile file,
+                        UUID consultationId,
+                        CustomUserPrincipal authUser) {
+                Consultation consultation = consultationRepository
+                                .findById(consultationId)
+                                .orElseThrow();
+
+                Patient patient = consultation.getPatient();
+
+                String url;
+                try {
+                        url = fileStorageService.storeFile(file);
+                } catch (IOException e) {
+                        url = null;
+                }
+                User user = authUser.getUser();
+
+                File dbFile = new File();
+
+                dbFile.setUploadedBy(user);
+                dbFile.setPatient(patient);
+                dbFile.setFileName(file.getOriginalFilename());
+                dbFile.setFileUrl(url);
+                dbFile.setMimeType(file.getContentType());
+                dbFile.setFileSizeBytes(file.getSize());
+
+                File saved = fileRepository.save(dbFile);
+
+                return FileUploadResponseDto.fromEntity(saved);
+
+        }
 
 }
