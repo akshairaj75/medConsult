@@ -13,12 +13,14 @@ import com.backend.medconsult.dto.caseRoomDto.CreateCaseRoomDto;
 import com.backend.medconsult.entity.caseDiscussion.CaseDiscussion;
 import com.backend.medconsult.entity.caseDiscussion.CaseRoom;
 import com.backend.medconsult.entity.caseDiscussion.CaseRoomMember;
+import com.backend.medconsult.entity.consultations.Consultation;
 import com.backend.medconsult.entity.people.Doctor;
 import com.backend.medconsult.entity.people.Patient;
 import com.backend.medconsult.enums.CaseMemberRole;
 import com.backend.medconsult.repository.CaseDiscussionRepository;
 import com.backend.medconsult.repository.CaseRoomMemberRepository;
 import com.backend.medconsult.repository.CaseRoomRepository;
+import com.backend.medconsult.repository.ConsultationRepository;
 import com.backend.medconsult.repository.DoctorRepository;
 import com.backend.medconsult.repository.PatientRepository;
 import com.backend.medconsult.security.CustomUserPrincipal;
@@ -32,6 +34,9 @@ public class CaseDiscussionServiceImpl implements CaseDiscussionService {
 
     @Autowired
     CaseRoomRepository caseRoomRepository;
+
+    @Autowired
+    ConsultationRepository consultationRepository;
 
     @Autowired
     CaseRoomMemberRepository caseRoomMemberRepository;
@@ -88,6 +93,13 @@ public class CaseDiscussionServiceImpl implements CaseDiscussionService {
         room.setCaseCode("CASE-" + System.currentTimeMillis());
         caseRoomRepository.save(room);
 
+        Consultation consultation = consultationRepository
+                .findById(dto.getConsultationId())
+                .orElseThrow(() -> new RuntimeException("Consultation not found"));
+
+        consultation.setCaseRoom(room);
+        consultationRepository.save(consultation);
+
         // creator member
         CaseRoomMember creatorMember = new CaseRoomMember();
 
@@ -137,10 +149,19 @@ public class CaseDiscussionServiceImpl implements CaseDiscussionService {
 
         Doctor doc = doctorRepository.findById(doctorId)
                 .orElseThrow();
-
         List<CaseRoomDto> response = caseRoomRepository.findByMembers_Doctor(doc)
-                .stream().map(CaseRoomDto::fromEntity)
+                .stream()
+                .map(caseRoom -> {
+                    CaseRoomDto dto = CaseRoomDto.fromEntity(caseRoom);
+
+                    consultationRepository
+                            .findByCaseRoom(caseRoom)
+                            .ifPresent(c -> dto.setConsultationId(c.getConsultationId()));
+
+                    return dto;
+                })
                 .toList();
+
         return response;
     }
 

@@ -11,6 +11,7 @@ public class CreateCaseRoomDto {
     private String description;
     private List<CaseRoomMemberDto> roomMembers;
     private List<UUID> doctorIds;
+    private UUID consultationId;
 
     public UUID getPatientId() {
         return patientId;
@@ -59,5 +60,14 @@ public class CreateCaseRoomDto {
     public void setRoomMembers(List<CaseRoomMemberDto> roomMembers) {
         this.roomMembers = roomMembers;
     }
+
+    public UUID getConsultationId() {
+        return consultationId;
+    }
+
+    public void setConsultationId(UUID consultationId) {
+        this.consultationId = consultationId;
+    }
+
 
 }

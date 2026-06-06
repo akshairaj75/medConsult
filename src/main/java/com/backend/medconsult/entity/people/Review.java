@@ -10,6 +10,7 @@ import org.hibernate.type.SqlTypes;
 
 import com.backend.medconsult.entity.consultations.Consultation;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -53,7 +54,7 @@ public class Review {
     private Patient patient;
 
     // FK → consultations(consultation_id) UNIQUE
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "consultation_id", nullable = false, unique = true)
     private Consultation consultation;
 

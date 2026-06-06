@@ -96,7 +96,7 @@ public class CaseRoom {
         @OneToMany(mappedBy = "caseRoom", cascade = CascadeType.ALL, orphanRemoval = true)
         private List<CaseRoomMember> members = new ArrayList<>();;
 
-        @OneToMany(mappedBy = "caseRoom")
+        @OneToMany(mappedBy = "caseRoom", cascade = CascadeType.ALL, orphanRemoval = true)
         private List<CaseDiscussion> discussions;
 
         @ManyToMany

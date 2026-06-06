@@ -10,6 +10,7 @@ import org.hibernate.type.SqlTypes;
 
 import com.backend.medconsult.entity.auth.User;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -35,7 +36,7 @@ public class PrivacySettings {
     private UUID privacyId;
 
     // FK → users(user_id) UNIQUE (1:1)
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
 

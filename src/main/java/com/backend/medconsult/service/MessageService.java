@@ -1,6 +1,4 @@
 package com.backend.medconsult.service;
-
-import java.security.Principal;
 import java.util.List;
 import java.util.UUID;
 
@@ -28,5 +26,7 @@ public interface MessageService {
     void markAsRead(UUID messageId);
 
     FileUploadResponseDto storeFile(MultipartFile file,UUID consultationId, CustomUserPrincipal authUser);
+
+    FileUploadResponseDto storeCaseFile(MultipartFile file, UUID caseRoomId, CustomUserPrincipal authUser);
 
 }

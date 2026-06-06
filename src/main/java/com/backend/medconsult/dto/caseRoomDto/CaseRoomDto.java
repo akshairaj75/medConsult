@@ -13,6 +13,7 @@ import com.backend.medconsult.enums.Priority;
 public class CaseRoomDto {
 
     private UUID caseId;
+    private UUID consultationId;
     private String caseCode;
     private PatientDto patient;
     private DoctorDto createdBy;
@@ -34,6 +35,14 @@ public class CaseRoomDto {
         this.caseId = caseId;
     }
 
+    public UUID getConsultationId() {
+        return consultationId;
+    }
+
+    public void setConsultationId(UUID consultationId) {
+        this.consultationId = consultationId;
+    }
+
     public String getCaseCode() {
         return caseCode;
     }
@@ -42,15 +51,13 @@ public class CaseRoomDto {
         this.caseCode = caseCode;
     }
 
-        public PatientDto getPatient() {
+    public PatientDto getPatient() {
         return patient;
     }
 
     public void setPatient(PatientDto patient) {
         this.patient = patient;
     }
-
-
 
     public DoctorDto getCreatedBy() {
         return createdBy;

@@ -110,17 +110,7 @@ public class DoctorController {
                 .status(HttpStatus.CREATED)
                 .body(createdSchedules);
     }
-    // @PostMapping("/add-schedules")
-    // public ResponseEntity<DoctorScheduleDto>
-    // addDoctorSchedule(@AuthenticationPrincipal CustomUserPrincipal authUser,
-    // @RequestBody DoctorScheduleDto scheduleDto) {
-    // DoctorScheduleDto createdSchedule = doctorService.addDoctorSchedule(authUser,
-    // scheduleDto);
-    // if (createdSchedule == null) {
-    // return ResponseEntity.notFound().build();
-    // }
-    // return ResponseEntity.status(HttpStatus.CREATED).body(createdSchedule);
-    // }
+
 
     @PostMapping("/{doctorId}/book_appointment")
     public ResponseEntity<BookAppointmentDto> bookAppointment(
@@ -181,5 +171,13 @@ public class DoctorController {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(updatedAppointment);
+    }
+
+    @DeleteMapping("/appointments/{appointmentId}")
+    public ResponseEntity<String> deleteAppointment(
+            @PathVariable UUID appointmentId,
+            @AuthenticationPrincipal CustomUserPrincipal authUser) {
+        String response = doctorService.deleteAppointment(appointmentId, authUser);
+        return ResponseEntity.ok(response);
     }
 }

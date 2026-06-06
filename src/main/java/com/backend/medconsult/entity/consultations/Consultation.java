@@ -82,7 +82,7 @@ public class Consultation {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "consultation")
+    @OneToMany(mappedBy = "consultation", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Message> messages;
 
     @ManyToOne(fetch = FetchType.LAZY)

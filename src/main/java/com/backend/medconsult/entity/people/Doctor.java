@@ -53,7 +53,7 @@ public class Doctor {
     private UUID doctorId;
 
     // FK → users(user_id)
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
@@ -113,31 +113,31 @@ public class Doctor {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "doctor")
+    @OneToMany(mappedBy = "doctor", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Review> reviews;
 
-    @OneToMany(mappedBy = "doctor")
+    @OneToMany(mappedBy = "doctor", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Consultation> consultations;
 
     @ManyToMany(mappedBy = "doctors")
     private List<CaseRoom> caseRooms;
 
-    @OneToMany(mappedBy = "doctor")
+    @OneToMany(mappedBy = "doctor", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CaseRoomMember> caseMemberships;
 
-    @OneToMany(mappedBy = "orderedBy")
+    @OneToMany(mappedBy = "orderedBy", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<LabResult> orderedLabs;
 
-    @OneToMany(mappedBy = "reviewedBy")
+    @OneToMany(mappedBy = "reviewedBy", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<LabResult> reviewedLabs;
 
-    @OneToMany(mappedBy = "doctor")
+    @OneToMany(mappedBy = "doctor", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Prescription> prescriptions;
 
     @OneToMany(mappedBy = "doctor", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DoctorSchedule> schedules;
 
-    @OneToMany(mappedBy = "doctor")
+    @OneToMany(mappedBy = "doctor", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Appointment> appointments;
 
     public UUID getDoctorId() {

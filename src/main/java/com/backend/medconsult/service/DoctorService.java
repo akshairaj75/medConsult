@@ -50,6 +50,8 @@ public interface DoctorService {
 
     public List<AppointmentDto> getAllDoctorAppointments(CustomUserPrincipal authUser);
 
+    public String deleteAppointment(UUID appointmentId, CustomUserPrincipal authUser);
+
 //     public List<BookedSlotDto> getBookedSlots(UUID doctorId, LocalDate date, CustomUserPrincipal authUser);
 
 }

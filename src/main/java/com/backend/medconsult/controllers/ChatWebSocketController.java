@@ -23,12 +23,10 @@ import org.springframework.web.multipart.MultipartFile;
 import com.backend.medconsult.dto.caseRoomDto.CaseDiscussionMessageDto;
 import com.backend.medconsult.dto.caseRoomDto.CaseDiscussionResponseDto;
 import com.backend.medconsult.dto.chatDto.ChatMessageDto;
-import com.backend.medconsult.dto.clinicalDataDto.FileUploadRequestDto;
 import com.backend.medconsult.dto.clinicalDataDto.FileUploadResponseDto;
 import com.backend.medconsult.security.CustomUserPrincipal;
 import com.backend.medconsult.service.CaseDiscussionService;
 import com.backend.medconsult.service.MessageService;
-import com.backend.medconsult.service.impl.FileStorageService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -44,11 +42,11 @@ public class ChatWebSocketController {
 
     @MessageMapping("/chat.send")
     public void sendConsultMessage(ChatMessageDto dto, Principal principal) {
-        
+
         UsernamePasswordAuthenticationToken auth = (UsernamePasswordAuthenticationToken) principal;
-        
+
         CustomUserPrincipal authUser = (CustomUserPrincipal) auth.getPrincipal();
-        
+
         ChatMessageDto saved = messageService.saveConsultMessage(dto, authUser);
 
         messagingTemplate.convertAndSend("/topic/chat/" + dto.getConsultationId(), saved);
@@ -91,8 +89,8 @@ public class ChatWebSocketController {
     public ResponseEntity<FileUploadResponseDto> upload(
             @RequestParam("file") MultipartFile file,
             @RequestParam UUID consultationId,
-            @AuthenticationPrincipal CustomUserPrincipal authUser) 
-            throws IOException{
+            @AuthenticationPrincipal CustomUserPrincipal authUser)
+            throws IOException {
 
         FileUploadResponseDto dto = messageService.storeFile(file, consultationId, authUser);
         // String url = fileStorageService.storeFile(file);
@@ -101,6 +99,7 @@ public class ChatWebSocketController {
     }
 
     // CASE ROOM DISCUSSIONS
+    // =========================
     @MessageMapping("/case-chat.send")
     public void sendCaseRoomMessage(CaseDiscussionMessageDto dto, Principal principal) {
 
@@ -109,6 +108,19 @@ public class ChatWebSocketController {
         CaseDiscussionResponseDto response = caseDiscussionService.sendCaseRoomMessage(dto, authUser);
 
         messagingTemplate.convertAndSend("/topic/case-room/" + dto.getCaseId(), response);
+    }
+
+    @PostMapping("/case/upload")
+    public ResponseEntity<FileUploadResponseDto> caseFileUpload(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam UUID caseRoomId,
+            @AuthenticationPrincipal CustomUserPrincipal authUser)
+            throws IOException {
+
+        FileUploadResponseDto dto = messageService.storeCaseFile(file, caseRoomId, authUser);
+        // String url = fileStorageService.storeFile(file);
+
+        return ResponseEntity.ok(dto);
     }
 
 }

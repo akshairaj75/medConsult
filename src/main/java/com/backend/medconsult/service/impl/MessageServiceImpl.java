@@ -1,7 +1,6 @@
 package com.backend.medconsult.service.impl;
 
 import java.io.IOException;
-import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -12,11 +11,13 @@ import org.springframework.stereotype.Service;
 import com.backend.medconsult.dto.chatDto.ChatMessageDto;
 import com.backend.medconsult.dto.clinicalDataDto.FileUploadResponseDto;
 import com.backend.medconsult.entity.auth.User;
+import com.backend.medconsult.entity.caseDiscussion.CaseRoom;
 import com.backend.medconsult.entity.clinicalData.File;
 import com.backend.medconsult.entity.consultations.Consultation;
 import com.backend.medconsult.entity.consultations.Message;
 import com.backend.medconsult.entity.people.Patient;
 import com.backend.medconsult.enums.MessageType;
+import com.backend.medconsult.repository.CaseRoomRepository;
 import com.backend.medconsult.repository.ConsultationRepository;
 import com.backend.medconsult.repository.FileRepository;
 import com.backend.medconsult.repository.MessageRepository;
@@ -44,57 +45,9 @@ public class MessageServiceImpl implements MessageService {
         @Autowired
         ConsultationRepository consultationRepository;
 
-        // @Override
-        // public MessageDto saveMessage(ChatMessageDto dto) {
+        @Autowired
+        CaseRoomRepository caseRoomRepository;
 
-        // Consultation consultation =
-        // consultationRepository.findById(dto.getConsultationId())
-        // .orElseThrow(() -> new RuntimeException("Consultation not found"));
-
-        // User sender = userRepository.findById(dto.getSenderId())
-        // .orElseThrow(() -> new RuntimeException("Sender not found"));
-
-        // Message message = new Message();
-        // message.setConsultation(consultation);
-        // message.setSender(sender);
-        // message.setContent(dto.getContent());
-        // message.setMessageType(dto.getMessageType());
-
-        // repository.save(message);
-
-        // return MessageDto.fromMessageDto(message);
-        // // return null;
-        // }
-
-        // @Override
-        // public ChatMessageDto process(
-        // ChatMessageDto request,
-        // Principal principal) {
-        // User sender = userRepository
-        // .findByEmail(principal.getName())
-        // .orElseThrow(
-        // () -> new RuntimeException(
-        // "Sender not found"));
-
-        // Consultation consultation = consultationRepository
-        // .findById(request.getConsultationId())
-        // .orElseThrow(() -> new RuntimeException(
-        // "Consultation not found"));
-
-        // Message message = new Message();
-        // message.setConsultation(consultation);
-        // message.setSender(sender);
-        // message.setContent(request.getContent());
-        // message.setFileUrl(request.getFileUrl());
-        // message.setMessageType(
-        // request.getMessageType() != null
-        // ? request.getMessageType()
-        // : MessageType.TEXT);
-
-        // Message saved = messageRepository.save(message);
-
-        // return ChatMessageDto.fromEntity(saved);
-        // }
 
         @Override
         public List<ChatMessageDto> loadConsultMessages(UUID consultationId) {
@@ -187,6 +140,7 @@ public class MessageServiceImpl implements MessageService {
                 dbFile.setPatient(patient);
                 dbFile.setFileName(file.getOriginalFilename());
                 dbFile.setFileUrl(url);
+                dbFile.setConsultation(consultation);
                 dbFile.setMimeType(file.getContentType());
                 dbFile.setFileSizeBytes(file.getSize());
 
@@ -194,6 +148,39 @@ public class MessageServiceImpl implements MessageService {
 
                 return FileUploadResponseDto.fromEntity(saved);
 
+        }
+
+        @Override
+        public FileUploadResponseDto storeCaseFile(MultipartFile file, UUID caseRoomId,
+                        CustomUserPrincipal authUser) {
+                CaseRoom caseRoom = caseRoomRepository
+                                .findById(caseRoomId)
+                                .orElseThrow();
+
+                Patient patient = caseRoom.getPatient();
+
+                String url;
+                try {
+                        url = fileStorageService.storeFile(file);
+                } catch (IOException e) {
+                        url = null;
+                }
+                User user = authUser.getUser();
+
+                File dbFile = new File();
+
+                dbFile.setUploadedBy(user);
+                dbFile.setPatient(patient);
+                dbFile.setFileName(file.getOriginalFilename());
+                dbFile.setFileUrl(url);
+                dbFile.setCaseRoom(caseRoom);
+                ;
+                dbFile.setMimeType(file.getContentType());
+                dbFile.setFileSizeBytes(file.getSize());
+
+                File saved = fileRepository.save(dbFile);
+
+                return FileUploadResponseDto.fromEntity(saved);
         }
 
 }

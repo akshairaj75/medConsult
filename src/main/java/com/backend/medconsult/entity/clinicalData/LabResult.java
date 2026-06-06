@@ -91,7 +91,7 @@ public class LabResult {
     @OrderBy("sortOrder ASC")
     private List<LabItem> items = new ArrayList<>();;
 
-    @OneToMany(mappedBy = "labResult")
+    @OneToMany(mappedBy = "labResult", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<File> files;
 
     public UUID getLabResultId() {

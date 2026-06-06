@@ -16,6 +16,7 @@ import com.backend.medconsult.entity.people.DoctorSchedule;
 import com.backend.medconsult.entity.people.Patient;
 import com.backend.medconsult.enums.AppointmentStatus;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -54,7 +55,7 @@ public class Appointment {
     private Doctor doctor;
 
     // FK → consultations (optional)
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "consultation_id", unique = true)
     private Consultation consultation;
 
@@ -83,7 +84,7 @@ public class Appointment {
     @Column(name = "reminder_sent", nullable = false)
     private boolean reminderSent = false;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "schedule_id")
     private DoctorSchedule schedule;
 
