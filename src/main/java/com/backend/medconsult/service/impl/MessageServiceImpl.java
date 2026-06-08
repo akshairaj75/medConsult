@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.backend.medconsult.dto.chatDto.ChatMessageDto;
@@ -17,6 +18,7 @@ import com.backend.medconsult.entity.consultations.Consultation;
 import com.backend.medconsult.entity.consultations.Message;
 import com.backend.medconsult.entity.people.Patient;
 import com.backend.medconsult.enums.MessageType;
+import com.backend.medconsult.enums.Role;
 import com.backend.medconsult.repository.CaseRoomRepository;
 import com.backend.medconsult.repository.ConsultationRepository;
 import com.backend.medconsult.repository.FileRepository;
@@ -26,6 +28,7 @@ import com.backend.medconsult.security.CustomUserPrincipal;
 import com.backend.medconsult.service.MessageService;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class MessageServiceImpl implements MessageService {
@@ -48,9 +51,33 @@ public class MessageServiceImpl implements MessageService {
         @Autowired
         CaseRoomRepository caseRoomRepository;
 
-
         @Override
-        public List<ChatMessageDto> loadConsultMessages(UUID consultationId) {
+        public List<ChatMessageDto> loadConsultMessages(UUID consultationId, CustomUserPrincipal authUser) {
+
+                Consultation consultation = consultationRepository
+                                .findById(consultationId)
+                                .orElseThrow(() -> new RuntimeException("Consultation not found"));
+
+                User user = authUser.getUser();
+
+                if (user.getRole() == Role.DOCTOR) {
+
+                        if (user.getDoctor() == null ||
+                                        !consultation.getDoctor().getDoctorId()
+                                                        .equals(user.getDoctor().getDoctorId())) {
+
+                                throw new RuntimeException("Unauthorized");
+                        }
+
+                } else if (user.getRole() == Role.PATIENT) {
+
+                        if (user.getPatient() == null ||
+                                        !consultation.getPatient().getPatientId()
+                                                        .equals(user.getPatient().getPatientId())) {
+
+                                throw new RuntimeException("Unauthorized");
+                        }
+                }
 
                 return messageRepository
                                 .findMessagesByConsultation_ConsultationIdOrderByCreatedAtAsc(consultationId)
@@ -91,6 +118,25 @@ public class MessageServiceImpl implements MessageService {
                 User sender = userRepository.findById(authUser.getUserId())
                                 .orElseThrow();
 
+                if (sender.getRole() == Role.DOCTOR) {
+                        if (!consultation.getDoctor().getDoctorId().equals(sender.getDoctor().getDoctorId())) {
+                                throw new ResponseStatusException(
+                                                HttpStatus.FORBIDDEN,
+                                                "Unauthorized");
+
+                        }
+
+                } else if (sender.getRole() == Role.PATIENT) {
+                        if (!consultation.getPatient().getPatientId().equals(sender.getPatient().getPatientId())) {
+                                throw new ResponseStatusException(
+                                                HttpStatus.FORBIDDEN,
+                                                "Unauthorized");
+                        }
+                } else {
+                        throw new ResponseStatusException(
+                                        HttpStatus.FORBIDDEN,
+                                        "Unauthorized");
+                }
                 Message message = new Message();
 
                 message.setConsultation(consultation);
@@ -163,7 +209,7 @@ public class MessageServiceImpl implements MessageService {
                 try {
                         url = fileStorageService.storeFile(file);
                 } catch (IOException e) {
-                        url = null;
+                        throw new RuntimeException("File upload failed");
                 }
                 User user = authUser.getUser();
 
@@ -174,7 +220,6 @@ public class MessageServiceImpl implements MessageService {
                 dbFile.setFileName(file.getOriginalFilename());
                 dbFile.setFileUrl(url);
                 dbFile.setCaseRoom(caseRoom);
-                ;
                 dbFile.setMimeType(file.getContentType());
                 dbFile.setFileSizeBytes(file.getSize());
 

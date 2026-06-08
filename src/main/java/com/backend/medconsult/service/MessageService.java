@@ -16,7 +16,7 @@ public interface MessageService {
 
     // ChatMessageDto process(ChatMessageDto request, Principal principal);
 
-    List<ChatMessageDto> loadConsultMessages(UUID consultationId);
+    List<ChatMessageDto> loadConsultMessages(UUID consultationId, CustomUserPrincipal authUser);
 
     ChatMessageDto saveConsultMessage(ChatMessageDto dto, CustomUserPrincipal authUser);
 

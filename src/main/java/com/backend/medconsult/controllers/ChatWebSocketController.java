@@ -53,9 +53,11 @@ public class ChatWebSocketController {
     }
 
     @GetMapping("/{consultationId}/messages")
-    public ResponseEntity<List<ChatMessageDto>> getConsultMessages(@PathVariable UUID consultationId) {
+    public ResponseEntity<List<ChatMessageDto>> getConsultMessages(
+        @PathVariable UUID consultationId,
+        @AuthenticationPrincipal CustomUserPrincipal authUser) {
 
-        return ResponseEntity.ok(messageService.loadConsultMessages(consultationId));
+        return ResponseEntity.ok(messageService.loadConsultMessages(consultationId, authUser));
     }
 
     @GetMapping("/unread-count")
