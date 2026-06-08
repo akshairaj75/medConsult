@@ -17,6 +17,7 @@ import com.backend.medconsult.dto.caseRoomDto.CaseDiscussionResponseDto;
 import com.backend.medconsult.dto.caseRoomDto.CaseRoomDto;
 import com.backend.medconsult.dto.caseRoomDto.CreateCaseRoomDto;
 import com.backend.medconsult.dto.chatDto.ChatConsultationDto;
+import com.backend.medconsult.dto.clinicalDataDto.FileDto;
 import com.backend.medconsult.security.CustomUserPrincipal;
 import com.backend.medconsult.service.CaseDiscussionService;
 import com.backend.medconsult.service.ConsultationService;
@@ -47,17 +48,23 @@ public class ConsultationChatController {
 
     @PostMapping("/create")
     public ResponseEntity<CaseRoomDto> createRoom(@RequestBody CreateCaseRoomDto dto,
-                                                  @AuthenticationPrincipal CustomUserPrincipal authUser) {
+            @AuthenticationPrincipal CustomUserPrincipal authUser) {
 
         return ResponseEntity.ok(caseDiscussionService.createRoom(dto, authUser));
     }
 
     @GetMapping("/caserooms")
     public ResponseEntity<List<CaseRoomDto>> getCases(
-        @AuthenticationPrincipal CustomUserPrincipal authUser
-    ){
+            @AuthenticationPrincipal CustomUserPrincipal authUser) {
         List<CaseRoomDto> dto = caseDiscussionService.getCases(authUser);
         return ResponseEntity.ok(dto);
+
+    }
+
+    @GetMapping("/caseroom/files/{caseId}")
+    public ResponseEntity<List<FileDto>> getCaseFiles(@PathVariable UUID caseId) {
+        List<FileDto> files = caseDiscussionService.getCaseFiles(caseId);
+        return ResponseEntity.ok(files);
 
     }
 

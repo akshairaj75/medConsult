@@ -12,6 +12,11 @@ public class FileUploadResponseDto {
     private Long fileSizeBytes;
     private String mimeType;
 
+    private UUID caseId;
+    private UUID consultationId;
+
+
+
     public UUID getFileId() {
         return fileId;
     }
@@ -51,6 +56,22 @@ public class FileUploadResponseDto {
     public void setMimeType(String mimeType) {
         this.mimeType = mimeType;
     }
+        public UUID getCaseId() {
+        return caseId;
+    }
+
+    public void setCaseId(UUID caseId) {
+        this.caseId = caseId;
+    }
+
+    public UUID getConsultationId() {
+        return consultationId;
+    }
+
+    public void setConsultationId(UUID consultationId) {
+        this.consultationId = consultationId;
+    }
+
 
     public static FileUploadResponseDto fromEntity(File file){
         FileUploadResponseDto dto = new FileUploadResponseDto();
@@ -59,6 +80,12 @@ public class FileUploadResponseDto {
         dto.setFileSizeBytes(file.getFileSizeBytes());
         dto.setFileUrl(file.getFileUrl());
         dto.setMimeType(file.getMimeType());
+        if (file.getCaseRoom() != null) {
+            dto.setCaseId(file.getCaseRoom().getCaseId());
+        }
+        if (file.getConsultation() != null) {
+            dto.setConsultationId(file.getConsultation().getConsultationId());
+        }
         return dto;
 
     }

@@ -23,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.backend.medconsult.dto.caseRoomDto.CaseDiscussionMessageDto;
 import com.backend.medconsult.dto.caseRoomDto.CaseDiscussionResponseDto;
 import com.backend.medconsult.dto.chatDto.ChatMessageDto;
+import com.backend.medconsult.dto.clinicalDataDto.FileDto;
 import com.backend.medconsult.dto.clinicalDataDto.FileUploadResponseDto;
 import com.backend.medconsult.security.CustomUserPrincipal;
 import com.backend.medconsult.service.CaseDiscussionService;
@@ -115,14 +116,16 @@ public class ChatWebSocketController {
     @PostMapping("/case/upload")
     public ResponseEntity<FileUploadResponseDto> caseFileUpload(
             @RequestParam("file") MultipartFile file,
-            @RequestParam UUID caseRoomId,
+            @RequestParam UUID caseId,
             @AuthenticationPrincipal CustomUserPrincipal authUser)
             throws IOException {
 
-        FileUploadResponseDto dto = messageService.storeCaseFile(file, caseRoomId, authUser);
+        FileUploadResponseDto dto = caseDiscussionService.storeCaseFile(file, caseId, authUser);
         // String url = fileStorageService.storeFile(file);
 
         return ResponseEntity.ok(dto);
     }
+
+
 
 }

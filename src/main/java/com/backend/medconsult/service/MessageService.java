@@ -27,6 +27,5 @@ public interface MessageService {
 
     FileUploadResponseDto storeFile(MultipartFile file,UUID consultationId, CustomUserPrincipal authUser);
 
-    FileUploadResponseDto storeCaseFile(MultipartFile file, UUID caseRoomId, CustomUserPrincipal authUser);
 
 }

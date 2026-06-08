@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import com.backend.medconsult.dto.chatDto.ChatMessageDto;
 import com.backend.medconsult.dto.clinicalDataDto.FileUploadResponseDto;
 import com.backend.medconsult.entity.auth.User;
-import com.backend.medconsult.entity.caseDiscussion.CaseRoom;
 import com.backend.medconsult.entity.clinicalData.File;
 import com.backend.medconsult.entity.consultations.Consultation;
 import com.backend.medconsult.entity.consultations.Message;
@@ -196,36 +195,6 @@ public class MessageServiceImpl implements MessageService {
 
         }
 
-        @Override
-        public FileUploadResponseDto storeCaseFile(MultipartFile file, UUID caseRoomId,
-                        CustomUserPrincipal authUser) {
-                CaseRoom caseRoom = caseRoomRepository
-                                .findById(caseRoomId)
-                                .orElseThrow();
 
-                Patient patient = caseRoom.getPatient();
-
-                String url;
-                try {
-                        url = fileStorageService.storeFile(file);
-                } catch (IOException e) {
-                        throw new RuntimeException("File upload failed");
-                }
-                User user = authUser.getUser();
-
-                File dbFile = new File();
-
-                dbFile.setUploadedBy(user);
-                dbFile.setPatient(patient);
-                dbFile.setFileName(file.getOriginalFilename());
-                dbFile.setFileUrl(url);
-                dbFile.setCaseRoom(caseRoom);
-                dbFile.setMimeType(file.getContentType());
-                dbFile.setFileSizeBytes(file.getSize());
-
-                File saved = fileRepository.save(dbFile);
-
-                return FileUploadResponseDto.fromEntity(saved);
-        }
 
 }

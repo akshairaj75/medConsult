@@ -1,18 +1,24 @@
 package com.backend.medconsult.service.impl;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.backend.medconsult.dto.caseRoomDto.CaseDiscussionMessageDto;
 import com.backend.medconsult.dto.caseRoomDto.CaseDiscussionResponseDto;
 import com.backend.medconsult.dto.caseRoomDto.CaseRoomDto;
 import com.backend.medconsult.dto.caseRoomDto.CreateCaseRoomDto;
+import com.backend.medconsult.dto.clinicalDataDto.FileDto;
+import com.backend.medconsult.dto.clinicalDataDto.FileUploadResponseDto;
+import com.backend.medconsult.entity.auth.User;
 import com.backend.medconsult.entity.caseDiscussion.CaseDiscussion;
 import com.backend.medconsult.entity.caseDiscussion.CaseRoom;
 import com.backend.medconsult.entity.caseDiscussion.CaseRoomMember;
+import com.backend.medconsult.entity.clinicalData.File;
 import com.backend.medconsult.entity.consultations.Consultation;
 import com.backend.medconsult.entity.people.Doctor;
 import com.backend.medconsult.entity.people.Patient;
@@ -22,6 +28,7 @@ import com.backend.medconsult.repository.CaseRoomMemberRepository;
 import com.backend.medconsult.repository.CaseRoomRepository;
 import com.backend.medconsult.repository.ConsultationRepository;
 import com.backend.medconsult.repository.DoctorRepository;
+import com.backend.medconsult.repository.FileRepository;
 import com.backend.medconsult.repository.PatientRepository;
 import com.backend.medconsult.security.CustomUserPrincipal;
 import com.backend.medconsult.service.CaseDiscussionService;
@@ -47,6 +54,11 @@ public class CaseDiscussionServiceImpl implements CaseDiscussionService {
     @Autowired
     DoctorRepository doctorRepository;
 
+    @Autowired
+    FileStorageService fileStorageService;
+    @Autowired
+    FileRepository fileRepository;
+
     @Override
     public CaseDiscussionResponseDto sendCaseRoomMessage(CaseDiscussionMessageDto dto, CustomUserPrincipal authUser) {
 
@@ -71,8 +83,11 @@ public class CaseDiscussionServiceImpl implements CaseDiscussionService {
     @Override
     public List<CaseDiscussionResponseDto> loadCaseRoomMessages(UUID caseId) {
 
-        return caseDiscussionRepository.findByCaseRoom_CaseIdOrderByCreatedAtAsc(caseId).stream()
+        List<CaseDiscussionResponseDto> dto = caseDiscussionRepository.findByCaseRoom_CaseIdOrderByCreatedAtAsc(caseId)
+                .stream()
                 .map(CaseDiscussionResponseDto::fromEntity).toList();
+
+        return dto;
     }
 
     @Override
@@ -163,6 +178,49 @@ public class CaseDiscussionServiceImpl implements CaseDiscussionService {
                 .toList();
 
         return response;
+    }
+
+    @Override
+    public FileUploadResponseDto storeCaseFile(MultipartFile file, UUID caseRoomId,
+            CustomUserPrincipal authUser) {
+        CaseRoom caseRoom = caseRoomRepository
+                .findById(caseRoomId)
+                .orElseThrow();
+
+        Patient patient = caseRoom.getPatient();
+
+        String url;
+        try {
+            url = fileStorageService.storeFile(file);
+        } catch (IOException e) {
+            throw new RuntimeException("File upload failed");
+        }
+        User user = authUser.getUser();
+
+        File dbFile = new File();
+
+        dbFile.setUploadedBy(user);
+        dbFile.setPatient(patient);
+        dbFile.setFileName(file.getOriginalFilename());
+        dbFile.setFileUrl(url);
+        dbFile.setCaseRoom(caseRoom);
+        dbFile.setMimeType(file.getContentType());
+        dbFile.setFileSizeBytes(file.getSize());
+
+        File saved = fileRepository.save(dbFile);
+
+        return FileUploadResponseDto.fromEntity(saved);
+    }
+
+    @Override
+    public List<FileDto> getCaseFiles(UUID caseId) {
+        List<File> files = fileRepository
+                .findByCaseRoom_CaseIdOrderByCreatedAtAsc(caseId);
+
+        return files.stream()
+                .map(FileDto::fromEntity)
+                .toList();
+
     }
 
 }
